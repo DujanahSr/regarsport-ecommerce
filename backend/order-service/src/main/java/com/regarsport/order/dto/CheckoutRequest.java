@@ -10,7 +10,17 @@ public record CheckoutRequest(
     @NotBlank(message = "Shipping address cannot be blank")
     String shippingAddress,
 
+    String customerPhone,
+    String recipientName,
+    String shippingCity,
+    String shippingPostalCode,
+    String shippingNotes,
+
     @NotEmpty(message = "Checkout items cannot be empty")
     @Valid
     List<CheckoutItemRequest> items
-) {}
+) {
+    public CheckoutRequest(String shippingAddress, List<CheckoutItemRequest> items) {
+        this(shippingAddress, null, null, null, null, null, items);
+    }
+}

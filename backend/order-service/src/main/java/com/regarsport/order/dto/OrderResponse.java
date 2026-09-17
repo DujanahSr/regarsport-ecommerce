@@ -12,8 +12,13 @@ public record OrderResponse(
     Long userId,
     String customerName,
     String customerEmail,
+    String customerPhone,
+    String recipientName,
     BigDecimal totalAmount,
     String shippingAddress,
+    String shippingCity,
+    String shippingPostalCode,
+    String shippingNotes,
     String shippingCourier,
     String trackingNumber,
     OrderStatus status,
@@ -31,11 +36,31 @@ public record OrderResponse(
         String customerEmail,
         BigDecimal totalAmount,
         String shippingAddress,
+        String shippingCourier,
+        String trackingNumber,
+        OrderStatus status,
+        List<OrderItemResponse> items,
+        Instant shippedAt,
+        Instant completedAt,
+        Instant createdAt,
+        Instant updatedAt
+    ) {
+        this(id, orderNumber, userId, customerName, customerEmail, null, customerName, totalAmount, shippingAddress, null, null, null, shippingCourier, trackingNumber, status, items, shippedAt, completedAt, createdAt, updatedAt);
+    }
+
+    public OrderResponse(
+        Long id,
+        String orderNumber,
+        Long userId,
+        String customerName,
+        String customerEmail,
+        BigDecimal totalAmount,
+        String shippingAddress,
         OrderStatus status,
         List<OrderItemResponse> items,
         Instant createdAt,
         Instant updatedAt
     ) {
-        this(id, orderNumber, userId, customerName, customerEmail, totalAmount, shippingAddress, null, null, status, items, null, null, createdAt, updatedAt);
+        this(id, orderNumber, userId, customerName, customerEmail, null, customerName, totalAmount, shippingAddress, null, null, null, null, null, status, items, null, null, createdAt, updatedAt);
     }
 }

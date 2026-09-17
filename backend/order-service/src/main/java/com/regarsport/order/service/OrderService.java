@@ -56,12 +56,21 @@ public class OrderService {
         List<OrderItemEventPayload> eventItems = new ArrayList<>();
         List<Long> productIds = new ArrayList<>();
 
+        String recipient = (request.recipientName() != null && !request.recipientName().isBlank())
+                ? request.recipientName().trim()
+                : customerName;
+
         Order order = Order.builder()
                 .orderNumber(orderNumber)
                 .userId(userId)
                 .customerName(customerName)
                 .customerEmail(customerEmail)
+                .customerPhone(request.customerPhone() != null ? request.customerPhone().trim() : null)
+                .recipientName(recipient)
                 .shippingAddress(request.shippingAddress().trim())
+                .shippingCity(request.shippingCity() != null ? request.shippingCity().trim() : null)
+                .shippingPostalCode(request.shippingPostalCode() != null ? request.shippingPostalCode().trim() : null)
+                .shippingNotes(request.shippingNotes() != null ? request.shippingNotes().trim() : null)
                 .status(OrderStatus.PENDING)
                 .build();
 

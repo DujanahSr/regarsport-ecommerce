@@ -223,11 +223,16 @@ export default function Orders() {
                       </td>
                       <td className="p-6">
                         <div className="font-medium text-white">
-                          {order.customerName || order.users?.full_name || "Customer"}
+                          {order.recipientName || order.customerName || order.users?.full_name || "Customer"}
                         </div>
                         <div className="text-xs text-slate-400 mt-0.5">
-                          {order.customerEmail || order.users?.email || "-"}
+                          {order.customerPhone || order.customerEmail || order.users?.email || "-"}
                         </div>
+                        {order.shippingCity && (
+                          <div className="text-[11px] text-[#00BFA5]/80 mt-0.5">
+                            📍 {order.shippingCity}
+                          </div>
+                        )}
                       </td>
                       <td className="p-6">
                         <div className="space-y-1.5 min-w-44 max-w-xs">
@@ -359,6 +364,36 @@ export default function Orders() {
               >
                 <X size={20} />
               </button>
+            </div>
+
+            {/* Destination Preview */}
+            <div className="mb-4 p-3 rounded-2xl bg-white/5 border border-white/10 text-xs text-white/80 space-y-1">
+              <p>
+                <span className="text-white/40">Penerima:</span>{" "}
+                <strong className="text-white">
+                  {shippingOrder.recipientName || shippingOrder.customerName || "Customer"}
+                </strong>
+                {(shippingOrder.customerPhone || shippingOrder.shippingPhone) && (
+                  <span className="font-mono text-white/60 ml-1.5">
+                    ({shippingOrder.customerPhone || shippingOrder.shippingPhone})
+                  </span>
+                )}
+              </p>
+              <p className="text-white/70">
+                <span className="text-white/40">Alamat:</span>{" "}
+                {[
+                  shippingOrder.shippingAddress || shippingOrder.shipping_address,
+                  shippingOrder.shippingCity,
+                  shippingOrder.shippingPostalCode,
+                ]
+                  .filter(Boolean)
+                  .join(", ") || "Alamat tidak tercantum"}
+              </p>
+              {shippingOrder.shippingNotes && (
+                <p className="text-amber-400 bg-amber-400/10 px-2 py-1 rounded-lg border border-amber-400/20 text-[11px] mt-1">
+                  <span className="font-bold">Catatan:</span> {shippingOrder.shippingNotes}
+                </p>
+              )}
             </div>
 
             <form onSubmit={handleShipSubmit} className="space-y-4">

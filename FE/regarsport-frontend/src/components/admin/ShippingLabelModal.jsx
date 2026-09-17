@@ -78,9 +78,12 @@ export default function ShippingLabelModal({ isOpen, onClose, order }) {
   const orderNumber = order.orderNumber || `#${order.id}`;
   const trackingNo = order.trackingNumber || orderNumber;
   const courierName = (order.shippingCourier || "J&T EXPRESS").toUpperCase();
-  const customerName = order.customerName || order.users?.full_name || "Pelanggan RegarSport";
-  const customerPhone = order.customerPhone || order.shippingPhone || "0812-XXXX-XXXX";
-  const shippingAddress = order.shippingAddress || order.shipping_address || "Alamat pengiriman terdaftar pada sistem";
+  const customerName = order.recipientName || order.customerName || order.users?.full_name || "Pelanggan RegarSport";
+  const customerPhone = order.customerPhone || order.shippingPhone || "";
+  const streetAddr = order.shippingAddress || order.shipping_address || "Alamat pengiriman terdaftar pada sistem";
+  const cityPostal = [order.shippingCity, order.shippingPostalCode].filter(Boolean).join(" ");
+  const fullShippingAddress = cityPostal ? `${streetAddr}, ${cityPostal}` : streetAddr;
+  const shippingNotes = order.shippingNotes || "";
   const items = order.items || order.order_items || [];
   const totalQty = items.reduce((acc, it) => acc + (Number(it.quantity) || 1), 0);
   const estWeight = Math.max(1, Math.ceil(totalQty * 0.35)); // ~350g per sport apparel
@@ -199,10 +202,17 @@ export default function ShippingLabelModal({ isOpen, onClose, order }) {
                   Kepada (Penerima):
                 </span>
                 <p className="font-black text-xs text-black uppercase">{customerName}</p>
-                <p className="font-bold text-black font-mono text-[11px] mb-1">{customerPhone}</p>
+                {customerPhone && (
+                  <p className="font-bold text-black font-mono text-[11px] mb-1">{customerPhone}</p>
+                )}
                 <p className="text-zinc-800 leading-snug text-[10.5px]">
-                  {shippingAddress}
+                  {fullShippingAddress}
                 </p>
+                {shippingNotes && (
+                  <p className="text-[9px] text-zinc-700 italic mt-1 bg-zinc-100 p-1 rounded border border-zinc-300 leading-tight">
+                    <span className="font-bold not-italic text-black">Catatan:</span> {shippingNotes}
+                  </p>
+                )}
               </div>
 
               {/* Pengirim (4 Cols) */}

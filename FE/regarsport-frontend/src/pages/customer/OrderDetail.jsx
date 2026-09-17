@@ -459,11 +459,31 @@ export default function OrderDetail() {
               <MapPin size={16} className="text-emerald-600" />
               Alamat Pengiriman
             </h3>
-            <p className="text-sm text-slate-600 leading-relaxed">
-              {order.shippingAddress ||
-                order.shipping_address ||
-                "Alamat tidak tercantum"}
-            </p>
+            <div className="text-sm text-slate-600 leading-relaxed space-y-1">
+              <p className="font-bold text-slate-900">
+                {order.recipientName || order.customerName || "Penerima"}
+                {(order.customerPhone || order.shippingPhone) && (
+                  <span className="font-normal text-slate-500 font-mono text-xs ml-2">
+                    ({order.customerPhone || order.shippingPhone})
+                  </span>
+                )}
+              </p>
+              <p>
+                {order.shippingAddress ||
+                  order.shipping_address ||
+                  "Alamat tidak tercantum"}
+              </p>
+              {(order.shippingCity || order.shippingPostalCode) && (
+                <p className="text-slate-500 text-xs">
+                  {[order.shippingCity, order.shippingPostalCode].filter(Boolean).join(", ")}
+                </p>
+              )}
+              {order.shippingNotes && (
+                <div className="mt-2.5 p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-xs text-amber-700">
+                  <span className="font-bold">Catatan Kurir:</span> {order.shippingNotes}
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Payment Summary */}

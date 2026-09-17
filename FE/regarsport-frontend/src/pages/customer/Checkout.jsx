@@ -1,11 +1,12 @@
 /* eslint-disable react-hooks/immutability */
 import { useState } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
-import { MapPin, Package, CreditCard, ArrowLeft, ShoppingBag } from "lucide-react";
+import { MapPin, Package, CreditCard, ArrowLeft, ShoppingBag, User, Phone, Building2, FileText } from "lucide-react";
 import toast from "react-hot-toast";
 
 import api from "../../services/api";
 import { useCart } from "../../context/CartContext";
+import { useAuth } from "../../context/AuthContext";
 import { EmptyState, ScreenLoader } from "../../components/common/UiStates";
 import MidtransModal from "../../components/common/MidtransModal";
 
@@ -15,7 +16,15 @@ export default function Checkout() {
 
   const { cartItems, loadCart, setSelectedItems } = useCart();
 
-  const [address, setAddress] = useState("");
+  const { user } = useAuth();
+
+  const [recipientName, setRecipientName] = useState(user?.fullName || user?.full_name || "");
+  const [phone, setPhone] = useState("");
+  const [city, setCity] = useState("");
+  const [postalCode, setPostalCode] = useState("");
+  const [streetAddress, setStreetAddress] = useState("");
+  const [shippingNotes, setShippingNotes] = useState("");
+
   const [loading, setLoading] = useState(false);
   const [validationError, setValidationError] = useState("");
   const [createdOrder, setCreatedOrder] = useState(null);
@@ -41,8 +50,29 @@ export default function Checkout() {
         return;
       }
 
-      if (!address.trim()) {
-        setValidationError("Alamat pengiriman wajib diisi lengkap");
+      if (!recipientName.trim()) {
+        setValidationError("Nama penerima paket wajib diisi");
+        return;
+      }
+
+      const cleanPhone = phone.trim().replace(/[-\s]/g, "");
+      if (!cleanPhone || !/^08\d{8,12}$/.test(cleanPhone)) {
+        setValidationError("Nomor WhatsApp/HP wajib diawali 08 dan memiliki 10-13 digit (contoh: 081234567890)");
+        return;
+      }
+
+      if (!city.trim()) {
+        setValidationError("Kota / Kabupaten pengiriman wajib diisi");
+        return;
+      }
+
+      if (!postalCode.trim() || !/^\d{5}$/.test(postalCode.trim())) {
+        setValidationError("Kode pos wajib 5 digit angka (contoh: 57612)");
+        return;
+      }
+
+      if (!streetAddress.trim() || streetAddress.trim().length < 8) {
+        setValidationError("Alamat jalan & nomor rumah wajib diisi lengkap (minimal 8 karakter)");
         return;
       }
 
@@ -64,7 +94,12 @@ export default function Checkout() {
       }));
 
       const orderResponse = await api.post("/orders/checkout", {
-        shippingAddress: address.trim(),
+        shippingAddress: streetAddress.trim(),
+        recipientName: recipientName.trim(),
+        customerPhone: cleanPhone,
+        shippingCity: city.trim(),
+        shippingPostalCode: postalCode.trim(),
+        shippingNotes: shippingNotes.trim(),
         items,
       });
 
@@ -150,20 +185,113 @@ export default function Checkout() {
           </span>
         </div>
 
-        {/* Shipping Address Section */}
-        <div className="mt-6">
-          <h2 className="flex items-center gap-2 text-base font-bold text-slate-900">
-            <MapPin size={18} className="text-emerald-600" />
-            Alamat Pengiriman
-          </h2>
+        {/* Shipping Information Section */}
+        <div className="mt-6 space-y-4">
+          <div className="flex items-center justify-between">
+            <h2 className="flex items-center gap-2 text-base font-bold text-slate-900">
+              <MapPin size={18} className="text-emerald-600" />
+              Informasi Penerima & Alamat Pengiriman
+            </h2>
+            <span className="text-xs text-slate-400 font-medium hidden sm:inline">
+              Wajib diisi lengkap untuk resi kurir
+            </span>
+          </div>
 
-          <textarea
-            placeholder="Tulis alamat lengkap (Nama Jalan, No. Rumah, RT/RW, Kelurahan, Kecamatan, Kota, Kode Pos)..."
-            value={address}
-            onChange={(e) => setAddress(e.target.value)}
-            rows="3"
-            className="mt-3 w-full rounded-2xl border border-slate-200 bg-slate-50/70 p-4 text-sm text-slate-800 transition placeholder:text-slate-400 focus:border-emerald-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
-          />
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {/* Nama Penerima */}
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 mb-1.5 flex items-center gap-1.5">
+                <User size={13} className="text-emerald-600" />
+                Nama Lengkap Penerima <span className="text-rose-500">*</span>
+              </label>
+              <input
+                type="text"
+                placeholder="Nama penerima paket"
+                value={recipientName}
+                onChange={(e) => setRecipientName(e.target.value)}
+                className="w-full rounded-2xl border border-slate-200 bg-slate-50/70 px-4 py-3 text-sm text-slate-800 transition placeholder:text-slate-400 focus:border-emerald-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+                required
+              />
+            </div>
+
+            {/* No WhatsApp / HP */}
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 mb-1.5 flex items-center gap-1.5">
+                <Phone size={13} className="text-emerald-600" />
+                No. WhatsApp / HP Aktif <span className="text-rose-500">*</span>
+              </label>
+              <input
+                type="tel"
+                placeholder="Contoh: 081234567890"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                className="w-full rounded-2xl border border-slate-200 bg-slate-50/70 px-4 py-3 text-sm text-slate-800 transition placeholder:text-slate-400 focus:border-emerald-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 font-mono"
+                required
+              />
+            </div>
+
+            {/* Kota / Kabupaten */}
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 mb-1.5 flex items-center gap-1.5">
+                <Building2 size={13} className="text-emerald-600" />
+                Kota / Kabupaten <span className="text-rose-500">*</span>
+              </label>
+              <input
+                type="text"
+                placeholder="Contoh: Kab. Wonogiri / Kota Surakarta"
+                value={city}
+                onChange={(e) => setCity(e.target.value)}
+                className="w-full rounded-2xl border border-slate-200 bg-slate-50/70 px-4 py-3 text-sm text-slate-800 transition placeholder:text-slate-400 focus:border-emerald-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+                required
+              />
+            </div>
+
+            {/* Kode Pos */}
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                Kode Pos (5 Digit) <span className="text-rose-500">*</span>
+              </label>
+              <input
+                type="text"
+                maxLength={5}
+                placeholder="Contoh: 57612"
+                value={postalCode}
+                onChange={(e) => setPostalCode(e.target.value.replace(/\D/g, ""))}
+                className="w-full rounded-2xl border border-slate-200 bg-slate-50/70 px-4 py-3 text-sm text-slate-800 transition placeholder:text-slate-400 focus:border-emerald-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 font-mono"
+                required
+              />
+            </div>
+          </div>
+
+          {/* Alamat Jalan Lengkap */}
+          <div>
+            <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+              Alamat Lengkap & Patokan Rumah <span className="text-rose-500">*</span>
+            </label>
+            <textarea
+              placeholder="Tuliskan nama jalan, nomor rumah, RT/RW, kelurahan, kecamatan, serta patokan (misal: Rumah pagar hitam seberang masjid)..."
+              value={streetAddress}
+              onChange={(e) => setStreetAddress(e.target.value)}
+              rows="3"
+              className="w-full rounded-2xl border border-slate-200 bg-slate-50/70 p-4 text-sm text-slate-800 transition placeholder:text-slate-400 focus:border-emerald-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 resize-none"
+              required
+            />
+          </div>
+
+          {/* Catatan untuk Kurir */}
+          <div>
+            <label className="block text-xs font-semibold text-slate-700 mb-1.5 flex items-center gap-1.5">
+              <FileText size={13} className="text-slate-400" />
+              Catatan Khusus Kurir / Pengiriman (Opsional)
+            </label>
+            <input
+              type="text"
+              placeholder="Contoh: Titip satpam komplek jika rumah kosong"
+              value={shippingNotes}
+              onChange={(e) => setShippingNotes(e.target.value)}
+              className="w-full rounded-2xl border border-slate-200 bg-slate-50/70 px-4 py-2.5 text-xs sm:text-sm text-slate-800 transition placeholder:text-slate-400 focus:border-emerald-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+            />
+          </div>
         </div>
 
         {validationError ? (

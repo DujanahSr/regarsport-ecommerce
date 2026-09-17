@@ -38,8 +38,23 @@ public class Order {
     @Column(name = "total_amount", nullable = false, precision = 14, scale = 2)
     private BigDecimal totalAmount;
 
+    @Column(name = "customer_phone", length = 30)
+    private String customerPhone;
+
+    @Column(name = "recipient_name", length = 150)
+    private String recipientName;
+
     @Column(name = "shipping_address", nullable = false, columnDefinition = "TEXT")
     private String shippingAddress;
+
+    @Column(name = "shipping_city", length = 100)
+    private String shippingCity;
+
+    @Column(name = "shipping_postal_code", length = 20)
+    private String shippingPostalCode;
+
+    @Column(name = "shipping_notes", length = 255)
+    private String shippingNotes;
 
     @Column(name = "shipping_courier", length = 100)
     private String shippingCourier;
