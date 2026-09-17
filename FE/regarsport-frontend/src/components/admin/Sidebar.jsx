@@ -12,19 +12,26 @@ import {
   X
 } from "lucide-react";
 import { useState } from "react";
+import { useAuth } from "../../context/AuthContext";
 
 export default function Sidebar() {
   const [isOpen, setIsOpen] = useState(false);
+  const { user } = useAuth();
+  const isLogistics = user?.role === "logistics";
 
-  const menuItems = [
-    { to: "/admin", icon: LayoutDashboard, label: "Dashboard" },
-    { to: "/admin/categories", icon: FolderTree, label: "Categories" },
-    { to: "/admin/products", icon: Package, label: "Products" },
+  const allMenuItems = [
+    { to: "/admin", icon: LayoutDashboard, label: "Dashboard", adminOnly: true },
+    { to: "/admin/categories", icon: FolderTree, label: "Categories", adminOnly: true },
+    { to: "/admin/products", icon: Package, label: "Products", adminOnly: true },
     { to: "/admin/orders", icon: ShoppingCart, label: "Orders" },
-    { to: "/admin/users", icon: Users, label: "Users" },
-    { to: "/admin/reviews", icon: Star, label: "Reviews" },
+    { to: "/admin/users", icon: Users, label: "Users", adminOnly: true },
+    { to: "/admin/reviews", icon: Star, label: "Reviews", adminOnly: true },
     { to: "/admin/profile", icon: UserCircle, label: "Profile" },
   ];
+
+  const menuItems = isLogistics
+    ? allMenuItems.filter((item) => !item.adminOnly)
+    : allMenuItems;
 
   const menuClass = ({ isActive }) =>
     `flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${isActive
@@ -61,7 +68,11 @@ export default function Sidebar() {
             <Zap size={16} className="text-black" strokeWidth={3} />
           </div>
           <span className="text-white font-black tracking-[3px] text-sm uppercase">RegarSport</span>
-          <span className="ml-auto text-[9px] font-bold text-[#00BFA5]/60 uppercase tracking-widest">Admin</span>
+          <span className={`ml-auto text-[9px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-md ${
+            isLogistics ? "bg-purple-500/20 text-purple-400 border border-purple-500/30" : "text-[#00BFA5]/60"
+          }`}>
+            {isLogistics ? "Gudang" : "Admin"}
+          </span>
         </div>
 
         {/* Navigation */}

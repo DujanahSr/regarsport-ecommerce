@@ -21,12 +21,15 @@ import {
   Camera,
   ImagePlus,
   Loader2,
+  Printer,
+  FileText,
 } from "lucide-react";
 import toast from "react-hot-toast";
 
 import api from "../../services/api";
 import { EmptyState, ScreenLoader } from "../../components/common/UiStates";
 import MidtransModal from "../../components/common/MidtransModal";
+import InvoiceModal from "../../components/customer/InvoiceModal";
 import { useAuth } from "../../context/AuthContext";
 
 const ORDER_STEPS = [
@@ -54,6 +57,7 @@ export default function OrderDetail() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [showModal, setShowModal] = useState(false);
+  const [showInvoiceModal, setShowInvoiceModal] = useState(false);
   const [copiedResi, setCopiedResi] = useState(false);
   const [completing, setCompleting] = useState(false);
 
@@ -307,6 +311,17 @@ export default function OrderDetail() {
           </div>
 
           <div className="flex items-center gap-3">
+            {/* Tombol Cetak Invoice Resmi */}
+            <button
+              type="button"
+              onClick={() => setShowInvoiceModal(true)}
+              className="flex items-center gap-1.5 rounded-2xl bg-white px-4 py-2 text-xs sm:text-sm font-bold text-slate-700 ring-1 ring-slate-200 shadow-xs transition hover:bg-slate-50 hover:text-emerald-700 active:scale-95 cursor-pointer"
+              title="Cetak Faktur Pembelian / Invoice Resmi"
+            >
+              <Printer size={15} />
+              <span className="hidden sm:inline">Cetak</span> Invoice
+            </button>
+
             {isCancelled ? (
               <span className="rounded-full bg-rose-50 px-3.5 py-1.5 text-xs font-bold text-rose-600 ring-1 ring-rose-200">
                 Dibatalkan
@@ -746,6 +761,13 @@ export default function OrderDetail() {
             getOrder();
           }, 600);
         }}
+      />
+
+      {/* Invoice Resmi Pembelian Modal */}
+      <InvoiceModal
+        isOpen={showInvoiceModal}
+        onClose={() => setShowInvoiceModal(false)}
+        order={order}
       />
     </div>
   );

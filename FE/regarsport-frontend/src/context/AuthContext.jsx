@@ -8,15 +8,22 @@ const AuthContext = createContext();
 const normalizeUser = (u) => {
   if (!u) return null;
   const roleStr = (u.role || "").toLowerCase();
-  const isAdmin = roleStr.includes("admin");
+  let role = "customer";
+  if (roleStr.includes("admin")) {
+    role = "admin";
+  } else if (roleStr.includes("logistics") || roleStr.includes("gudang")) {
+    role = "logistics";
+  }
+
   return {
     ...u,
-    role: isAdmin ? "admin" : "customer",
+    role,
     rawRole: u.role,
     full_name: u.full_name || u.fullName || "User",
     fullName: u.fullName || u.full_name || "User",
     avatar_url: u.avatar_url || u.avatarUrl || "",
     avatarUrl: u.avatarUrl || u.avatar_url || "",
+    active: u.active ?? true,
   };
 };
 

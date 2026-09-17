@@ -5,6 +5,9 @@ import {
   Users as UsersIcon,
   Shield,
   User,
+  Truck,
+  UserX,
+  UserCheck,
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
@@ -16,35 +19,51 @@ import toast from "react-hot-toast";
 /* ----------------------------------------------------------------
    UserRow – tetap memoized untuk performa
 ---------------------------------------------------------------- */
-const UserRow = memo(function UserRow({ user, index, page, limit, onRoleChange }) {
+const UserRow = memo(function UserRow({ user, index, page, limit, onUserChange }) {
   const [avatarError, setAvatarError] = useState(false);
-  const [updating, setUpdating] = useState(false);
+  const [updatingRole, setUpdatingRole] = useState(false);
+  const [updatingStatus, setUpdatingStatus] = useState(false);
 
   const fullName = user.fullName || user.full_name || "Pengguna";
   const email = user.email || "-";
-  const roleRaw = user.role || "ROLE_CUSTOMER";
-  const isAdmin = roleRaw.toUpperCase().includes("ADMIN");
+  const roleRaw = (user.role || "ROLE_CUSTOMER").toUpperCase();
+  const isAdmin = roleRaw.includes("ADMIN");
+  const isLogistics = roleRaw.includes("LOGISTICS") || roleRaw.includes("GUDANG");
+  const isActive = user.active !== false;
   const avatarUrl = user.avatarUrl || user.avatar_url;
   const createdAt = user.createdAt || user.created_at;
 
-  const roleBadge = isAdmin
-    ? "bg-red-500/10 text-red-400 border-red-500/20"
-    : "bg-emerald-500/10 text-emerald-400 border-emerald-500/20";
-
-  const handleToggleRole = async () => {
-    const nextRole = isAdmin ? "ROLE_CUSTOMER" : "ROLE_ADMIN";
-    const actionLabel = isAdmin ? "turunkan ke Customer" : "jadikan Admin";
-    if (!window.confirm(`Yakin ingin mengubah ${fullName} menjadi ${nextRole}?`)) return;
+  const handleRoleChange = async (e) => {
+    const newRole = e.target.value;
+    if (newRole === roleRaw) return;
+    if (!window.confirm(`Yakin ingin mengubah role ${fullName} menjadi ${newRole}?`)) return;
 
     try {
-      setUpdating(true);
-      await api.patch(`/admin/users/${user.id}/role`, { role: nextRole });
+      setUpdatingRole(true);
+      await api.patch(`/admin/users/${user.id}/role`, { role: newRole });
       toast.success(`Role ${fullName} berhasil diubah!`);
-      if (onRoleChange) onRoleChange();
+      if (onUserChange) onUserChange();
     } catch (err) {
       toast.error(err.response?.data?.message || "Gagal mengubah role pengguna");
     } finally {
-      setUpdating(false);
+      setUpdatingRole(false);
+    }
+  };
+
+  const handleToggleStatus = async () => {
+    const nextActive = !isActive;
+    const actionLabel = nextActive ? "mengaktifkan kembali" : "menonaktifkan / suspend";
+    if (!window.confirm(`Yakin ingin ${actionLabel} akun ${fullName}?`)) return;
+
+    try {
+      setUpdatingStatus(true);
+      await api.patch(`/admin/users/${user.id}/status`, { active: nextActive });
+      toast.success(`Akun ${fullName} berhasil ${nextActive ? "diaktifkan" : "disuspend"}!`);
+      if (onUserChange) onUserChange();
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Gagal mengubah status pengguna");
+    } finally {
+      setUpdatingStatus(false);
     }
   };
 
@@ -78,14 +97,44 @@ const UserRow = memo(function UserRow({ user, index, page, limit, onRoleChange }
           </div>
         </div>
       </td>
+
+      {/* Role Selector */}
+      <td className="p-4">
+        <div className="flex items-center gap-2">
+          <select
+            value={roleRaw}
+            onChange={handleRoleChange}
+            disabled={updatingRole}
+            className={`bg-[#0D0D0D] border rounded-xl px-3 py-1.5 text-xs font-semibold outline-none cursor-pointer transition ${
+              isAdmin
+                ? "border-red-500/40 text-red-400 focus:border-red-500"
+                : isLogistics
+                ? "border-purple-500/40 text-purple-400 focus:border-purple-500"
+                : "border-emerald-500/40 text-emerald-400 focus:border-[#00BFA5]"
+            }`}
+          >
+            <option value="ROLE_CUSTOMER" className="bg-[#14141E] text-white">Customer</option>
+            <option value="ROLE_LOGISTICS" className="bg-[#14141E] text-white">Staf Gudang (Logistik)</option>
+            <option value="ROLE_ADMIN" className="bg-[#14141E] text-white">Admin</option>
+          </select>
+        </div>
+      </td>
+
+      {/* Status Akun */}
       <td className="p-4">
         <span
-          className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-2xl text-xs font-bold border ${roleBadge} transition-all duration-200`}
+          className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-2xl text-xs font-bold border ${
+            isActive
+              ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
+              : "bg-rose-500/10 text-rose-400 border-rose-500/20"
+          }`}
         >
-          {isAdmin ? <Shield size={11} /> : <User size={11} />}
-          {isAdmin ? "Admin" : "Customer"}
+          <span className={`w-1.5 h-1.5 rounded-full ${isActive ? "bg-emerald-400" : "bg-rose-400"}`} />
+          {isActive ? "Aktif" : "Suspended"}
         </span>
       </td>
+
+      {/* Tanggal Bergabung */}
       <td className="p-4 text-white/40 text-sm">
         {createdAt
           ? new Date(createdAt).toLocaleDateString("id-ID", {
@@ -95,18 +144,21 @@ const UserRow = memo(function UserRow({ user, index, page, limit, onRoleChange }
             })
           : "-"}
       </td>
+
+      {/* Tombol Aksi Moderasi */}
       <td className="p-4">
         <button
-          onClick={handleToggleRole}
-          disabled={updating}
-          className={`px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all duration-200 active:scale-95 disabled:opacity-50 ${
-            isAdmin
-              ? "border-yellow-500/30 text-yellow-400 hover:bg-yellow-500/10"
-              : "border-[#00BFA5]/30 text-[#00BFA5] hover:bg-[#00BFA5]/10"
+          onClick={handleToggleStatus}
+          disabled={updatingStatus}
+          className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-semibold border transition-all duration-200 active:scale-95 disabled:opacity-50 cursor-pointer ${
+            isActive
+              ? "border-rose-500/30 text-rose-400 hover:bg-rose-500/10"
+              : "border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10"
           }`}
-          title={isAdmin ? "Ubah ke Customer" : "Promosikan ke Admin"}
+          title={isActive ? "Suspend Akun Pengguna" : "Aktifkan Kembali Akun"}
         >
-          {updating ? "Menyimpan..." : isAdmin ? "Set Customer" : "Set Admin"}
+          {isActive ? <UserX size={13} /> : <UserCheck size={13} />}
+          {updatingStatus ? "Menyimpan..." : isActive ? "Suspend" : "Aktifkan"}
         </button>
       </td>
     </tr>
@@ -225,6 +277,7 @@ export default function Users() {
         >
           <option value="">Semua Role</option>
           <option value="admin" className="bg-[#0D0D0D]">Admin</option>
+          <option value="logistics" className="bg-[#0D0D0D]">Staf Gudang (Logistik)</option>
           <option value="customer" className="bg-[#0D0D0D]">Customer</option>
         </select>
       </div>
@@ -254,13 +307,16 @@ export default function Users() {
                     Pengguna
                   </th>
                   <th className="p-4 text-left text-xs font-bold text-slate-400 uppercase tracking-widest">
-                    Role
+                    Role & Hak Akses
+                  </th>
+                  <th className="p-4 text-left text-xs font-bold text-slate-400 uppercase tracking-widest">
+                    Status Akun
                   </th>
                   <th className="p-4 text-left text-xs font-bold text-slate-400 uppercase tracking-widest">
                     Bergabung
                   </th>
                   <th className="p-4 text-left text-xs font-bold text-slate-400 uppercase tracking-widest">
-                    Aksi
+                    Aksi Moderasi
                   </th>
                 </tr>
               </thead>
@@ -272,7 +328,7 @@ export default function Users() {
                     index={index}
                     page={page}
                     limit={limit}
-                    onRoleChange={getUsers}
+                    onUserChange={getUsers}
                   />
                 ))}
               </tbody>

@@ -120,28 +120,40 @@ export default function App() {
                   />
                 </Route>
 
-                {/* ADMIN */}
+                {/* ADMIN & LOGISTICS */}
                 <Route
                   path="/admin"
                   element={
-                    <ProtectedRoute adminOnly>
+                    <ProtectedRoute allowedRoles={["admin", "logistics"]}>
                       <AdminLayouts />
                     </ProtectedRoute>
                   }
                 >
                   <Route
                     index
-                    element={<Dashboard />}
+                    element={
+                      <ProtectedRoute allowedRoles={["admin"]}>
+                        <Dashboard />
+                      </ProtectedRoute>
+                    }
                   />
 
                   <Route
                     path="categories"
-                    element={<Categories />}
+                    element={
+                      <ProtectedRoute allowedRoles={["admin"]}>
+                        <Categories />
+                      </ProtectedRoute>
+                    }
                   />
 
                   <Route
                     path="products"
-                    element={<Products />}
+                    element={
+                      <ProtectedRoute allowedRoles={["admin"]}>
+                        <Products />
+                      </ProtectedRoute>
+                    }
                   />
 
                   <Route
@@ -151,11 +163,19 @@ export default function App() {
 
                   <Route
                     path="users"
-                    element={<Users />}
+                    element={
+                      <ProtectedRoute allowedRoles={["admin"]}>
+                        <Users />
+                      </ProtectedRoute>
+                    }
                   />
                   <Route
                     path="reviews"
-                    element={<Reviews />}
+                    element={
+                      <ProtectedRoute allowedRoles={["admin"]}>
+                        <Reviews />
+                      </ProtectedRoute>
+                    }
                   />
 
                   <Route

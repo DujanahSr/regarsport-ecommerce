@@ -9,5 +9,10 @@ public record UserResponse(
     String email,
     String role,
     String avatarUrl,
+    Boolean active,
     Instant createdAt
-) implements Serializable {}
+) implements Serializable {
+    public UserResponse(Long id, String fullName, String email, String role, String avatarUrl, Instant createdAt) {
+        this(id, fullName, email, role, avatarUrl, true, createdAt);
+    }
+}

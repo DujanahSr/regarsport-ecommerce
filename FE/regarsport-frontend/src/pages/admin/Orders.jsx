@@ -3,10 +3,11 @@
 // FRONTEND/src/pages/admin/Orders.jsx
 
 import { useCallback, useEffect, useState } from "react";
-import { Download, Filter, ShoppingCart, ChevronLeft, ChevronRight, Truck, X, PackageCheck } from "lucide-react";
+import { Download, Filter, ShoppingCart, ChevronLeft, ChevronRight, Truck, X, PackageCheck, Printer } from "lucide-react";
 import api from "../../services/api";
 import { EmptyState, ScreenLoader } from "../../components/common/UiStates";
 import toast from "react-hot-toast";
+import ShippingLabelModal from "../../components/admin/ShippingLabelModal";
 
 const orderStatuses = ["pending", "paid", "processing", "shipped", "completed", "cancelled"];
 
@@ -42,6 +43,9 @@ export default function Orders() {
   const [courier, setCourier] = useState(courierList[0]);
   const [trackingNumber, setTrackingNumber] = useState("");
   const [shippingSubmitting, setShippingSubmitting] = useState(false);
+
+  // Label Thermal Modal State
+  const [labelOrder, setLabelOrder] = useState(null);
 
   const getOrders = useCallback(async () => {
     try {
@@ -200,6 +204,7 @@ export default function Orders() {
                   <th className="p-6 text-left text-xs font-bold text-slate-400 uppercase tracking-wider">Total</th>
                   <th className="p-6 text-left text-xs font-bold text-slate-400 uppercase tracking-wider">Status</th>
                   <th className="p-6 text-left text-xs font-bold text-slate-400 uppercase tracking-wider">Pengiriman & Resi</th>
+                  <th className="p-6 text-left text-xs font-bold text-slate-400 uppercase tracking-wider">Label Logistik</th>
                   <th className="p-6 text-left text-xs font-bold text-slate-400 uppercase tracking-wider">Ubah Status</th>
                 </tr>
               </thead>
@@ -275,6 +280,15 @@ export default function Orders() {
                         ) : (
                           <span className="text-xs text-white/30 italic">-</span>
                         )}
+                      </td>
+                      <td className="p-6">
+                        <button
+                          onClick={() => setLabelOrder(order)}
+                          className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-purple-500/10 hover:bg-purple-500/20 text-purple-300 border border-purple-500/30 text-xs font-semibold transition active:scale-95 whitespace-nowrap cursor-pointer hover:shadow-lg hover:shadow-purple-500/10"
+                          title="Cetak Label Pengiriman Thermal A6 & Packing Slip"
+                        >
+                          <Printer size={14} /> Cetak Label A6
+                        </button>
                       </td>
                       <td className="p-6">
                         <select
@@ -394,6 +408,13 @@ export default function Orders() {
           </div>
         </div>
       )}
+
+      {/* Modal Cetak Label Thermal Pengiriman & Packing Slip */}
+      <ShippingLabelModal
+        isOpen={!!labelOrder}
+        onClose={() => setLabelOrder(null)}
+        order={labelOrder}
+      />
     </div>
   );
 }

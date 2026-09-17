@@ -43,7 +43,8 @@ public class OrderController {
             @RequestHeader(value = "X-User-Id", defaultValue = "1") Long userId,
             @RequestHeader(value = "X-User-Role", defaultValue = "ROLE_CUSTOMER") String role
     ) {
-        boolean isAdmin = "ROLE_ADMIN".equalsIgnoreCase(role) || "ADMIN".equalsIgnoreCase(role);
+        boolean isAdmin = "ROLE_ADMIN".equalsIgnoreCase(role) || "ADMIN".equalsIgnoreCase(role)
+                || "ROLE_LOGISTICS".equalsIgnoreCase(role) || "LOGISTICS".equalsIgnoreCase(role);
         OrderResponse response = orderService.getOrderById(id, userId, isAdmin);
         return ResponseEntity.ok(ApiResponse.success(response));
     }

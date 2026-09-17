@@ -76,6 +76,10 @@ public class AuthService {
             throw new BadRequestException("Invalid email or password");
         }
 
+        if (Boolean.FALSE.equals(user.getActive())) {
+            throw new BadRequestException("Akun Anda telah dinonaktifkan/disuspend oleh Admin. Silakan hubungi customer support.");
+        }
+
         UserResponse userResponse = userMapper.toResponse(user);
 
         String accessToken = jwtService.generateAccessToken(
@@ -182,6 +186,17 @@ public class AuthService {
                 : Role.valueOf("ROLE_" + roleStr.toUpperCase());
         user.setRole(newRole);
         User saved = userRepository.save(user);
+        return userMapper.toResponse(saved);
+    }
+
+    @Transactional
+    public UserResponse updateUserStatus(Long userId, boolean active) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
+
+        user.setActive(active);
+        User saved = userRepository.save(user);
+        log.info("User id {} status updated to active={}", userId, active);
         return userMapper.toResponse(saved);
     }
 
