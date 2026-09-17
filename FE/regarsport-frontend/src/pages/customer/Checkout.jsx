@@ -1,0 +1,263 @@
+/* eslint-disable react-hooks/immutability */
+import { useState } from "react";
+import { useNavigate, useLocation, Link } from "react-router-dom";
+import { MapPin, Package, CreditCard, ArrowLeft, ShoppingBag } from "lucide-react";
+import toast from "react-hot-toast";
+
+import api from "../../services/api";
+import { useCart } from "../../context/CartContext";
+import { EmptyState, ScreenLoader } from "../../components/common/UiStates";
+import MidtransModal from "../../components/common/MidtransModal";
+
+export default function Checkout() {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const { cartItems, loadCart, setSelectedItems } = useCart();
+
+  const [address, setAddress] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [validationError, setValidationError] = useState("");
+  const [createdOrder, setCreatedOrder] = useState(null);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+
+  const directItem = location.state?.directItem;
+  const selectedIds = location.state?.selectedItems || [];
+
+  const checkoutItems = directItem
+    ? [directItem]
+    : cartItems.filter((item) => selectedIds.includes(item.id));
+
+  const total = checkoutItems.reduce(
+    (acc, item) =>
+      acc + Number(item.price || item.products?.price || 0) * item.quantity,
+    0
+  );
+
+  const handleCheckout = async () => {
+    try {
+      if (checkoutItems.length === 0) {
+        setValidationError("Pilih produk terlebih dahulu");
+        return;
+      }
+
+      if (!address.trim()) {
+        setValidationError("Alamat pengiriman wajib diisi lengkap");
+        return;
+      }
+
+      setValidationError("");
+      setLoading(true);
+
+      const items = checkoutItems.map((item) => ({
+        productId: item.productId || item.products?.id || item.id,
+        productName: item.productName || item.products?.name || item.name,
+        productImage:
+          item.productImage ||
+          item.products?.image_url ||
+          item.imageUrl ||
+          item.image_url ||
+          "",
+        price: Number(item.price || item.products?.price),
+        quantity: Number(item.quantity),
+        size: item.size || "L",
+      }));
+
+      const orderResponse = await api.post("/orders/checkout", {
+        shippingAddress: address.trim(),
+        items,
+      });
+
+      const orderData = orderResponse.data?.data;
+      setCreatedOrder(orderData);
+
+      // Refresh cart and clear selected items
+      await loadCart();
+      setSelectedItems([]);
+      setValidationError("");
+
+      toast.success("Pesanan berhasil dibuat!");
+      // Directly trigger Midtrans payment modal on checkout page
+      setShowPaymentModal(true);
+    } catch (error) {
+      const msg = error.response?.data?.message || "Checkout pesanan gagal";
+      setValidationError(msg);
+      toast.error(msg);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handlePaymentSuccess = (order) => {
+    const targetId = order?.id || createdOrder?.id;
+    navigate(`/dashboard/orders/${targetId}`);
+  };
+
+  const handlePaymentClose = () => {
+    setShowPaymentModal(false);
+    if (createdOrder?.id) {
+      toast("Pesanan disimpan. Anda dapat membayar nanti di Detail Pesanan.", {
+        icon: "ℹ️",
+      });
+      navigate(`/dashboard/orders/${createdOrder.id}`);
+    }
+  };
+
+  if (loading && checkoutItems.length === 0) {
+    return <ScreenLoader label="Menyiapkan checkout..." />;
+  }
+
+  if (checkoutItems.length === 0) {
+    return (
+      <EmptyState
+        title="Belum ada produk yang dipilih"
+        description="Pilih item dari keranjang atau gunakan fitur 'Beli Sekarang' pada produk."
+        action={
+          <Link
+            to="/dashboard/cart"
+            className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-emerald-600/20 transition hover:bg-emerald-700"
+          >
+            <ShoppingBag size={18} />
+            Buka Keranjang
+          </Link>
+        }
+      />
+    );
+  }
+
+  return (
+    <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6 sm:py-12">
+      <Link
+        to={directItem ? -1 : "/dashboard/cart"}
+        className="mb-6 inline-flex items-center gap-2 text-sm font-semibold text-slate-500 hover:text-slate-800 transition"
+      >
+        <ArrowLeft size={16} />
+        {directItem ? "Kembali ke Produk" : "Kembali ke Keranjang"}
+      </Link>
+
+      <div className="rounded-3xl bg-white p-6 shadow-sm ring-1 ring-slate-900/5 sm:p-8">
+        <div className="flex items-center justify-between pb-6 border-b border-slate-100">
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+              Checkout Pembayaran
+            </h1>
+            <p className="text-sm text-slate-500 mt-1">
+              Periksa rincian pesanan dan alamat pengiriman Anda sebelum membayar.
+            </p>
+          </div>
+          <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-700 border border-emerald-100">
+            {checkoutItems.length} Item
+          </span>
+        </div>
+
+        {/* Shipping Address Section */}
+        <div className="mt-6">
+          <h2 className="flex items-center gap-2 text-base font-bold text-slate-900">
+            <MapPin size={18} className="text-emerald-600" />
+            Alamat Pengiriman
+          </h2>
+
+          <textarea
+            placeholder="Tulis alamat lengkap (Nama Jalan, No. Rumah, RT/RW, Kelurahan, Kecamatan, Kota, Kode Pos)..."
+            value={address}
+            onChange={(e) => setAddress(e.target.value)}
+            rows="3"
+            className="mt-3 w-full rounded-2xl border border-slate-200 bg-slate-50/70 p-4 text-sm text-slate-800 transition placeholder:text-slate-400 focus:border-emerald-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+          />
+        </div>
+
+        {validationError ? (
+          <div className="mt-4 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-medium text-rose-600">
+            {validationError}
+          </div>
+        ) : null}
+
+        {/* Order Summary */}
+        <div className="mt-8 border-t border-slate-100 pt-6">
+          <h2 className="flex items-center gap-2 text-base font-bold text-slate-900 mb-4">
+            <Package size={18} className="text-emerald-600" />
+            Ringkasan Item Pesanan
+          </h2>
+
+          <div className="space-y-3">
+            {checkoutItems.map((item, index) => {
+              const name = item.productName || item.products?.name || item.name;
+              const img =
+                item.productImage ||
+                item.products?.image_url ||
+                item.imageUrl ||
+                item.image_url ||
+                "https://placehold.co/200x200?text=Produk";
+              const price = Number(item.price || item.products?.price || 0);
+
+              return (
+                <div
+                  key={item.id || index}
+                  className="flex items-center justify-between gap-4 rounded-2xl border border-slate-100 bg-slate-50/50 p-3.5 text-sm transition hover:border-slate-200"
+                >
+                  <div className="flex items-center gap-3 min-w-0">
+                    <img
+                      src={img}
+                      alt={name}
+                      className="h-12 w-12 shrink-0 rounded-xl object-cover bg-white border border-slate-100"
+                      onError={(e) => {
+                        e.currentTarget.onerror = null;
+                        e.currentTarget.src = "https://placehold.co/200x200?text=Produk";
+                      }}
+                    />
+                    <div className="min-w-0">
+                      <p className="font-semibold text-slate-800 truncate">{name}</p>
+                      <div className="flex items-center gap-2 mt-0.5">
+                        <p className="text-xs text-slate-400">Jumlah: {item.quantity} pcs</p>
+                        {item.size && (
+                          <span className="inline-flex items-center rounded-md bg-emerald-50 px-1.5 py-0.5 text-[10px] font-bold text-emerald-700 border border-emerald-200/60">
+                            Size: {item.size}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  <span className="shrink-0 font-bold text-slate-900">
+                    Rp {(price * item.quantity).toLocaleString("id-ID")}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+
+          <div className="mt-6 flex items-center justify-between border-t border-slate-100 pt-5">
+            <div>
+              <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+                Total Tagihan
+              </span>
+              <h3 className="text-2xl font-black text-emerald-600 sm:text-3xl">
+                Rp {total.toLocaleString("id-ID")}
+              </h3>
+            </div>
+
+            <button
+              type="button"
+              onClick={handleCheckout}
+              disabled={loading}
+              className="flex items-center justify-center gap-2 rounded-2xl bg-emerald-600 px-8 py-3.5 text-sm font-bold text-white shadow-lg shadow-emerald-600/25 transition hover:-translate-y-0.5 hover:bg-emerald-700 hover:shadow-emerald-600/35 disabled:cursor-not-allowed disabled:translate-y-0 disabled:opacity-50 disabled:shadow-none"
+            >
+              <CreditCard size={18} />
+              {loading ? "Memproses Order..." : "Bayar Sekarang"}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Direct Midtrans Payment Modal on Checkout */}
+      {createdOrder && (
+        <MidtransModal
+          isOpen={showPaymentModal}
+          onClose={handlePaymentClose}
+          order={createdOrder}
+          onSuccess={handlePaymentSuccess}
+        />
+      )}
+    </div>
+  );
+}
