@@ -26,6 +26,102 @@ export default function InvoiceModal({ isOpen, onClose, order }) {
   const isPending = rawStatus === "PENDING";
   const isCancelled = rawStatus === "CANCELLED";
 
+  // Fungsi untuk membersihkan dan mengonversi warna modern (oklch, oklab, lab, lch) ke sRGB standar
+  // agar html2canvas / html2pdf tidak error 'Unsupported color function oklch'
+  const sanitizeColorsForCanvas = (clonedDoc) => {
+    const canvas = document.createElement("canvas");
+    canvas.width = 1;
+    canvas.height = 1;
+    const ctx = canvas.getContext("2d", { willReadFrequently: true });
+    const colorCache = new Map();
+
+    const convertColorToRgb = (colorStr) => {
+      if (!colorStr || typeof colorStr !== "string") return colorStr;
+      if (
+        !colorStr.includes("oklch") &&
+        !colorStr.includes("oklab") &&
+        !colorStr.includes("lab(") &&
+        !colorStr.includes("lch(")
+      ) {
+        return colorStr;
+      }
+
+      if (colorCache.has(colorStr)) {
+        return colorCache.get(colorStr);
+      }
+
+      try {
+        ctx.clearRect(0, 0, 1, 1);
+        ctx.fillStyle = "#000000";
+        ctx.fillStyle = colorStr;
+        ctx.fillRect(0, 0, 1, 1);
+        const [r, g, b, a] = ctx.getImageData(0, 0, 1, 1).data;
+        const alpha = +(a / 255).toFixed(3);
+        const res = alpha === 1 ? `rgb(${r}, ${g}, ${b})` : `rgba(${r}, ${g}, ${b}, ${alpha})`;
+        colorCache.set(colorStr, res);
+        return res;
+      } catch {
+        return "rgb(30, 41, 59)";
+      }
+    };
+
+    const regexModernColor = /(oklch|oklab|lab|lch)\([^)]+\)/gi;
+
+    // 1. Sanitasi semua style tags
+    const styles = clonedDoc.querySelectorAll("style");
+    styles.forEach((st) => {
+      if (st.textContent && regexModernColor.test(st.textContent)) {
+        st.textContent = st.textContent.replace(regexModernColor, (match) => convertColorToRgb(match));
+      }
+    });
+
+    // 2. Ubah external stylesheet link menjadi style tag yang telah disanitasi
+    const links = clonedDoc.querySelectorAll("link[rel='stylesheet']");
+    links.forEach((lk) => {
+      try {
+        const sheet = Array.from(document.styleSheets).find((s) => s.href === lk.href);
+        if (sheet && sheet.cssRules) {
+          const cssText = Array.from(sheet.cssRules)
+            .map((r) => r.cssText)
+            .join("\n");
+          const styleTag = clonedDoc.createElement("style");
+          styleTag.textContent = cssText.replace(regexModernColor, (m) => convertColorToRgb(m));
+          lk.parentNode.replaceChild(styleTag, lk);
+        }
+      } catch {
+        // Cross-origin stylesheet handling
+      }
+    });
+
+    // 3. Traversal dan beri inline sRGB style pada setiap node invoice
+    const invoice = clonedDoc.getElementById("official-customer-invoice");
+    if (invoice) {
+      const allNodes = [invoice, ...invoice.querySelectorAll("*")];
+      const colorProps = [
+        "color",
+        "backgroundColor",
+        "borderColor",
+        "borderTopColor",
+        "borderRightColor",
+        "borderBottomColor",
+        "borderLeftColor",
+        "outlineColor",
+      ];
+
+      allNodes.forEach((node) => {
+        if (node.nodeType === 1) {
+          const computed = window.getComputedStyle(node);
+          colorProps.forEach((prop) => {
+            const val = computed[prop];
+            if (val && regexModernColor.test(val)) {
+              node.style[prop] = convertColorToRgb(val);
+            }
+          });
+        }
+      });
+    }
+  };
+
   const handleDownloadPDF = async () => {
     const invoiceEl = document.getElementById("official-customer-invoice");
     if (!invoiceEl) return;
@@ -38,7 +134,15 @@ export default function InvoiceModal({ isOpen, onClose, order }) {
         margin: [8, 10, 8, 10],
         filename: `${invoiceNumber.replace(/[^a-zA-Z0-9-]/g, "_")}.pdf`,
         image: { type: "jpeg", quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true, letterRendering: true },
+        html2canvas: {
+          scale: 2,
+          useCORS: true,
+          letterRendering: true,
+          logging: false,
+          onclone: (clonedDoc) => {
+            sanitizeColorsForCanvas(clonedDoc);
+          },
+        },
         jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
       };
 
@@ -46,7 +150,10 @@ export default function InvoiceModal({ isOpen, onClose, order }) {
       toast.success("Dokumen PDF berhasil diunduh!", { id: "pdf-toast" });
     } catch (err) {
       console.error("Gagal download PDF:", err);
-      toast.error("Gagal mengunduh PDF secara otomatis. Silakan gunakan Cetak Faktur.", { id: "pdf-toast" });
+      toast("Mengalihkan ke dialog Cetak / Simpan PDF...", { id: "pdf-toast", icon: "📄" });
+      setTimeout(() => {
+        handlePrint();
+      }, 400);
     } finally {
       setDownloadingPDF(false);
     }
