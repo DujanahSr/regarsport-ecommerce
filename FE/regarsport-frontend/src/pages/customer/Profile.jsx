@@ -196,8 +196,8 @@ export default function Profile() {
     fetchRoleData();
   }, [user]);
 
-  // Image selection handler
-  const handleSelectImage = (e) => {
+  // Image selection handler - Otomatis upload ke Cloudinary dan simpan ke database secara instan!
+  const handleSelectImage = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -212,8 +212,43 @@ export default function Profile() {
     }
 
     setAvatarError(false);
+    const objectUrl = URL.createObjectURL(file);
+    setPreviewUrl(objectUrl);
     setImageFile(file);
-    toast.success("Foto dipilih! Klik 'Simpan Profil' untuk menerapkan.");
+
+    try {
+      setUploadingAvatar(true);
+      toast.loading("Mengunggah foto ke Cloudinary...", { id: "avatar-action" });
+      const cdnUrl = await uploadAvatarToCloudinary(file);
+
+      const payload = {
+        fullName: (form.fullName || user?.fullName || user?.full_name || "User").trim(),
+        avatarUrl: cdnUrl,
+        phoneNumber: form.phoneNumber || user?.phoneNumber || "",
+        address: form.address || user?.address || "",
+        city: form.city || user?.city || "",
+        postalCode: form.postalCode || user?.postalCode || "",
+        bio: form.bio || user?.bio || "",
+      };
+
+      const res = await api.put("/auth/profile", payload);
+      const updatedUser = res.data?.data || res.data?.user || res.data;
+
+      setUser(updatedUser);
+      setPreviewUrl(cdnUrl);
+      setImageFile(null);
+      toast.success("Foto profil berhasil diunggah ke Cloudinary dan disimpan!", { id: "avatar-action" });
+    } catch (err) {
+      console.error("Auto upload avatar error:", err);
+      const msg = err.response?.data?.message || err.message || "Gagal mengunggah foto profil";
+      toast.error(msg, { id: "avatar-action" });
+      setPreviewUrl(user?.avatarUrl || user?.avatar_url || "");
+    } finally {
+      setUploadingAvatar(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+    }
   };
 
   // Upload avatar to Cloudinary
@@ -251,23 +286,24 @@ export default function Profile() {
 
     try {
       setSavingProfile(true);
+      toast.loading("Menghapus foto profil...", { id: "avatar-action" });
       const res = await api.put("/auth/profile", {
-        fullName: form.fullName.trim(),
+        fullName: (form.fullName || user?.fullName || user?.full_name || "User").trim(),
         avatarUrl: "",
-        phoneNumber: form.phoneNumber.trim(),
-        address: form.address.trim(),
-        city: form.city.trim(),
-        postalCode: form.postalCode.trim(),
-        bio: form.bio.trim(),
+        phoneNumber: form.phoneNumber || user?.phoneNumber || "",
+        address: form.address || user?.address || "",
+        city: form.city || user?.city || "",
+        postalCode: form.postalCode || user?.postalCode || "",
+        bio: form.bio || user?.bio || "",
       });
 
       const updated = res.data?.data || res.data?.user || res.data;
       setUser({ ...updated, avatarUrl: "", avatar_url: "" });
       setImageFile(null);
       setPreviewUrl("");
-      toast.success("Foto profil berhasil dihapus");
+      toast.success("Foto profil berhasil dihapus", { id: "avatar-action" });
     } catch (err) {
-      toast.error(err.response?.data?.message || "Gagal menghapus foto profil");
+      toast.error(err.response?.data?.message || "Gagal menghapus foto profil", { id: "avatar-action" });
     } finally {
       setSavingProfile(false);
     }

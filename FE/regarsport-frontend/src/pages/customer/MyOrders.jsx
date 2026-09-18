@@ -11,6 +11,7 @@ import {
   ShoppingBag,
   CreditCard,
   Eye,
+  RotateCcw,
 } from "lucide-react";
 
 import api from "../../services/api";
@@ -152,6 +153,11 @@ export default function MyOrders() {
             {filteredOrders.map((order) => {
               const isPending =
                 (order.status || "").toUpperCase() === "PENDING";
+              const createdAtDate = new Date(order.createdAt || order.created_at);
+              const isExpired =
+                isPending &&
+                !isNaN(createdAtDate.getTime()) &&
+                Date.now() - createdAtDate.getTime() > 24 * 60 * 60 * 1000;
 
               return (
                 <div
@@ -175,11 +181,13 @@ export default function MyOrders() {
                     </div>
 
                     <span
-                      className={`rounded-full px-3 py-1 text-xs font-bold uppercase tracking-wider ${getStatusColor(
-                        order.status
-                      )}`}
+                      className={`rounded-full px-3 py-1 text-xs font-bold uppercase tracking-wider ${
+                        isExpired
+                          ? "bg-rose-50 text-rose-700 border border-rose-200"
+                          : getStatusColor(order.status)
+                      }`}
                     >
-                      {order.status}
+                      {isExpired ? "KEDALUWARSA" : order.status}
                     </span>
                   </div>
 
@@ -212,7 +220,7 @@ export default function MyOrders() {
                         Lihat Detail
                       </Link>
 
-                      {isPending && (
+                      {isPending && !isExpired && (
                         <button
                           type="button"
                           onClick={() => setPayingOrder(order)}
@@ -221,6 +229,21 @@ export default function MyOrders() {
                           <CreditCard size={15} />
                           Bayar Sekarang
                         </button>
+                      )}
+
+                      {isExpired && (
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className="text-xs text-rose-600 bg-rose-50 border border-rose-200/80 px-3 py-1.5 rounded-xl font-medium">
+                            Batas Bayar 24 Jam Berakhir
+                          </span>
+                          <Link
+                            to="/dashboard"
+                            className="inline-flex items-center gap-1.5 rounded-xl bg-slate-800 hover:bg-slate-900 px-3.5 py-1.5 text-xs font-semibold text-white transition shadow-xs"
+                          >
+                            <RotateCcw size={13} />
+                            Pesan Ulang
+                          </Link>
+                        </div>
                       )}
                     </div>
                   </div>

@@ -30,6 +30,9 @@ public class MidtransService {
     @Value("${midtrans.is-production:false}")
     private boolean isProduction;
 
+    @Value("${app.frontend-url:http://localhost:5173}")
+    private String frontendUrl;
+
     private final HttpClient httpClient = HttpClient.newBuilder()
             .connectTimeout(Duration.ofSeconds(10))
             .build();
@@ -57,9 +60,13 @@ public class MidtransService {
                 customerDetails.put("first_name", (customerName != null && !customerName.isBlank()) ? customerName : "Customer");
                 customerDetails.put("email", (customerEmail != null && !customerEmail.isBlank()) ? customerEmail : "customer@regarsport.com");
 
+                Map<String, Object> callbacks = new HashMap<>();
+                callbacks.put("finish", (frontendUrl != null ? frontendUrl : "http://localhost:5173") + "/dashboard/my-orders");
+
                 Map<String, Object> requestBody = new HashMap<>();
                 requestBody.put("transaction_details", transactionDetails);
                 requestBody.put("customer_details", customerDetails);
+                requestBody.put("callbacks", callbacks);
 
                 String jsonBody = objectMapper.writeValueAsString(requestBody);
 

@@ -23,6 +23,7 @@ import {
   Loader2,
   Printer,
   FileText,
+  RotateCcw,
 } from "lucide-react";
 import toast from "react-hot-toast";
 
@@ -274,6 +275,11 @@ export default function OrderDetail() {
   const currentRank = STATUS_RANK[rawStatus] || 1;
   const isCancelled = rawStatus === "CANCELLED";
   const isPending = rawStatus === "PENDING";
+  const createdAtDate = new Date(order.createdAt || order.created_at);
+  const isExpired =
+    isPending &&
+    !isNaN(createdAtDate.getTime()) &&
+    Date.now() - createdAtDate.getTime() > 24 * 60 * 60 * 1000;
   const isPaid = ["PAID", "PROCESSING", "SHIPPED", "COMPLETED"].includes(rawStatus);
   const orderItems = order.items || order.order_items || [];
   const totalAmount = Number(order.totalAmount || order.total_amount || 0);
@@ -283,9 +289,9 @@ export default function OrderDetail() {
       {/* Back Button */}
       <Link
         to="/dashboard/my-orders"
-        className="mb-6 inline-flex items-center gap-2 text-sm font-semibold text-slate-500 hover:text-slate-800 transition"
+        className="inline-flex items-center gap-2 text-sm font-semibold text-slate-500 hover:text-slate-800 transition mb-6 group"
       >
-        <ArrowLeft size={16} />
+        <ArrowLeft size={16} className="transition group-hover:-translate-x-1" />
         Kembali ke Pesanan Saya
       </Link>
 
@@ -333,6 +339,19 @@ export default function OrderDetail() {
               <span className="rounded-full bg-rose-50 px-3.5 py-1.5 text-xs font-bold text-rose-600 ring-1 ring-rose-200">
                 Dibatalkan
               </span>
+            ) : isExpired ? (
+              <div className="flex items-center gap-2">
+                <span className="rounded-full bg-rose-50 px-3.5 py-1.5 text-xs font-bold text-rose-600 ring-1 ring-rose-200">
+                  Kedaluwarsa
+                </span>
+                <Link
+                  to="/dashboard"
+                  className="inline-flex items-center gap-1.5 rounded-2xl bg-slate-800 hover:bg-slate-900 px-4 py-2 text-xs font-bold text-white shadow-xs transition"
+                >
+                  <RotateCcw size={14} />
+                  Pesan Ulang
+                </Link>
+              </div>
             ) : isPending ? (
               <button
                 type="button"
@@ -358,6 +377,18 @@ export default function OrderDetail() {
             <p className="text-sm font-medium">
               Pesanan ini telah dibatalkan dan tidak dapat diproses lebih lanjut.
             </p>
+          </div>
+        ) : isExpired ? (
+          <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-amber-900 flex items-center gap-3">
+            <AlertCircle size={20} className="text-amber-600 shrink-0" />
+            <div>
+              <p className="text-sm font-bold">
+                Batas Waktu Pembayaran Telah Kedaluwarsa (Melebihi 24 Jam)
+              </p>
+              <p className="text-xs text-amber-700 mt-0.5">
+                Tagihan pembayaran untuk transaksi lama ini sudah kedaluwarsa di sistem Midtrans. Silakan pesan ulang produk yang Anda inginkan.
+              </p>
+            </div>
           </div>
         ) : (
           <div className="py-2">
