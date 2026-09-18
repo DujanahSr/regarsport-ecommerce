@@ -10,6 +10,8 @@ import {
   User,
   X,
   Info,
+  Truck,
+  Shield,
 } from "lucide-react";
 
 import { useAuth } from "../../context/AuthContext";
@@ -80,6 +82,26 @@ export default function Header() {
         </nav>
 
         <div className="hidden items-center gap-3 border-l border-white/10 pl-3 lg:flex">
+          {user?.role === "logistics" && (
+            <Link
+              to="/admin/orders"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs shadow-md shadow-purple-900/30 transition animate-pulse"
+            >
+              <Truck size={15} />
+              <span>Panel Gudang</span>
+            </Link>
+          )}
+
+          {user?.role === "admin" && (
+            <Link
+              to="/admin"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-emerald-950 font-bold text-xs shadow-md transition"
+            >
+              <Shield size={15} />
+              <span>Panel Admin</span>
+            </Link>
+          )}
+
           <div className="flex items-center gap-2 text-sm text-emerald-50/80">
             <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white/10">
               <User size={15} />
@@ -119,6 +141,28 @@ export default function Header() {
           </div>
 
           <div className="flex flex-col gap-1">
+            {user?.role === "logistics" && (
+              <Link
+                to="/admin/orders"
+                onClick={() => setIsMenuOpen(false)}
+                className="flex items-center gap-2.5 rounded-lg bg-purple-600 px-3 py-2.5 text-sm font-bold text-white mb-1 shadow-md"
+              >
+                <Truck size={18} />
+                <span>Buka Panel Gudang (Orders)</span>
+              </Link>
+            )}
+
+            {user?.role === "admin" && (
+              <Link
+                to="/admin"
+                onClick={() => setIsMenuOpen(false)}
+                className="flex items-center gap-2.5 rounded-lg bg-emerald-500 px-3 py-2.5 text-sm font-bold text-emerald-950 mb-1 shadow-md"
+              >
+                <Shield size={18} />
+                <span>Buka Panel Admin</span>
+              </Link>
+            )}
+
             {navLinks.map(({ to, label, icon: Icon, badge }) => (
               <Link
                 key={to}

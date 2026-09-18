@@ -93,7 +93,13 @@ export default function Login() {
 
       toast.success("Login berhasil!");
       const roleStr = (loggedInUser?.role || "").toLowerCase();
-      navigate(roleStr.includes("admin") ? "/admin" : "/dashboard");
+      if (roleStr.includes("logistics") || roleStr.includes("gudang")) {
+        navigate("/admin/orders");
+      } else if (roleStr.includes("admin")) {
+        navigate("/admin");
+      } else {
+        navigate("/dashboard");
+      }
     } catch (err) {
       const message = err.response?.data?.message || err.message || "Login gagal";
       setError(message);

@@ -89,7 +89,83 @@ export default function ShippingLabelModal({ isOpen, onClose, order }) {
   const estWeight = Math.max(1, Math.ceil(totalQty * 0.35)); // ~350g per sport apparel
 
   const handlePrint = () => {
-    window.print();
+    const labelEl = document.getElementById("thermal-shipping-label");
+    if (!labelEl) {
+      window.print();
+      return;
+    }
+
+    const frameId = "official-shipping-label-frame";
+    let iframe = document.getElementById(frameId);
+    if (iframe) iframe.remove();
+
+    iframe = document.createElement("iframe");
+    iframe.id = frameId;
+    iframe.style.position = "fixed";
+    iframe.style.top = "-9999px";
+    iframe.style.left = "-9999px";
+    iframe.style.width = "0";
+    iframe.style.height = "0";
+    iframe.style.border = "none";
+    document.body.appendChild(iframe);
+
+    const styleTags = Array.from(document.querySelectorAll("style, link[rel='stylesheet']"))
+      .map((el) => el.outerHTML)
+      .join("\n");
+
+    const frameDoc = iframe.contentWindow.document;
+    frameDoc.open();
+    frameDoc.write(`
+      <!DOCTYPE html>
+      <html lang="id">
+        <head>
+          <meta charset="utf-8">
+          <title>Label Pengiriman - ${trackingNo}</title>
+          ${styleTags}
+          <style>
+            @page {
+              size: 100mm 150mm;
+              margin: 0;
+            }
+            * {
+              -webkit-print-color-adjust: exact !important;
+              print-color-adjust: exact !important;
+              box-sizing: border-box;
+            }
+            html, body {
+              margin: 0 !important;
+              padding: 0 !important;
+              background: #ffffff !important;
+              color: #000000 !important;
+              width: 100mm !important;
+              font-family: Arial, Helvetica, sans-serif !important;
+              overflow: hidden !important;
+            }
+            #thermal-shipping-label {
+              width: 100mm !important;
+              max-width: 100mm !important;
+              margin: 0 auto !important;
+              padding: 2.5mm !important;
+              box-shadow: none !important;
+              border: 2px solid #000 !important;
+              page-break-inside: avoid !important;
+              break-inside: avoid !important;
+            }
+          </style>
+        </head>
+        <body>
+          <div id="thermal-shipping-label" class="w-full bg-white text-black font-sans text-xs leading-tight">
+            ${labelEl.innerHTML}
+          </div>
+        </body>
+      </html>
+    `);
+    frameDoc.close();
+
+    setTimeout(() => {
+      iframe.contentWindow.focus();
+      iframe.contentWindow.print();
+    }, 250);
   };
 
   return (
@@ -97,14 +173,41 @@ export default function ShippingLabelModal({ isOpen, onClose, order }) {
       {/* Print CSS Scoped to this label */}
       <style>{`
         @media print {
+          @page {
+            size: 100mm 150mm;
+            margin: 0;
+          }
+          html, body {
+            margin: 0 !important;
+            padding: 0 !important;
+            background: #fff !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+            overflow: visible !important;
+          }
           body * {
             visibility: hidden !important;
+          }
+          .fixed.inset-0 {
+            position: static !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            backdrop-filter: none !important;
+            -webkit-backdrop-filter: none !important;
+          }
+          .relative.w-full.max-w-xl {
+            position: static !important;
+            max-width: 100% !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            border: none !important;
+            box-shadow: none !important;
           }
           #thermal-shipping-label, #thermal-shipping-label * {
             visibility: visible !important;
           }
           #thermal-shipping-label {
-            position: fixed !important;
+            position: relative !important;
             left: 0 !important;
             top: 0 !important;
             width: 100mm !important;
@@ -116,11 +219,9 @@ export default function ShippingLabelModal({ isOpen, onClose, order }) {
             font-family: Arial, Helvetica, sans-serif !important;
             border: 2px solid #000 !important;
             box-shadow: none !important;
-            z-index: 99999 !important;
-          }
-          @page {
-            size: 100mm 150mm;
-            margin: 0;
+            page-break-after: avoid !important;
+            page-break-inside: avoid !important;
+            break-inside: avoid !important;
           }
         }
       `}</style>

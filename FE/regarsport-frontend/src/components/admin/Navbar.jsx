@@ -16,7 +16,15 @@ export default function Navbar() {
   return (
     <header className="sticky top-0 z-30 bg-[#0D0D0D]/80 backdrop-blur-lg border-b border-white/5 px-6 py-3 flex justify-between items-center">
       <h2 className="text-sm font-semibold text-white/70 tracking-wide">
-        <span className="text-[#00BFA5]">/</span> Admin Panel
+        {user?.role === "logistics" ? (
+          <>
+            <span className="text-purple-400">/</span> Panel Gudang & Logistik
+          </>
+        ) : (
+          <>
+            <span className="text-[#00BFA5]">/</span> Admin Panel
+          </>
+        )}
       </h2>
 
       <div className="flex items-center gap-3">

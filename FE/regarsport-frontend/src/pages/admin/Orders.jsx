@@ -8,6 +8,7 @@ import api from "../../services/api";
 import { EmptyState, ScreenLoader } from "../../components/common/UiStates";
 import toast from "react-hot-toast";
 import ShippingLabelModal from "../../components/admin/ShippingLabelModal";
+import { useAuth } from "../../context/AuthContext";
 
 const orderStatuses = ["pending", "paid", "processing", "shipped", "completed", "cancelled"];
 
@@ -31,6 +32,8 @@ const statusColors = {
 };
 
 export default function Orders() {
+  const { user } = useAuth();
+  const isLogistics = user?.role === "logistics";
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState("");
@@ -147,8 +150,14 @@ export default function Orders() {
           </div>
         </div>
         <div>
-          <h1 className="text-4xl font-black text-white tracking-[-1px]">ORDERS</h1>
-          <p className="text-[#2a3a3a] text-sm">Kelola semua pesanan pelanggan RegarSport</p>
+          <h1 className="text-4xl font-black text-white tracking-[-1px]">
+            {isLogistics ? "LOGISTIK & PENGIRIMAN" : "ORDERS"}
+          </h1>
+          <p className="text-[#2a3a3a] text-sm">
+            {isLogistics
+              ? "Operasional packing gudang, cetak label resi thermal A6, dan update kurir"
+              : "Kelola semua pesanan pelanggan RegarSport"}
+          </p>
         </div>
       </div>
 
@@ -175,14 +184,16 @@ export default function Orders() {
           </div>
         </div>
 
-        <button
-          onClick={handleExportCSV}
-          disabled={exporting}
-          className="flex items-center gap-2.5 bg-[#00BFA5]/10 hover:bg-[#00BFA5]/20 text-[#00BFA5] hover:text-white px-5 py-3 rounded-2xl border border-[#00BFA5]/20 transition-all font-medium disabled:opacity-50"
-        >
-          <Download size={18} />
-          {exporting ? "Mengekspor..." : "Export CSV"}
-        </button>
+        {!isLogistics && (
+          <button
+            onClick={handleExportCSV}
+            disabled={exporting}
+            className="flex items-center gap-2.5 bg-[#00BFA5]/10 hover:bg-[#00BFA5]/20 text-[#00BFA5] hover:text-white px-5 py-3 rounded-2xl border border-[#00BFA5]/20 transition-all font-medium disabled:opacity-50"
+          >
+            <Download size={18} />
+            {exporting ? "Mengekspor..." : "Export CSV"}
+          </button>
+        )}
       </div>
 
       {loading ? (

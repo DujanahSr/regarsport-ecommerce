@@ -22,12 +22,93 @@ export default function InvoiceModal({ isOpen, onClose, order }) {
   const isPaid = ["PAID", "PROCESSING", "SHIPPED", "COMPLETED"].includes(rawStatus);
 
   const handlePrint = () => {
-    window.print();
+    const invoiceEl = document.getElementById("official-customer-invoice");
+    if (!invoiceEl) {
+      window.print();
+      return;
+    }
+
+    // Buat iframe terisolasi agar tidak terpengaruh CSS/posisi flex modal induk
+    const frameId = "official-invoice-print-frame";
+    let iframe = document.getElementById(frameId);
+    if (iframe) iframe.remove();
+
+    iframe = document.createElement("iframe");
+    iframe.id = frameId;
+    iframe.style.position = "fixed";
+    iframe.style.top = "-9999px";
+    iframe.style.left = "-9999px";
+    iframe.style.width = "0";
+    iframe.style.height = "0";
+    iframe.style.border = "none";
+    document.body.appendChild(iframe);
+
+    // Salin seluruh stylesheet Vite & Tailwind ke iframe
+    const styleTags = Array.from(document.querySelectorAll("style, link[rel='stylesheet']"))
+      .map((el) => el.outerHTML)
+      .join("\n");
+
+    const frameDoc = iframe.contentWindow.document;
+    frameDoc.open();
+    frameDoc.write(`
+      <!DOCTYPE html>
+      <html lang="id">
+        <head>
+          <meta charset="utf-8">
+          <title>${invoiceNumber}</title>
+          ${styleTags}
+          <style>
+            @page {
+              size: A4 portrait;
+              margin: 8mm 10mm;
+            }
+            * {
+              -webkit-print-color-adjust: exact !important;
+              print-color-adjust: exact !important;
+              box-sizing: border-box;
+            }
+            html, body {
+              margin: 0 !important;
+              padding: 0 !important;
+              background: #ffffff !important;
+              color: #0f172a !important;
+              font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+              height: auto !important;
+              overflow: visible !important;
+            }
+            #official-customer-invoice {
+              width: 100% !important;
+              max-width: 100% !important;
+              min-width: 0 !important;
+              margin: 0 auto !important;
+              padding: 0 !important;
+              box-shadow: none !important;
+              border: none !important;
+              page-break-after: avoid !important;
+              page-break-inside: avoid !important;
+              break-inside: avoid !important;
+            }
+          </style>
+        </head>
+        <body>
+          <div id="official-customer-invoice" class="w-full bg-white text-zinc-900 font-sans text-xs">
+            ${invoiceEl.innerHTML}
+          </div>
+        </body>
+      </html>
+    `);
+    frameDoc.close();
+
+    // Tunggu stylesheet memuat lalu panggil printer
+    setTimeout(() => {
+      iframe.contentWindow.focus();
+      iframe.contentWindow.print();
+    }, 250);
   };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm overflow-y-auto animate-in fade-in duration-200">
-      {/* Print CSS Scoped to this invoice: Single-Sheet A4 Guarantee */}
+      {/* Fallback Print CSS Scoped jika user menekan Ctrl+P langsung di browser */}
       <style>{`
         @media print {
           @page {
@@ -41,15 +122,31 @@ export default function InvoiceModal({ isOpen, onClose, order }) {
             background: #fff !important;
             -webkit-print-color-adjust: exact !important;
             print-color-adjust: exact !important;
+            overflow: visible !important;
           }
           body * {
             visibility: hidden !important;
+          }
+          .fixed.inset-0 {
+            position: static !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            backdrop-filter: none !important;
+            -webkit-backdrop-filter: none !important;
+          }
+          .relative.w-full.max-w-3xl {
+            position: static !important;
+            max-width: 100% !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            border: none !important;
+            box-shadow: none !important;
           }
           #official-customer-invoice, #official-customer-invoice * {
             visibility: visible !important;
           }
           #official-customer-invoice {
-            position: absolute !important;
+            position: relative !important;
             left: 0 !important;
             top: 0 !important;
             width: 100% !important;
@@ -61,7 +158,6 @@ export default function InvoiceModal({ isOpen, onClose, order }) {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
             border: none !important;
             box-shadow: none !important;
-            z-index: 99999 !important;
             page-break-after: avoid !important;
             page-break-inside: avoid !important;
             break-inside: avoid !important;
