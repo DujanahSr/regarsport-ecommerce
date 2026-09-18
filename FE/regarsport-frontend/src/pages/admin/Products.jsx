@@ -2,15 +2,17 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-hooks/set-state-in-effect */
 import { useEffect, useRef, useState } from "react";
-import { Search, Plus, Pencil, Trash2, X, Package, Upload, Sparkles } from "lucide-react";
+import { Search, Plus, Pencil, Trash2, X, Package, Upload, Sparkles, Sliders } from "lucide-react";
 import api from "../../services/api";
 import { EmptyState, ScreenLoader } from "../../components/common/UiStates";
+import ManageSizeStockModal from "../../components/admin/ManageSizeStockModal";
 import toast from "react-hot-toast";
 
 export default function Products() {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [editingId, setEditingId] = useState(null);
+  const [selectedProductForStock, setSelectedProductForStock] = useState(null);
   const [image, setImage] = useState(null);
   const [currentImageUrl, setCurrentImageUrl] = useState("");
   const [imagePreview, setImagePreview] = useState("");
@@ -558,18 +560,26 @@ export default function Products() {
                   <div className="absolute inset-0 bg-linear-to-t from-[#0D0D0D] via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
                   {/* Quick actions overlay */}
-                  <div className="absolute bottom-3 left-3 right-3 flex gap-2 translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-400 ease-out">
+                  <div className="absolute bottom-3 left-3 right-3 flex gap-1.5 translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-400 ease-out">
+                    <button
+                      onClick={() => setSelectedProductForStock(product)}
+                      className="flex-1 flex items-center justify-center gap-1 bg-[#14141E]/95 backdrop-blur-sm hover:bg-[#00BFA5] text-[#00BFA5] hover:text-black px-2 py-2 rounded-xl text-xs font-bold transition-all duration-300 border border-white/10 hover:border-[#00BFA5]/50 cursor-pointer shadow-lg"
+                      title="Kelola kuota stok per ukuran"
+                    >
+                      <Sliders size={13} /> Stok
+                    </button>
                     <button
                       onClick={() => handleEdit(product)}
-                      className="flex-1 flex items-center justify-center gap-1.5 bg-[#14141E]/90 backdrop-blur-sm hover:bg-blue-500/90 text-blue-400 hover:text-white px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-300 border border-white/10 hover:border-blue-400/50"
+                      className="flex-1 flex items-center justify-center gap-1 bg-[#14141E]/95 backdrop-blur-sm hover:bg-blue-500 text-blue-400 hover:text-white px-2 py-2 rounded-xl text-xs font-bold transition-all duration-300 border border-white/10 hover:border-blue-400/50 cursor-pointer shadow-lg"
                     >
                       <Pencil size={13} /> Edit
                     </button>
                     <button
                       onClick={() => handleDelete(product.id)}
-                      className="flex-1 flex items-center justify-center gap-1.5 bg-[#14141E]/90 backdrop-blur-sm hover:bg-red-500/90 text-red-400 hover:text-white px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-300 border border-white/10 hover:border-red-400/50"
+                      className="flex items-center justify-center bg-[#14141E]/95 backdrop-blur-sm hover:bg-red-500 text-red-400 hover:text-white p-2 rounded-xl text-xs font-semibold transition-all duration-300 border border-white/10 hover:border-red-400/50 cursor-pointer shadow-lg"
+                      title="Hapus produk"
                     >
-                      <Trash2 size={13} /> Hapus
+                      <Trash2 size={13} />
                     </button>
                   </div>
 
@@ -590,7 +600,7 @@ export default function Products() {
                           ? "bg-amber-500/10 text-amber-400 border-amber-500/20"
                           : "bg-red-500/10 text-red-400 border-red-500/20"
                       }`}>
-                      {product.stock > 0 ? `${product.stock} stok` : "Habis"}
+                      {product.stock > 0 ? `${product.stock} total` : "Habis"}
                     </span>
                   </div>
                 </div>
@@ -607,15 +617,49 @@ export default function Products() {
                     </p>
                   )}
 
+                  {/* Size Stock Chips Breakdown */}
+                  {product.sizeStocks && Object.keys(product.sizeStocks).length > 0 && (
+                    <div className="flex flex-wrap gap-1 mt-3 pt-3 border-t border-white/5">
+                      {Object.entries(product.sizeStocks).slice(0, 5).map(([sz, st]) => {
+                        const numSt = Number(st) || 0;
+                        const isZero = numSt === 0;
+                        const isLow = numSt > 0 && numSt < 5;
+                        return (
+                          <span
+                            key={sz}
+                            className={`text-[9px] font-bold px-1.5 py-0.5 rounded-md border ${
+                              isZero
+                                ? "bg-rose-500/10 text-rose-400 border-rose-500/20 line-through opacity-60"
+                                : isLow
+                                ? "bg-amber-500/10 text-amber-400 border-amber-500/20"
+                                : "bg-white/5 text-slate-300 border-white/10"
+                            }`}
+                          >
+                            {sz}:{st}
+                          </span>
+                        );
+                      })}
+                      {Object.keys(product.sizeStocks).length > 5 && (
+                        <span className="text-[9px] text-slate-500 self-center px-1">
+                          +{Object.keys(product.sizeStocks).length - 5}
+                        </span>
+                      )}
+                    </div>
+                  )}
+
                   <div className="flex items-end justify-between mt-4">
                     <div>
                       <p className="text-[#00BFA5] font-black text-xl tracking-tight">
                         Rp {Number(product.price).toLocaleString("id-ID")}
                       </p>
                     </div>
-                    <span className="text-[10px] text-slate-600 font-mono">
-                      #{product.id}
-                    </span>
+                    <button
+                      onClick={() => setSelectedProductForStock(product)}
+                      className="text-[10px] text-slate-400 hover:text-[#00BFA5] flex items-center gap-1 font-semibold transition cursor-pointer"
+                    >
+                      <Sliders size={11} />
+                      Ubah Stok
+                    </button>
                   </div>
                 </div>
               </div>
@@ -664,6 +708,19 @@ export default function Products() {
             </svg>
           </button>
         </div>
+      )}
+
+      {/* Manage Size Stock Modal */}
+      {selectedProductForStock && (
+        <ManageSizeStockModal
+          product={selectedProductForStock}
+          onClose={() => setSelectedProductForStock(null)}
+          onStockUpdated={(updated) => {
+            setProducts((prev) =>
+              prev.map((p) => (p.id === updated.id ? { ...p, ...updated } : p))
+            );
+          }}
+        />
       )}
 
       {/* Subtle background grid pattern */}

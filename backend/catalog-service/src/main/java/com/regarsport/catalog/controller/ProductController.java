@@ -69,12 +69,12 @@ public class ProductController {
     }
 
     @PatchMapping("/{id}/stock")
-    @Operation(summary = "Update product stock", description = "Adjust product inventory stock level")
+    @Operation(summary = "Update product stock", description = "Adjust product inventory stock level overall or by specific size")
     public ResponseEntity<ApiResponse<ProductResponse>> updateStock(
             @PathVariable Long id,
             @Valid @RequestBody StockUpdateRequest request
     ) {
-        ProductResponse updated = productService.updateStock(id, request.quantityChange());
+        ProductResponse updated = productService.updateStock(id, request.quantityChange(), request.size());
         return ResponseEntity.ok(ApiResponse.success("Stock updated successfully", updated));
     }
 }

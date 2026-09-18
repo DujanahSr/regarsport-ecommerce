@@ -21,6 +21,7 @@ public class ProductMapper {
                 product.getPrice(),
                 product.getStock(),
                 product.getImageUrl(),
+                product.getSizeStocks(),
                 product.getCreatedAt(),
                 product.getUpdatedAt()
         );
@@ -28,13 +29,21 @@ public class ProductMapper {
 
     public Product toEntity(ProductRequest request) {
         if (request == null) return null;
-        return Product.builder()
+        Product product = Product.builder()
                 .name(request.name().trim())
                 .description(request.description())
                 .price(request.price())
                 .stock(request.stock())
                 .imageUrl(request.imageUrl())
                 .build();
+
+        if (request.sizeStocks() != null && !request.sizeStocks().isEmpty()) {
+            product.setSizeStocks(new java.util.LinkedHashMap<>(request.sizeStocks()));
+            product.recalculateTotalStock();
+        } else {
+            product.initDefaultSizeStocks();
+        }
+        return product;
     }
 
     public void updateEntityFromRequest(ProductRequest request, Product product) {
@@ -42,7 +51,14 @@ public class ProductMapper {
         product.setName(request.name().trim());
         product.setDescription(request.description());
         product.setPrice(request.price());
-        product.setStock(request.stock());
         product.setImageUrl(request.imageUrl());
+
+        if (request.sizeStocks() != null && !request.sizeStocks().isEmpty()) {
+            product.setSizeStocks(new java.util.LinkedHashMap<>(request.sizeStocks()));
+            product.recalculateTotalStock();
+        } else {
+            product.setStock(request.stock());
+            product.initDefaultSizeStocks();
+        }
     }
 }

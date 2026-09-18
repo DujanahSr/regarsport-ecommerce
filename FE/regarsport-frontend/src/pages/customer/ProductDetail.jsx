@@ -104,15 +104,47 @@ export default function ProductDetail() {
   const [showSizeChart, setShowSizeChart] = useState(false);
   const [activeChartTab, setActiveChartTab] = useState("clothing"); // clothing, shoes, equipment
 
-  const availableSizes = useMemo(() => getAvailableSizes(product), [product]);
+  const availableSizes = useMemo(() => {
+    if (product?.sizeStocks && Object.keys(product.sizeStocks).length > 0) {
+      return Object.keys(product.sizeStocks);
+    }
+    return getAvailableSizes(product);
+  }, [product]);
+
+  // Current stock for chosen size
+  const currentSizeStock = useMemo(() => {
+    if (product?.sizeStocks && selectedSize) {
+      return Number(product.sizeStocks[selectedSize] ?? 0);
+    }
+    return Number(product?.stock ?? 0);
+  }, [product, selectedSize]);
+
+  const isCurrentSizeSoldOut = currentSizeStock <= 0;
+
+  // Auto select size that has available stock
+  useEffect(() => {
+    if (product?.sizeStocks && Object.keys(product.sizeStocks).length > 0) {
+      const entries = Object.entries(product.sizeStocks);
+      const firstWithStock = entries.find(([_, s]) => Number(s) > 0);
+      if (firstWithStock) {
+        setSelectedSize(firstWithStock[0]);
+      } else {
+        setSelectedSize(entries[0][0]);
+      }
+    }
+  }, [product]);
 
   const handleAddToCart = () => {
     if (product.stock <= 0) {
       toast.error("Stok produk ini sedang habis");
       return;
     }
-    if (qty > product.stock) {
-      toast.error(`Stock hanya tersisa ${product.stock} buah`);
+    if (isCurrentSizeSoldOut) {
+      toast.error(`Ukuran ${selectedSize} sedang habis`);
+      return;
+    }
+    if (qty > currentSizeStock) {
+      toast.error(`Stok ukuran ${selectedSize} hanya tersisa ${currentSizeStock} buah`);
       return;
     }
     addToCart(product, qty, selectedSize);
@@ -128,8 +160,12 @@ export default function ProductDetail() {
       toast.error("Stok produk ini sedang habis");
       return;
     }
-    if (qty > product.stock) {
-      toast.error(`Stok hanya tersisa ${product.stock} buah`);
+    if (isCurrentSizeSoldOut) {
+      toast.error(`Ukuran ${selectedSize} sedang habis`);
+      return;
+    }
+    if (qty > currentSizeStock) {
+      toast.error(`Stok ukuran ${selectedSize} hanya tersisa ${currentSizeStock} buah`);
       return;
     }
 
@@ -357,8 +393,10 @@ export default function ProductDetail() {
                   <span className="text-xs font-bold uppercase tracking-wider text-slate-600">
                     Pilihan Ukuran:
                   </span>
-                  <span className="inline-flex items-center rounded-lg bg-emerald-600 px-2.5 py-0.5 text-xs font-black text-white shadow-xs">
-                    {selectedSize}
+                  <span className={`inline-flex items-center rounded-lg px-2.5 py-0.5 text-xs font-black shadow-xs ${
+                    isCurrentSizeSoldOut ? 'bg-rose-600 text-white' : 'bg-emerald-600 text-white'
+                  }`}>
+                    {selectedSize} {isCurrentSizeSoldOut && '(Habis)'}
                   </span>
                 </div>
 
@@ -373,31 +411,63 @@ export default function ProductDetail() {
                 </button>
               </div>
 
-              {/* Size Buttons */}
+              {/* Size Buttons with Dynamic Stock Indicators */}
               <div className="flex flex-wrap gap-2">
                 {availableSizes.map((sz) => {
                   const isSelected = selectedSize === sz;
+                  const szStock = product?.sizeStocks ? Number(product.sizeStocks[sz] ?? 0) : (product?.stock ?? 0);
+                  const isSzSoldOut = szStock <= 0;
+                  const isSzLow = szStock > 0 && szStock < 5;
+
                   return (
                     <button
                       key={sz}
                       type="button"
                       onClick={() => setSelectedSize(sz)}
-                      className={`h-10 min-w-11 px-3.5 rounded-xl text-xs font-bold transition-all active:scale-95 ${
+                      className={`relative h-11 min-w-12 px-3 rounded-xl text-xs font-bold transition-all active:scale-95 flex flex-col items-center justify-center cursor-pointer ${
                         isSelected
-                          ? "bg-emerald-600 text-white shadow-md shadow-emerald-600/25 ring-2 ring-emerald-500/20"
+                          ? isSzSoldOut
+                            ? "bg-rose-600 text-white shadow-md shadow-rose-600/25 ring-2 ring-rose-500/20"
+                            : "bg-emerald-600 text-white shadow-md shadow-emerald-600/25 ring-2 ring-emerald-500/20"
+                          : isSzSoldOut
+                          ? "bg-slate-100 text-slate-400 border border-dashed border-slate-300 opacity-60"
                           : "bg-white text-slate-700 border border-slate-200 hover:border-emerald-400 hover:bg-emerald-50/30"
                       }`}
                     >
-                      {sz}
+                      <span className={isSzSoldOut ? "line-through" : ""}>{sz}</span>
+                      {isSzSoldOut ? (
+                        <span className="text-[9px] font-black text-rose-500 tracking-tighter uppercase leading-none mt-0.5">
+                          Habis
+                        </span>
+                      ) : isSzLow ? (
+                        <span className={`text-[8px] font-bold tracking-tighter leading-none mt-0.5 ${isSelected ? 'text-amber-200' : 'text-amber-600'}`}>
+                          Sisa {szStock}
+                        </span>
+                      ) : null}
                     </button>
                   );
                 })}
               </div>
 
-              <p className="mt-2.5 text-[11px] text-slate-400 flex items-center gap-1">
-                <Info size={12} className="text-slate-400 shrink-0" />
-                Pilih ukuran yang sesuai sebelum menambahkan ke keranjang atau beli sekarang.
-              </p>
+              {/* Size Stock Feedback Banner */}
+              {isCurrentSizeSoldOut ? (
+                <div className="mt-3 p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-semibold flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-rose-500 shrink-0" />
+                  <span>Ukuran <strong>{selectedSize}</strong> saat ini habis. Silakan pilih varian ukuran lain yang masih tersedia.</span>
+                </div>
+              ) : (
+                <div className="mt-3 p-2.5 rounded-xl bg-emerald-50/80 border border-emerald-200/60 text-emerald-800 text-xs flex items-center justify-between">
+                  <span className="flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
+                    Stok varian <strong>{selectedSize}</strong>: <strong>{currentSizeStock} pcs</strong> tersedia
+                  </span>
+                  {currentSizeStock < 5 && (
+                    <span className="text-[10px] font-bold text-amber-700 bg-amber-100 px-2 py-0.5 rounded-md">
+                      Segera Habis!
+                    </span>
+                  )}
+                </div>
+              )}
             </div>
 
             <div className="mt-6">
@@ -409,25 +479,31 @@ export default function ProductDetail() {
                   <button
                     type="button"
                     onClick={() => qty > 1 && setQty(qty - 1)}
-                    disabled={qty <= 1}
-                    className="flex h-11 w-11 items-center justify-center rounded-full text-slate-600 transition hover:bg-emerald-50 hover:text-emerald-700 disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-slate-600"
+                    disabled={qty <= 1 || isCurrentSizeSoldOut}
+                    className="flex h-11 w-11 items-center justify-center rounded-full text-slate-600 transition hover:bg-emerald-50 hover:text-emerald-700 disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-slate-600 cursor-pointer"
                     aria-label="Kurangi jumlah"
                   >
                     <Minus size={16} />
                   </button>
 
-                  <span className="min-w-12 text-center text-lg font-bold text-slate-900">{qty}</span>
+                  <span className="min-w-12 text-center text-lg font-bold text-slate-900">{isCurrentSizeSoldOut ? 0 : qty}</span>
 
                   <button
                     type="button"
-                    onClick={() => qty < product.stock && setQty(qty + 1)}
-                    disabled={qty >= product.stock}
-                    className="flex h-11 w-11 items-center justify-center rounded-full text-slate-600 transition hover:bg-emerald-50 hover:text-emerald-700 disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-slate-600"
+                    onClick={() => qty < currentSizeStock && setQty(qty + 1)}
+                    disabled={qty >= currentSizeStock || isCurrentSizeSoldOut}
+                    className="flex h-11 w-11 items-center justify-center rounded-full text-slate-600 transition hover:bg-emerald-50 hover:text-emerald-700 disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-slate-600 cursor-pointer"
                     aria-label="Tambah jumlah"
                   >
                     <Plus size={16} />
                   </button>
                 </div>
+
+                {!isCurrentSizeSoldOut && currentSizeStock > 0 && (
+                  <span className="text-xs text-slate-500">
+                    Maks. {currentSizeStock} pcs
+                  </span>
+                )}
               </div>
             </div>
 
@@ -441,7 +517,7 @@ export default function ProductDetail() {
                     await addToWishlist(product);
                   }
                 }}
-                className="flex items-center gap-2 rounded-2xl border border-slate-200 px-4 py-3 text-sm font-semibold text-slate-700 transition hover:border-rose-200 hover:bg-rose-50 hover:text-rose-600"
+                className="flex items-center gap-2 rounded-2xl border border-slate-200 px-4 py-3 text-sm font-semibold text-slate-700 transition hover:border-rose-200 hover:bg-rose-50 hover:text-rose-600 cursor-pointer"
               >
                 <Heart
                   size={18}
@@ -453,18 +529,22 @@ export default function ProductDetail() {
               <button
                 type="button"
                 onClick={handleAddToCart}
-                disabled={product.stock <= 0}
-                className="flex items-center gap-2 rounded-2xl border-2 border-emerald-600 bg-emerald-50/60 px-5 py-3 text-sm font-bold text-emerald-700 transition hover:bg-emerald-100 disabled:cursor-not-allowed disabled:opacity-40"
+                disabled={product.stock <= 0 || isCurrentSizeSoldOut}
+                className={`flex items-center gap-2 rounded-2xl border-2 px-5 py-3 text-sm font-bold transition disabled:cursor-not-allowed disabled:opacity-40 ${
+                  isCurrentSizeSoldOut
+                    ? 'border-slate-300 bg-slate-100 text-slate-400'
+                    : 'border-emerald-600 bg-emerald-50/60 text-emerald-700 hover:bg-emerald-100 cursor-pointer'
+                }`}
               >
                 <ShoppingCart size={18} />
-                + Keranjang
+                {isCurrentSizeSoldOut ? `Ukuran ${selectedSize} Habis` : '+ Keranjang'}
               </button>
 
               <button
                 type="button"
                 onClick={handleDirectBuy}
-                disabled={product.stock <= 0}
-                className="flex items-center gap-2 rounded-2xl bg-emerald-600 px-6 py-3 text-sm font-bold text-white shadow-lg shadow-emerald-600/20 transition hover:-translate-y-0.5 hover:bg-emerald-700 hover:shadow-emerald-600/30 disabled:cursor-not-allowed disabled:translate-y-0 disabled:opacity-40"
+                disabled={product.stock <= 0 || isCurrentSizeSoldOut}
+                className="flex items-center gap-2 rounded-2xl bg-emerald-600 px-6 py-3 text-sm font-bold text-white shadow-lg shadow-emerald-600/20 transition hover:-translate-y-0.5 hover:bg-emerald-700 hover:shadow-emerald-600/30 disabled:cursor-not-allowed disabled:translate-y-0 disabled:opacity-40 cursor-pointer"
               >
                 <Zap size={18} />
                 Beli Sekarang

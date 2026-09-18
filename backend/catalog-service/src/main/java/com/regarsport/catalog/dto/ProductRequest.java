@@ -26,5 +26,18 @@ public record ProductRequest(
     @Min(value = 0, message = "Stock cannot be negative")
     Integer stock,
 
-    String imageUrl
-) {}
+    String imageUrl,
+
+    java.util.Map<String, Integer> sizeStocks
+) {
+    public ProductRequest(
+            Long categoryId,
+            String name,
+            String description,
+            BigDecimal price,
+            Integer stock,
+            String imageUrl
+    ) {
+        this(categoryId, name, description, price, stock, imageUrl, null);
+    }
+}

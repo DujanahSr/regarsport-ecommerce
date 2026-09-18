@@ -128,21 +128,44 @@ public class ProductService {
 
     @Transactional
     @CacheEvict(value = "products", allEntries = true)
-    public ProductResponse updateStock(Long id, Integer quantityChange) {
-        log.info("Updating stock for product id: {}, delta: {}", id, quantityChange);
+    public ProductResponse updateStock(Long id, Integer quantityChange, String size) {
+        log.info("Updating stock for product id: {}, delta: {}, size: {}", id, quantityChange, size);
         Product product = productRepository.findByIdWithCategory(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found with id: " + id));
 
-        int newStock = product.getStock() + quantityChange;
-        if (newStock < 0) {
-            throw new InsufficientStockException(
-                    String.format("Insufficient stock for product '%s'. Requested change: %d, Available: %d",
-                            product.getName(), quantityChange, product.getStock())
-            );
+        var sizes = product.getSizeStocks();
+        if (size != null && !size.isBlank()) {
+            String targetSize = size.trim();
+            int currentSizeStock = sizes.getOrDefault(targetSize, 0);
+            int newSizeStock = currentSizeStock + quantityChange;
+
+            if (newSizeStock < 0) {
+                throw new InsufficientStockException(
+                        String.format("Stok tidak mencukupi untuk ukuran '%s' produk '%s'. Permintaan: %d, Tersedia: %d",
+                                targetSize, product.getName(), Math.abs(quantityChange), currentSizeStock)
+                );
+            }
+
+            sizes.put(targetSize, newSizeStock);
+            product.recalculateTotalStock();
+        } else {
+            int newStock = product.getStock() + quantityChange;
+            if (newStock < 0) {
+                throw new InsufficientStockException(
+                        String.format("Insufficient stock for product '%s'. Requested change: %d, Available: %d",
+                                product.getName(), quantityChange, product.getStock())
+                );
+            }
+            product.setStock(newStock);
         }
 
-        product.setStock(newStock);
         Product updated = productRepository.save(product);
         return productMapper.toResponse(updated);
+    }
+
+    @Transactional
+    @CacheEvict(value = "products", allEntries = true)
+    public ProductResponse updateStock(Long id, Integer quantityChange) {
+        return updateStock(id, quantityChange, null);
     }
 }

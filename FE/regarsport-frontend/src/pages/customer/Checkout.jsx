@@ -106,6 +106,16 @@ export default function Checkout() {
       const orderData = orderResponse.data?.data;
       setCreatedOrder(orderData);
 
+      // Sinkronisasi pengurangan stok ukuran produk secara otomatis di katalog
+      for (const it of items) {
+        if (it.productId) {
+          api.patch(`/products/${it.productId}/stock`, {
+            size: it.size,
+            quantityChange: -Number(it.quantity),
+          }).catch((err) => console.warn("Stock sync warning:", err));
+        }
+      }
+
       // Refresh cart and clear selected items
       await loadCart();
       setSelectedItems([]);
