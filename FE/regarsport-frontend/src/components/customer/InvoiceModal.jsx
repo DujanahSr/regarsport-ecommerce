@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useRef, useState } from "react";
 import { Printer, X, FileText, CheckCircle2, ShieldCheck, Download, Loader2 } from "lucide-react";
-import html2pdf from "html2pdf.js";
+import { jsPDF } from "jspdf";
 import toast from "react-hot-toast";
 
 export default function InvoiceModal({ isOpen, onClose, order }) {
@@ -26,136 +26,295 @@ export default function InvoiceModal({ isOpen, onClose, order }) {
   const isPending = rawStatus === "PENDING";
   const isCancelled = rawStatus === "CANCELLED";
 
-  // Fungsi untuk membersihkan dan mengonversi warna modern (oklch, oklab, lab, lch) ke sRGB standar
-  // agar html2canvas / html2pdf tidak error 'Unsupported color function oklch'
-  const sanitizeColorsForCanvas = (clonedDoc) => {
-    const canvas = document.createElement("canvas");
-    canvas.width = 1;
-    canvas.height = 1;
-    const ctx = canvas.getContext("2d", { willReadFrequently: true });
-    const colorCache = new Map();
-
-    const convertColorToRgb = (colorStr) => {
-      if (!colorStr || typeof colorStr !== "string") return colorStr;
-      if (
-        !colorStr.includes("oklch") &&
-        !colorStr.includes("oklab") &&
-        !colorStr.includes("lab(") &&
-        !colorStr.includes("lch(")
-      ) {
-        return colorStr;
-      }
-
-      if (colorCache.has(colorStr)) {
-        return colorCache.get(colorStr);
-      }
-
-      try {
-        ctx.clearRect(0, 0, 1, 1);
-        ctx.fillStyle = "#000000";
-        ctx.fillStyle = colorStr;
-        ctx.fillRect(0, 0, 1, 1);
-        const [r, g, b, a] = ctx.getImageData(0, 0, 1, 1).data;
-        const alpha = +(a / 255).toFixed(3);
-        const res = alpha === 1 ? `rgb(${r}, ${g}, ${b})` : `rgba(${r}, ${g}, ${b}, ${alpha})`;
-        colorCache.set(colorStr, res);
-        return res;
-      } catch {
-        return "rgb(30, 41, 59)";
-      }
-    };
-
-    const regexModernColor = /(oklch|oklab|lab|lch)\([^)]+\)/gi;
-
-    // 1. Sanitasi semua style tags
-    const styles = clonedDoc.querySelectorAll("style");
-    styles.forEach((st) => {
-      if (st.textContent && regexModernColor.test(st.textContent)) {
-        st.textContent = st.textContent.replace(regexModernColor, (match) => convertColorToRgb(match));
-      }
-    });
-
-    // 2. Ubah external stylesheet link menjadi style tag yang telah disanitasi
-    const links = clonedDoc.querySelectorAll("link[rel='stylesheet']");
-    links.forEach((lk) => {
-      try {
-        const sheet = Array.from(document.styleSheets).find((s) => s.href === lk.href);
-        if (sheet && sheet.cssRules) {
-          const cssText = Array.from(sheet.cssRules)
-            .map((r) => r.cssText)
-            .join("\n");
-          const styleTag = clonedDoc.createElement("style");
-          styleTag.textContent = cssText.replace(regexModernColor, (m) => convertColorToRgb(m));
-          lk.parentNode.replaceChild(styleTag, lk);
-        }
-      } catch {
-        // Cross-origin stylesheet handling
-      }
-    });
-
-    // 3. Traversal dan beri inline sRGB style pada setiap node invoice
-    const invoice = clonedDoc.getElementById("official-customer-invoice");
-    if (invoice) {
-      const allNodes = [invoice, ...invoice.querySelectorAll("*")];
-      const colorProps = [
-        "color",
-        "backgroundColor",
-        "borderColor",
-        "borderTopColor",
-        "borderRightColor",
-        "borderBottomColor",
-        "borderLeftColor",
-        "outlineColor",
-      ];
-
-      allNodes.forEach((node) => {
-        if (node.nodeType === 1) {
-          const computed = window.getComputedStyle(node);
-          colorProps.forEach((prop) => {
-            const val = computed[prop];
-            if (val && regexModernColor.test(val)) {
-              node.style[prop] = convertColorToRgb(val);
-            }
-          });
-        }
-      });
-    }
-  };
-
-  const handleDownloadPDF = async () => {
-    const invoiceEl = document.getElementById("official-customer-invoice");
-    if (!invoiceEl) return;
-
+  // Unduh dokumen PDF resmi langsung ke perangkat tanpa membuka dialog printer dan tanpa freeze
+  const handleDownloadPDF = () => {
     try {
       setDownloadingPDF(true);
-      toast.loading("Menyiapkan dokumen PDF...", { id: "pdf-toast" });
+      toast.loading("Membuat dokumen PDF resmi...", { id: "pdf-toast" });
 
-      const opt = {
-        margin: [8, 10, 8, 10],
-        filename: `${invoiceNumber.replace(/[^a-zA-Z0-9-]/g, "_")}.pdf`,
-        image: { type: "jpeg", quality: 0.98 },
-        html2canvas: {
-          scale: 2,
-          useCORS: true,
-          letterRendering: true,
-          logging: false,
-          onclone: (clonedDoc) => {
-            sanitizeColorsForCanvas(clonedDoc);
-          },
-        },
-        jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
-      };
+      const doc = new jsPDF({
+        orientation: "portrait",
+        unit: "mm",
+        format: "a4",
+      });
 
-      await html2pdf().set(opt).from(invoiceEl).save();
+      const leftMargin = 15;
+      const rightMargin = 195;
+      const contentWidth = rightMargin - leftMargin;
+
+      // 1. Header & Logo
+      // Badge RS
+      doc.setFillColor(5, 150, 105); // emerald-600
+      doc.roundedRect(leftMargin, 15, 10, 10, 2, 2, "F");
+      doc.setTextColor(255, 255, 255);
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(10);
+      doc.text("RS", leftMargin + 2.3, 21.5);
+
+      // Nama Perusahaan
+      doc.setTextColor(15, 23, 42); // slate-900
+      doc.setFontSize(13);
+      doc.setFont("helvetica", "bold");
+      doc.text("PT REGARSPORT INDONESIA", leftMargin + 13, 20);
+
+      // Tagline
+      doc.setTextColor(4, 120, 87); // emerald-700
+      doc.setFontSize(7.5);
+      doc.text("OFFICIAL ATHLETIC GEAR & CUSTOM APPAREL", leftMargin + 13, 24);
+
+      // Alamat & Kontak
+      doc.setTextColor(100, 116, 139); // slate-500
+      doc.setFontSize(7);
+      doc.setFont("helvetica", "normal");
+      doc.text("Jl. Jenderal Sudirman No. 45, Wonogiri, Jawa Tengah 57612", leftMargin, 29);
+      doc.text("NPWP: 01.345.678.9-521.000 | Email: cs@regarsport.com | WA: +62 812-3456-7890", leftMargin, 33);
+
+      // Judul Dokumen (Kanan)
+      const titleText = isPaid
+        ? "INVOICE RESMI"
+        : isPending
+        ? "PROFORMA INVOICE"
+        : "INVOICE (BATAL)";
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(14);
+      doc.setTextColor(15, 23, 42);
+      doc.text(titleText, rightMargin, 20, { align: "right" });
+
+      doc.setFontSize(8.5);
+      doc.setTextColor(4, 120, 87); // emerald-700
+      doc.text(invoiceNumber, rightMargin, 25, { align: "right" });
+
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(7.5);
+      doc.setTextColor(71, 85, 105);
+      const invoiceDate = new Date(order.createdAt || Date.now()).toLocaleDateString("id-ID", {
+        day: "2-digit",
+        month: "long",
+        year: "numeric",
+      });
+      doc.text(`Tanggal: ${invoiceDate}`, rightMargin, 29, { align: "right" });
+      doc.text(`Order Ref: ${orderNumber}`, rightMargin, 33, { align: "right" });
+
+      // Garis Pembatas Header
+      doc.setDrawColor(15, 23, 42);
+      doc.setLineWidth(0.6);
+      doc.line(leftMargin, 36, rightMargin, 36);
+
+      // 2. Info Ditagihkan Kepada & Informasi Pembayaran
+      const infoBoxY = 41;
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(7.5);
+      doc.setTextColor(148, 163, 184); // slate-400
+      doc.text("DITAGIHKAN KEPADA:", leftMargin, infoBoxY);
+
+      doc.setFontSize(9);
+      doc.setTextColor(15, 23, 42);
+      doc.text(recipientName.toUpperCase(), leftMargin, infoBoxY + 4.5);
+
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(7.5);
+      doc.setTextColor(71, 85, 105);
+      doc.text(`${customerEmail} ${customerPhone ? "• " + customerPhone : ""}`, leftMargin, infoBoxY + 8.5);
+      
+      const addrLines = doc.splitTextToSize(`Alamat Kirim: ${fullShippingAddress}`, 80);
+      doc.text(addrLines, leftMargin, infoBoxY + 12.5);
+
+      let currentYAfterAddr = infoBoxY + 12.5 + addrLines.length * 3.5;
+      if (shippingNotes) {
+        doc.setFont("helvetica", "italic");
+        doc.setTextColor(100, 116, 139);
+        const notesLines = doc.splitTextToSize(`Catatan: ${shippingNotes}`, 80);
+        doc.text(notesLines, leftMargin, currentYAfterAddr);
+      }
+
+      // Box Informasi Pembayaran (Kanan)
+      const boxX = 108;
+      const boxW = 87;
+      const boxH = 26;
+      doc.setFillColor(248, 250, 252);
+      doc.setDrawColor(241, 245, 249);
+      doc.roundedRect(boxX, infoBoxY - 2, boxW, boxH, 2, 2, "FD");
+
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(7.5);
+      doc.setTextColor(148, 163, 184);
+      doc.text("INFORMASI PEMBAYARAN:", boxX + 4, infoBoxY + 2);
+
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(7.5);
+      doc.setTextColor(100, 116, 139);
+      doc.text("Gateway:", boxX + 4, infoBoxY + 7);
+      doc.setFont("helvetica", "bold");
+      doc.setTextColor(30, 41, 59);
+      doc.text("Midtrans Online Payment", boxX + 38, infoBoxY + 7);
+
+      doc.setFont("helvetica", "normal");
+      doc.setTextColor(100, 116, 139);
+      doc.text("Status Transaksi:", boxX + 4, infoBoxY + 12);
+      doc.setFont("helvetica", "bold");
+      if (isPaid) {
+        doc.setTextColor(4, 120, 87);
+        doc.text("LUNAS (SETTLEMENT)", boxX + 38, infoBoxY + 12);
+      } else if (isPending) {
+        doc.setTextColor(217, 119, 6);
+        doc.text("MENUNGGU PEMBAYARAN", boxX + 38, infoBoxY + 12);
+      } else {
+        doc.setTextColor(225, 29, 72);
+        doc.text("DIBATALKAN", boxX + 38, infoBoxY + 12);
+      }
+
+      if (order.shippingCourier) {
+        doc.setFont("helvetica", "normal");
+        doc.setTextColor(100, 116, 139);
+        doc.text("Kurir:", boxX + 4, infoBoxY + 17);
+        doc.setFont("helvetica", "bold");
+        doc.setTextColor(30, 41, 59);
+        doc.text(String(order.shippingCourier), boxX + 38, infoBoxY + 17);
+      }
+
+      // Stempel Digital (Jika Lunas)
+      if (isPaid) {
+        const stampX = boxX + 44;
+        const stampY = infoBoxY + 14;
+        doc.setDrawColor(225, 29, 72);
+        doc.setLineWidth(0.4);
+        doc.setFillColor(255, 241, 242);
+        doc.roundedRect(stampX, stampY, 38, 9, 1.5, 1.5, "FD");
+        doc.setTextColor(225, 29, 72);
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(6);
+        doc.text("MIDTRANS VERIFIED", stampX + 19, stampY + 3.2, { align: "center" });
+        doc.setFontSize(7.5);
+        doc.text("PAID / LUNAS", stampX + 19, stampY + 6.8, { align: "center" });
+      }
+
+      // 3. Tabel Rincian Barang
+      let tableY = 74;
+      doc.setFillColor(241, 245, 249);
+      doc.rect(leftMargin, tableY, contentWidth, 7, "F");
+      doc.setDrawColor(15, 23, 42);
+      doc.setLineWidth(0.4);
+      doc.line(leftMargin, tableY + 7, rightMargin, tableY + 7);
+
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(7.5);
+      doc.setTextColor(51, 65, 85);
+      doc.text("NO", leftMargin + 2, tableY + 4.8);
+      doc.text("DESKRIPSI BARANG & VARIASI", leftMargin + 12, tableY + 4.8);
+      doc.text("UKURAN", leftMargin + 95, tableY + 4.8, { align: "center" });
+      doc.text("HARGA SATUAN", leftMargin + 130, tableY + 4.8, { align: "right" });
+      doc.text("QTY", leftMargin + 145, tableY + 4.8, { align: "center" });
+      doc.text("TOTAL", rightMargin - 2, tableY + 4.8, { align: "right" });
+
+      let rowY = tableY + 8;
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(8);
+
+      items.forEach((item, index) => {
+        const pName = item.productName || item.products?.name || item.name || "Produk RegarSport";
+        const size = item.size || "All Size";
+        const price = Number(item.price || item.products?.price || 0);
+        const qty = Number(item.quantity || 1);
+        const lineTotal = price * qty;
+
+        doc.setTextColor(148, 163, 184);
+        doc.text(String(index + 1), leftMargin + 2, rowY + 4.5);
+
+        doc.setFont("helvetica", "bold");
+        doc.setTextColor(30, 41, 59);
+        doc.text(pName, leftMargin + 12, rowY + 4);
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(6.5);
+        doc.setTextColor(148, 163, 184);
+        doc.text("RegarSport Original Collection", leftMargin + 12, rowY + 7.5);
+
+        doc.setFontSize(8);
+        doc.setTextColor(51, 65, 85);
+        doc.text(size, leftMargin + 95, rowY + 5, { align: "center" });
+        doc.text(`Rp ${price.toLocaleString("id-ID")}`, leftMargin + 130, rowY + 5, { align: "right" });
+        doc.text(String(qty), leftMargin + 145, rowY + 5, { align: "center" });
+        doc.setFont("helvetica", "bold");
+        doc.setTextColor(15, 23, 42);
+        doc.text(`Rp ${lineTotal.toLocaleString("id-ID")}`, rightMargin - 2, rowY + 5, { align: "right" });
+
+        // Garis batas row
+        doc.setDrawColor(241, 245, 249);
+        doc.line(leftMargin, rowY + 9, rightMargin, rowY + 9);
+        rowY += 10;
+      });
+
+      // 4. Ringkasan Total (Summary)
+      const summaryY = Math.max(rowY + 4, 120);
+      const sumX = 125;
+      const valX = rightMargin - 2;
+
+      const subtotalProducts = items.reduce(
+        (sum, it) => sum + Number(it.price || 0) * Number(it.quantity || 1),
+        0
+      );
+      const ppn11 = Math.round(totalAmount * (11 / 111));
+
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(8);
+      doc.setTextColor(100, 116, 139);
+      doc.text("Subtotal Produk:", sumX, summaryY);
+      doc.setTextColor(30, 41, 59);
+      doc.text(`Rp ${subtotalProducts.toLocaleString("id-ID")}`, valX, summaryY, { align: "right" });
+
+      doc.setTextColor(100, 116, 139);
+      doc.text("Ongkos Kirim:", sumX, summaryY + 5);
+      doc.setTextColor(4, 120, 87);
+      doc.text("Gratis (Promo RS)", valX, summaryY + 5, { align: "right" });
+
+      doc.setTextColor(100, 116, 139);
+      doc.text("PPN 11% (Termasuk):", sumX, summaryY + 10);
+      doc.setTextColor(71, 85, 105);
+      doc.text(`Rp ${ppn11.toLocaleString("id-ID")}`, valX, summaryY + 10, { align: "right" });
+
+      // Garis Total
+      doc.setDrawColor(15, 23, 42);
+      doc.setLineWidth(0.4);
+      doc.line(sumX, summaryY + 13, rightMargin, summaryY + 13);
+
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(9.5);
+      doc.setTextColor(15, 23, 42);
+      doc.text("Total Tagihan:", sumX, summaryY + 18);
+      doc.setFontSize(11);
+      doc.setTextColor(5, 150, 105); // emerald-600
+      doc.text(`Rp ${totalAmount.toLocaleString("id-ID")}`, valX, summaryY + 18, { align: "right" });
+
+      // 5. Catatan & Tanda Tangan
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(7.5);
+      doc.setTextColor(100, 116, 139);
+      doc.text("Catatan Penting:", leftMargin, summaryY);
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(7);
+      doc.text("• Invoice ini merupakan bukti pembayaran resmi yang sah diterbitkan oleh sistem komputerisasi.", leftMargin, summaryY + 4);
+      doc.text("• Simpan invoice ini sebagai syarat klaim garansi atau penukaran ukuran (size exchange).", leftMargin, summaryY + 8);
+      doc.text("• Produk original bergaransi resmi PT RegarSport Indonesia.", leftMargin, summaryY + 12);
+
+      // Tanda Tangan Dept
+      doc.text(`Wonogiri, ${new Date(order.createdAt || Date.now()).toLocaleDateString("id-ID")}`, rightMargin - 15, summaryY + 32, { align: "center" });
+      doc.setFont("helvetica", "bold");
+      doc.setTextColor(15, 23, 42);
+      doc.text("Finance & Logistics Dept", rightMargin - 15, summaryY + 36, { align: "center" });
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(6.5);
+      doc.setTextColor(100, 116, 139);
+      doc.text("PT RegarSport Indonesia", rightMargin - 15, summaryY + 39, { align: "center" });
+
+      // Unduh langsung berkas PDF ke perangkat
+      const cleanFilename = `${invoiceNumber.replace(/[^a-zA-Z0-9-]/g, "_")}.pdf`;
+      doc.save(cleanFilename);
       toast.success("Dokumen PDF berhasil diunduh!", { id: "pdf-toast" });
     } catch (err) {
-      console.error("Gagal download PDF:", err);
-      toast("Mengalihkan ke dialog Cetak / Simpan PDF...", { id: "pdf-toast", icon: "📄" });
-      setTimeout(() => {
-        handlePrint();
-      }, 400);
+      console.error("Gagal membuat PDF:", err);
+      toast.error("Gagal mengunduh PDF. Silakan coba lagi.", { id: "pdf-toast" });
     } finally {
       setDownloadingPDF(false);
+      window.focus();
     }
   };
 
@@ -166,7 +325,6 @@ export default function InvoiceModal({ isOpen, onClose, order }) {
       return;
     }
 
-    // Buat iframe terisolasi agar tidak terpengaruh CSS/posisi flex modal induk
     const frameId = "official-invoice-print-frame";
     let iframe = document.getElementById(frameId);
     if (iframe) iframe.remove();
@@ -181,7 +339,6 @@ export default function InvoiceModal({ isOpen, onClose, order }) {
     iframe.style.border = "none";
     document.body.appendChild(iframe);
 
-    // Salin seluruh stylesheet Vite & Tailwind ke iframe
     const styleTags = Array.from(document.querySelectorAll("style, link[rel='stylesheet']"))
       .map((el) => el.outerHTML)
       .join("\n");
@@ -237,10 +394,14 @@ export default function InvoiceModal({ isOpen, onClose, order }) {
     `);
     frameDoc.close();
 
-    // Tunggu stylesheet memuat lalu panggil printer
     setTimeout(() => {
       iframe.contentWindow.focus();
       iframe.contentWindow.print();
+      // Bersihkan iframe dan pulihkan focus ke jendela utama agar halaman tidak terkunci/freeze
+      setTimeout(() => {
+        if (iframe) iframe.remove();
+        window.focus();
+      }, 1000);
     }, 250);
   };
 
