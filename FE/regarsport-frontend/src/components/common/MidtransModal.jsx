@@ -42,7 +42,7 @@ export default function MidtransModal({
         try {
           const res = await api.get(`/payments/order/${order.id}`);
           const token = res.data?.data?.snapToken || res.data?.snapToken;
-          if (token) {
+          if (token && !token.startsWith("SNAP-TOKEN-")) {
             setSnapToken(token);
             return;
           }

@@ -33,7 +33,19 @@ public class PaymentService {
 
         Optional<PaymentTransaction> existing = paymentTransactionRepository.findByOrderId(event.orderId());
         if (existing.isPresent()) {
-            return toResponse(existing.get());
+            PaymentTransaction tx = existing.get();
+            if (tx.getSnapToken() == null || tx.getSnapToken().startsWith("SNAP-TOKEN-")) {
+                MidtransService.SnapResult snapResult = midtransService.createSnapToken(
+                        event.orderNumber(),
+                        event.totalAmount(),
+                        event.customerName(),
+                        event.customerEmail()
+                );
+                tx.setSnapToken(snapResult.token());
+                tx.setSnapRedirectUrl(snapResult.redirectUrl());
+                return toResponse(paymentTransactionRepository.save(tx));
+            }
+            return toResponse(tx);
         }
 
         MidtransService.SnapResult snapResult = midtransService.createSnapToken(
@@ -83,7 +95,7 @@ public class PaymentService {
                             .build();
                 });
 
-        if (transaction.getSnapToken() == null) {
+        if (transaction.getSnapToken() == null || transaction.getSnapToken().startsWith("SNAP-TOKEN-")) {
             MidtransService.SnapResult snapResult = midtransService.createSnapToken(
                     request.orderNumber(),
                     request.amount(),
