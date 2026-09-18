@@ -62,9 +62,6 @@ public class Product {
         if (sizeStocks == null) {
             sizeStocks = new java.util.LinkedHashMap<>();
         }
-        if (sizeStocks.isEmpty()) {
-            initDefaultSizeStocks();
-        }
         return sizeStocks;
     }
 

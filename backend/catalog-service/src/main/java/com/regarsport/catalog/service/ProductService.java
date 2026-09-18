@@ -31,6 +31,7 @@ public class ProductService {
     private final CategoryRepository categoryRepository;
     private final ProductMapper productMapper;
 
+    @Transactional(readOnly = true)
     public PageResponse<ProductResponse> getProducts(
             String search,
             Long categoryId,
@@ -74,6 +75,7 @@ public class ProductService {
         );
     }
 
+    @Transactional(readOnly = true)
     @Cacheable(value = "products", key = "#id")
     public ProductResponse getProductById(Long id) {
         log.info("Fetching product by id: {} (cache miss)", id);

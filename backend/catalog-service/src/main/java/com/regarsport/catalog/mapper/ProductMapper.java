@@ -12,6 +12,29 @@ public class ProductMapper {
         if (product == null) return null;
         Long categoryId = product.getCategory() != null ? product.getCategory().getId() : null;
         String categoryName = product.getCategory() != null ? product.getCategory().getName() : null;
+
+        java.util.Map<String, Integer> safeSizeStocks = new java.util.LinkedHashMap<>();
+        try {
+            if (product.getSizeStocks() != null) {
+                safeSizeStocks.putAll(product.getSizeStocks());
+            }
+        } catch (Exception ignored) {
+        }
+
+        if (safeSizeStocks.isEmpty()) {
+            boolean isShoe = (categoryName != null && categoryName.toLowerCase().contains("sepatu"));
+            int baseStock = (product.getStock() != null && product.getStock() > 0) ? product.getStock() : 50;
+            if (isShoe) {
+                String[] shoeSizes = {"39", "40", "41", "42", "43", "44"};
+                int perSize = Math.max(1, baseStock / shoeSizes.length);
+                for (String s : shoeSizes) safeSizeStocks.put(s, perSize);
+            } else {
+                String[] apparelSizes = {"S", "M", "L", "XL", "XXL"};
+                int perSize = Math.max(1, baseStock / apparelSizes.length);
+                for (String s : apparelSizes) safeSizeStocks.put(s, perSize);
+            }
+        }
+
         return new ProductResponse(
                 product.getId(),
                 categoryId,
@@ -21,7 +44,7 @@ public class ProductMapper {
                 product.getPrice(),
                 product.getStock(),
                 product.getImageUrl(),
-                product.getSizeStocks(),
+                safeSizeStocks,
                 product.getCreatedAt(),
                 product.getUpdatedAt()
         );
