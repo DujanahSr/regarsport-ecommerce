@@ -1,9 +1,12 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useRef } from "react";
-import { Printer, X, FileText, CheckCircle2, ShieldCheck, Download } from "lucide-react";
+import React, { useRef, useState } from "react";
+import { Printer, X, FileText, CheckCircle2, ShieldCheck, Download, Loader2 } from "lucide-react";
+import html2pdf from "html2pdf.js";
+import toast from "react-hot-toast";
 
 export default function InvoiceModal({ isOpen, onClose, order }) {
   const printRef = useRef(null);
+  const [downloadingPDF, setDownloadingPDF] = useState(false);
 
   if (!isOpen || !order) return null;
 
@@ -20,6 +23,34 @@ export default function InvoiceModal({ isOpen, onClose, order }) {
   const totalAmount = Number(order.totalAmount || order.total_amount || 0);
   const rawStatus = (order.status || "").toUpperCase();
   const isPaid = ["PAID", "PROCESSING", "SHIPPED", "COMPLETED"].includes(rawStatus);
+  const isPending = rawStatus === "PENDING";
+  const isCancelled = rawStatus === "CANCELLED";
+
+  const handleDownloadPDF = async () => {
+    const invoiceEl = document.getElementById("official-customer-invoice");
+    if (!invoiceEl) return;
+
+    try {
+      setDownloadingPDF(true);
+      toast.loading("Menyiapkan dokumen PDF...", { id: "pdf-toast" });
+
+      const opt = {
+        margin: [8, 10, 8, 10],
+        filename: `${invoiceNumber.replace(/[^a-zA-Z0-9-]/g, "_")}.pdf`,
+        image: { type: "jpeg", quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true, letterRendering: true },
+        jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
+      };
+
+      await html2pdf().set(opt).from(invoiceEl).save();
+      toast.success("Dokumen PDF berhasil diunduh!", { id: "pdf-toast" });
+    } catch (err) {
+      console.error("Gagal download PDF:", err);
+      toast.error("Gagal mengunduh PDF secara otomatis. Silakan gunakan Cetak Faktur.", { id: "pdf-toast" });
+    } finally {
+      setDownloadingPDF(false);
+    }
+  };
 
   const handlePrint = () => {
     const invoiceEl = document.getElementById("official-customer-invoice");
@@ -169,25 +200,47 @@ export default function InvoiceModal({ isOpen, onClose, order }) {
         {/* Modal Actions Header */}
         <div className="flex items-center justify-between pb-5 mb-5 border-b border-white/10 print:hidden">
           <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-2xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+            <div className={`p-2.5 rounded-2xl border ${
+              isPaid
+                ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
+                : isPending
+                ? "bg-amber-500/10 text-amber-400 border-amber-500/20"
+                : "bg-rose-500/10 text-rose-400 border-rose-500/20"
+            }`}>
               <FileText size={22} />
             </div>
             <div>
-              <h3 className="text-lg font-bold text-white">Invoice Resmi Pembelian</h3>
+              <h3 className="text-lg font-bold text-white">
+                {isPaid
+                  ? "Invoice Resmi Pembelian (Lunas)"
+                  : isPending
+                  ? "Surat Tagihan / Proforma Invoice"
+                  : "Faktur Pembelian (Dibatalkan)"}
+              </h3>
               <p className="text-xs text-white/50">{invoiceNumber}</p>
             </div>
           </div>
 
           <div className="flex items-center gap-2">
             <button
-              onClick={handlePrint}
-              className="flex items-center gap-2 px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-lg shadow-emerald-600/20 transition active:scale-95 cursor-pointer"
+              onClick={handleDownloadPDF}
+              disabled={downloadingPDF}
+              className="flex items-center gap-1.5 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-bold text-xs rounded-xl shadow-lg shadow-blue-600/20 transition active:scale-95 cursor-pointer"
+              title="Unduh berkas PDF langsung ke perangkat"
             >
-              <Printer size={16} /> Cetak / Unduh PDF
+              {downloadingPDF ? <Loader2 size={15} className="animate-spin" /> : <Download size={15} />}
+              <span>{downloadingPDF ? "Menyimpan..." : "Unduh PDF"}</span>
+            </button>
+            <button
+              onClick={handlePrint}
+              className="flex items-center gap-1.5 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-lg shadow-emerald-600/20 transition active:scale-95 cursor-pointer"
+              title="Cetak lewat printer fisik atau preview dialog browser"
+            >
+              <Printer size={15} /> <span>Cetak Faktur</span>
             </button>
             <button
               onClick={onClose}
-              className="p-2 text-white/50 hover:text-white rounded-xl hover:bg-white/5 transition"
+              className="p-2 text-white/50 hover:text-white rounded-xl hover:bg-white/5 transition cursor-pointer"
               title="Tutup"
             >
               <X size={20} />
@@ -227,7 +280,11 @@ export default function InvoiceModal({ isOpen, onClose, order }) {
 
               <div className="text-right">
                 <span className="text-xl font-black text-slate-900 tracking-wider block">
-                  INVOICE
+                  {isPaid
+                    ? "INVOICE RESMI"
+                    : isPending
+                    ? "PROFORMA INVOICE"
+                    : "INVOICE (DIBATALKAN)"}
                 </span>
                 <p className="text-[11px] font-mono font-bold text-emerald-700">
                   {invoiceNumber}
@@ -282,8 +339,8 @@ export default function InvoiceModal({ isOpen, onClose, order }) {
                   </div>
                   <div className="flex justify-between">
                     <span className="text-slate-500">Status Transaksi:</span>
-                    <span className={`font-bold ${isPaid ? "text-emerald-700" : "text-amber-600"}`}>
-                      {isPaid ? "LUNAS (SETTLEMENT)" : "MENUNGGU PEMBAYARAN"}
+                    <span className={`font-bold ${isPaid ? "text-emerald-700" : isPending ? "text-amber-600" : "text-rose-600"}`}>
+                      {isPaid ? "LUNAS (SETTLEMENT)" : isPending ? "MENUNGGU PEMBAYARAN" : "DIBATALKAN"}
                     </span>
                   </div>
                   {order.shippingCourier && (
@@ -312,6 +369,37 @@ export default function InvoiceModal({ isOpen, onClose, order }) {
                       </span>
                       <span className="text-[7.5px] font-mono text-rose-500 font-bold block">
                         {new Date(order.createdAt || Date.now()).toLocaleDateString("id-ID")}
+                      </span>
+                    </div>
+                  </div>
+                )}
+
+                {/* Stempel Digital PROFORMA jika Belum Lunas */}
+                {isPending && (
+                  <div className="absolute right-2.5 bottom-1.5 transform -rotate-12 pointer-events-none opacity-85 select-none">
+                    <div className="border-2 border-dashed border-amber-500 rounded px-2.5 py-0.5 text-center bg-amber-50/60 shadow-xs">
+                      <span className="text-[8px] font-black uppercase text-amber-600 tracking-widest block">
+                        MENUNGGU BAYAR
+                      </span>
+                      <span className="text-xs font-black text-amber-600 tracking-widest leading-tight block">
+                        UNPAID / PROFORMA
+                      </span>
+                      <span className="text-[7.5px] font-mono text-amber-500 font-bold block">
+                        Tagihan Sementara
+                      </span>
+                    </div>
+                  </div>
+                )}
+
+                {/* Stempel Digital VOID jika Dibatalkan */}
+                {isCancelled && (
+                  <div className="absolute right-2.5 bottom-1.5 transform -rotate-12 pointer-events-none opacity-85 select-none">
+                    <div className="border-2 border-dashed border-rose-600 rounded px-2.5 py-0.5 text-center bg-rose-50/70 shadow-xs">
+                      <span className="text-[8px] font-black uppercase text-rose-600 tracking-widest block">
+                        STATUS TRANSAKSI
+                      </span>
+                      <span className="text-xs font-black text-rose-600 tracking-widest leading-tight block">
+                        VOID / BATAL
                       </span>
                     </div>
                   </div>
@@ -420,15 +508,23 @@ export default function InvoiceModal({ isOpen, onClose, order }) {
         <div className="flex justify-end gap-3 mt-5 print:hidden">
           <button
             onClick={onClose}
-            className="px-5 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-white/70 hover:text-white text-xs font-semibold transition"
+            className="px-5 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-white/70 hover:text-white text-xs font-semibold transition cursor-pointer"
           >
             Tutup
+          </button>
+          <button
+            onClick={handleDownloadPDF}
+            disabled={downloadingPDF}
+            className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white text-xs font-bold transition shadow-lg shadow-blue-600/20 active:scale-95 cursor-pointer"
+          >
+            {downloadingPDF ? <Loader2 size={16} className="animate-spin" /> : <Download size={16} />}
+            <span>{downloadingPDF ? "Menyimpan PDF..." : "Unduh PDF"}</span>
           </button>
           <button
             onClick={handlePrint}
             className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition shadow-lg shadow-emerald-600/20 active:scale-95 cursor-pointer"
           >
-            <Printer size={16} /> Cetak Faktur / PDF
+            <Printer size={16} /> Cetak Faktur
           </button>
         </div>
       </div>

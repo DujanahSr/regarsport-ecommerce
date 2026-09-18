@@ -310,16 +310,22 @@ export default function OrderDetail() {
             ) : null}
           </div>
 
-          <div className="flex items-center gap-3">
-            {/* Tombol Cetak Invoice Resmi */}
+          <div className="flex items-center gap-2.5">
+            {/* Tombol Cetak / Unduh Dokumen Resmi */}
             <button
               type="button"
               onClick={() => setShowInvoiceModal(true)}
-              className="flex items-center gap-1.5 rounded-2xl bg-white px-4 py-2 text-xs sm:text-sm font-bold text-slate-700 ring-1 ring-slate-200 shadow-xs transition hover:bg-slate-50 hover:text-emerald-700 active:scale-95 cursor-pointer"
-              title="Cetak Faktur Pembelian / Invoice Resmi"
+              className={`flex items-center gap-1.5 rounded-2xl px-4 py-2 text-xs sm:text-sm font-bold shadow-xs transition active:scale-95 cursor-pointer ${
+                isPaid
+                  ? "bg-emerald-50 text-emerald-800 border border-emerald-200 hover:bg-emerald-100"
+                  : isPending
+                  ? "bg-amber-50 text-amber-800 border border-amber-200 hover:bg-amber-100"
+                  : "bg-slate-100 text-slate-600 border border-slate-200 hover:bg-slate-200"
+              }`}
+              title={isPaid ? "Cetak atau Unduh Invoice Resmi Lunas" : "Lihat / Cetak Tagihan Sementara (Proforma)"}
             >
-              <Printer size={15} />
-              <span className="hidden sm:inline">Cetak</span> Invoice
+              {isPaid ? <FileText size={15} className="text-emerald-600" /> : <Printer size={15} className="text-amber-600" />}
+              <span>{isPaid ? "Invoice Resmi (PDF)" : "Cetak Tagihan"}</span>
             </button>
 
             {isCancelled ? (
@@ -330,7 +336,7 @@ export default function OrderDetail() {
               <button
                 type="button"
                 onClick={() => setShowModal(true)}
-                className="flex items-center gap-2 rounded-2xl bg-emerald-600 px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-emerald-600/20 transition hover:-translate-y-0.5 hover:bg-emerald-700"
+                className="flex items-center gap-2 rounded-2xl bg-emerald-600 px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-emerald-600/20 transition hover:-translate-y-0.5 hover:bg-emerald-700 active:scale-95 cursor-pointer"
               >
                 <CreditCard size={16} />
                 Bayar Sekarang
@@ -344,7 +350,7 @@ export default function OrderDetail() {
           </div>
         </div>
 
-        {/* Stepper / Timeline */}
+        {/* Stepper / Timeline Pelacakan Status Bergaris */}
         {isCancelled ? (
           <div className="rounded-2xl border border-rose-200 bg-rose-50 p-4 text-rose-800 flex items-center gap-3">
             <AlertCircle size={20} className="text-rose-600 shrink-0" />
@@ -354,50 +360,111 @@ export default function OrderDetail() {
           </div>
         ) : (
           <div className="py-2">
-            <h2 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-6">
-              Status Progres Pesanan
-            </h2>
-            <div className="grid grid-cols-2 sm:grid-cols-5 gap-4 relative">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xs font-bold uppercase tracking-wider text-slate-400">
+                Status Progres Pelacakan Pesanan
+              </h2>
+              <span className="text-xs font-semibold text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200/60">
+                Tahap {Math.max(1, currentRank)} dari 5
+              </span>
+            </div>
+
+            {/* Desktop Stepper Bergaris Aktif */}
+            <div className="hidden sm:block relative mb-6 pt-2">
+              {/* Garis Dasar Abu-Abu */}
+              <div className="absolute top-7 left-12 right-12 h-1 bg-slate-100 rounded-full z-0" />
+
+              {/* Garis Progres Hijau Berjalan */}
+              <div
+                className="absolute top-7 left-12 h-1 bg-emerald-500 rounded-full transition-all duration-500 z-0"
+                style={{
+                  width: `${Math.min(100, Math.max(0, ((currentRank - 1) / 4) * 85))}%`,
+                }}
+              />
+
+              <div className="grid grid-cols-5 relative z-10">
+                {ORDER_STEPS.map((step, idx) => {
+                  const stepRank = STATUS_RANK[step.key];
+                  const isCompleted = currentRank > stepRank;
+                  const isCurrent = currentRank === stepRank;
+                  const IconComponent = step.icon;
+
+                  return (
+                    <div key={step.key} className="flex flex-col items-center text-center px-1">
+                      <div
+                        className={`w-11 h-11 rounded-2xl flex items-center justify-center transition-all duration-300 ${
+                          isCurrent
+                            ? "bg-emerald-600 text-white shadow-lg shadow-emerald-600/30 ring-4 ring-emerald-100 scale-110"
+                            : isCompleted
+                            ? "bg-emerald-500 text-white shadow-sm"
+                            : "bg-white border-2 border-slate-200 text-slate-400"
+                        }`}
+                      >
+                        {isCompleted ? <Check size={18} strokeWidth={2.5} /> : <IconComponent size={18} />}
+                      </div>
+
+                      <span
+                        className={`text-xs font-bold mt-3 leading-tight ${
+                          isCurrent
+                            ? "text-emerald-700 font-black"
+                            : isCompleted
+                            ? "text-slate-800"
+                            : "text-slate-400"
+                        }`}
+                      >
+                        {step.label}
+                      </span>
+
+                      <span className="text-[10px] text-slate-400 mt-0.5 leading-tight">
+                        {isCurrent
+                          ? "Sedang berlangsung"
+                          : isCompleted
+                          ? "Selesai"
+                          : `Langkah ${idx + 1}`}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Mobile Vertical Stepper */}
+            <div className="sm:hidden space-y-4 relative pl-6 border-l-2 border-slate-200 ml-3">
               {ORDER_STEPS.map((step, idx) => {
                 const stepRank = STATUS_RANK[step.key];
-                const isCompleted = currentRank >= stepRank;
+                const isCompleted = currentRank > stepRank;
                 const isCurrent = currentRank === stepRank;
                 const IconComponent = step.icon;
 
                 return (
-                  <div
-                    key={step.key}
-                    className={`flex flex-col items-center text-center p-3 rounded-2xl border transition ${
-                      isCurrent
-                        ? "border-emerald-500 bg-emerald-50/50 shadow-xs"
-                        : isCompleted
-                        ? "border-slate-100 bg-slate-50/70"
-                        : "border-dashed border-slate-200 opacity-45"
-                    }`}
-                  >
+                  <div key={step.key} className="relative pb-2 last:pb-0">
                     <div
-                      className={`h-10 w-10 rounded-xl flex items-center justify-center mb-2 transition ${
-                        isCompleted
-                          ? "bg-emerald-600 text-white shadow-sm"
-                          : "bg-slate-200 text-slate-500"
-                      }`}
-                    >
-                      <IconComponent size={18} />
-                    </div>
-                    <span
-                      className={`text-xs font-bold ${
+                      className={`absolute -left-[31px] top-0 w-8 h-8 rounded-full flex items-center justify-center text-xs ${
                         isCurrent
-                          ? "text-emerald-700"
+                          ? "bg-emerald-600 text-white ring-4 ring-emerald-100 font-bold"
                           : isCompleted
-                          ? "text-slate-800"
-                          : "text-slate-400"
+                          ? "bg-emerald-500 text-white"
+                          : "bg-white border-2 border-slate-300 text-slate-400"
                       }`}
                     >
-                      {step.label}
-                    </span>
-                    <span className="text-[10px] text-slate-400 mt-0.5">
-                      Langkah {idx + 1}
-                    </span>
+                      {isCompleted ? <Check size={14} /> : <IconComponent size={14} />}
+                    </div>
+                    <div className="ml-2">
+                      <p
+                        className={`text-sm font-bold ${
+                          isCurrent
+                            ? "text-emerald-700 font-black"
+                            : isCompleted
+                            ? "text-slate-900"
+                            : "text-slate-400"
+                        }`}
+                      >
+                        {step.label}
+                      </p>
+                      <p className="text-xs text-slate-400">
+                        {isCurrent ? "Sedang dalam tahap ini" : isCompleted ? "Tahap selesai" : `Menunggu antrean`}
+                      </p>
+                    </div>
                   </div>
                 );
               })}

@@ -2,12 +2,28 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 // FRONTEND/src/pages/admin/Orders.jsx
 
-import { useCallback, useEffect, useState } from "react";
-import { Download, Filter, ShoppingCart, ChevronLeft, ChevronRight, Truck, X, PackageCheck, Printer } from "lucide-react";
+import { useCallback, useEffect, useState, useMemo } from "react";
+import {
+  Download,
+  Filter,
+  ShoppingCart,
+  ChevronLeft,
+  ChevronRight,
+  Truck,
+  X,
+  PackageCheck,
+  Printer,
+  Search,
+  Scan,
+  CheckSquare,
+  Square,
+  Layers,
+} from "lucide-react";
 import api from "../../services/api";
 import { EmptyState, ScreenLoader } from "../../components/common/UiStates";
 import toast from "react-hot-toast";
 import ShippingLabelModal from "../../components/admin/ShippingLabelModal";
+import BulkShippingLabelModal from "../../components/admin/BulkShippingLabelModal";
 import { useAuth } from "../../context/AuthContext";
 
 const orderStatuses = ["pending", "paid", "processing", "shipped", "completed", "cancelled"];
@@ -40,6 +56,13 @@ export default function Orders() {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [exporting, setExporting] = useState(false);
+
+  // Search & Barcode Scan State
+  const [searchQuery, setSearchQuery] = useState("");
+
+  // Bulk Selection & Print State
+  const [selectedOrderIds, setSelectedOrderIds] = useState([]);
+  const [showBulkModal, setShowBulkModal] = useState(false);
 
   // Ship Modal State
   const [shippingOrder, setShippingOrder] = useState(null);
@@ -78,7 +101,48 @@ export default function Orders() {
 
   useEffect(() => {
     getOrders();
+    setSelectedOrderIds([]);
   }, [getOrders]);
+
+  const filteredOrders = useMemo(() => {
+    if (!searchQuery.trim()) return orders;
+    const q = searchQuery.toLowerCase().trim();
+    return orders.filter((order) => {
+      const orderNum = (order.orderNumber || `#${order.id}`).toLowerCase();
+      const tracking = (order.trackingNumber || "").toLowerCase();
+      const recipient = (
+        order.recipientName ||
+        order.customerName ||
+        order.users?.full_name ||
+        ""
+      ).toLowerCase();
+      const phone = (order.customerPhone || order.shippingPhone || "").toLowerCase();
+      const courierName = (order.shippingCourier || "").toLowerCase();
+      const city = (order.shippingCity || "").toLowerCase();
+      return (
+        orderNum.includes(q) ||
+        tracking.includes(q) ||
+        recipient.includes(q) ||
+        phone.includes(q) ||
+        courierName.includes(q) ||
+        city.includes(q)
+      );
+    });
+  }, [orders, searchQuery]);
+
+  const toggleSelectOrder = (id) => {
+    setSelectedOrderIds((prev) =>
+      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
+    );
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedOrderIds.length === filteredOrders.length && filteredOrders.length > 0) {
+      setSelectedOrderIds([]);
+    } else {
+      setSelectedOrderIds(filteredOrders.map((o) => o.id));
+    }
+  };
 
   const updateStatus = async (id, status) => {
     try {
@@ -161,47 +225,112 @@ export default function Orders() {
         </div>
       </div>
 
-      {/* Controls */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
-        <div className="flex items-center gap-3">
-          <div className="flex items-center bg-[#14141E] border border-white/5 rounded-2xl px-4 py-2.5">
-            <Filter size={18} className="text-white/40 mr-3" />
-            <select
-              value={statusFilter}
-              onChange={(e) => {
+      {/* Quick Filter Tabs */}
+      <div className="flex items-center gap-2 overflow-x-auto pb-2 mb-6">
+        {[
+          { label: "Semua Pesanan", value: "" },
+          { label: "Perlu Dikemas", value: "PAID", badge: "Siap Kirim", badgeColor: "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30" },
+          { label: "Sedang Diproses", value: "PROCESSING", badgeColor: "bg-blue-500/20 text-blue-400 border border-blue-500/30" },
+          { label: "Dalam Pengiriman", value: "SHIPPED", badgeColor: "bg-purple-500/20 text-purple-400 border border-purple-500/30" },
+          { label: "Selesai", value: "COMPLETED", badgeColor: "bg-green-500/20 text-green-400 border border-green-500/30" },
+          { label: "Dibatalkan", value: "CANCELLED", badgeColor: "bg-red-500/20 text-red-400 border border-red-500/30" },
+        ].map((tab) => {
+          const isActive = (statusFilter || "").toUpperCase() === (tab.value || "").toUpperCase();
+          return (
+            <button
+              key={tab.value}
+              onClick={() => {
                 setPage(1);
-                setStatusFilter(e.target.value);
+                setStatusFilter(tab.value);
               }}
-              className="bg-transparent text-white text-sm outline-none cursor-pointer"
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${
+                isActive
+                  ? "bg-[#00BFA5] text-black shadow-lg shadow-[#00BFA5]/25"
+                  : "bg-[#14141E] text-slate-400 hover:text-white hover:bg-white/5 border border-white/5"
+              }`}
             >
-              <option value="">Semua Status</option>
-              {orderStatuses.map((s) => (
-                <option key={s} value={s} className="bg-[#0C0C16]">
-                  {s.charAt(0).toUpperCase() + s.slice(1)}
-                </option>
-              ))}
-            </select>
+              <span>{tab.label}</span>
+              {tab.badge && (
+                <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${isActive ? "bg-black/20 text-black font-black" : tab.badgeColor}`}>
+                  {tab.badge}
+                </span>
+              )}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Search & Action Bar */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+        {/* Barcode & Text Search */}
+        <div className="flex-1 max-w-lg">
+          <div className="flex items-center bg-[#14141E] border border-white/10 rounded-2xl px-4 py-2.5 focus-within:border-[#00BFA5]/60 focus-within:bg-[#00BFA5]/5 transition-all shadow-inner">
+            <Scan size={18} className="text-[#00BFA5] mr-2.5 shrink-0 animate-pulse" />
+            <input
+              type="text"
+              placeholder="Cari No. Order, Scan Barcode Resi, Nama, Kota, atau HP..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full bg-transparent text-white text-xs sm:text-sm outline-none placeholder:text-white/30"
+            />
+            {searchQuery && (
+              <button
+                type="button"
+                onClick={() => setSearchQuery("")}
+                className="text-white/40 hover:text-white ml-2 p-1"
+                title="Hapus pencarian"
+              >
+                <X size={15} />
+              </button>
+            )}
           </div>
         </div>
 
-        {!isLogistics && (
-          <button
-            onClick={handleExportCSV}
-            disabled={exporting}
-            className="flex items-center gap-2.5 bg-[#00BFA5]/10 hover:bg-[#00BFA5]/20 text-[#00BFA5] hover:text-white px-5 py-3 rounded-2xl border border-[#00BFA5]/20 transition-all font-medium disabled:opacity-50"
-          >
-            <Download size={18} />
-            {exporting ? "Mengekspor..." : "Export CSV"}
-          </button>
-        )}
+        {/* Action buttons */}
+        <div className="flex items-center gap-3">
+          {filteredOrders.length > 0 && (
+            <button
+              type="button"
+              onClick={toggleSelectAll}
+              className="flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white border border-white/5 text-xs font-semibold transition cursor-pointer"
+            >
+              {selectedOrderIds.length > 0 && selectedOrderIds.length === filteredOrders.length ? (
+                <>
+                  <CheckSquare size={16} className="text-[#00BFA5]" />
+                  <span>Batal Pilih Semua</span>
+                </>
+              ) : (
+                <>
+                  <Square size={16} />
+                  <span>Pilih Semua ({filteredOrders.length})</span>
+                </>
+              )}
+            </button>
+          )}
+
+          {!isLogistics && (
+            <button
+              onClick={handleExportCSV}
+              disabled={exporting}
+              className="flex items-center gap-2.5 bg-[#00BFA5]/10 hover:bg-[#00BFA5]/20 text-[#00BFA5] hover:text-white px-5 py-2.5 rounded-2xl border border-[#00BFA5]/20 transition-all font-semibold text-xs disabled:opacity-50 cursor-pointer"
+            >
+              <Download size={16} />
+              {exporting ? "Mengekspor..." : "Export CSV"}
+            </button>
+          )}
+        </div>
       </div>
 
       {loading ? (
         <ScreenLoader label="Memuat daftar pesanan..." />
-      ) : orders.length === 0 ? (
+      ) : filteredOrders.length === 0 ? (
         <EmptyState
-          title="Belum ada pesanan"
-          description="Pesanan dari pelanggan akan muncul di sini."
+          title={searchQuery ? "Tidak ditemukan pesanan" : "Belum ada pesanan"}
+          description={
+            searchQuery
+              ? `Tidak ada pesanan yang sesuai dengan kata kunci "${searchQuery}".`
+              : "Pesanan dari pelanggan akan muncul di sini."
+          }
         />
       ) : (
         <div className="bg-[#14141E] border border-white/5 rounded-3xl overflow-hidden">
@@ -209,27 +338,51 @@ export default function Orders() {
             <table className="w-full min-w-225">
               <thead>
                 <tr className="border-b border-white/5 bg-white/5">
-                  <th className="p-6 text-left text-xs font-bold text-slate-400 uppercase tracking-wider">Order ID</th>
-                  <th className="p-6 text-left text-xs font-bold text-slate-400 uppercase tracking-wider">Pelanggan</th>
-                  <th className="p-6 text-left text-xs font-bold text-slate-400 uppercase tracking-wider">Item & Ukuran</th>
-                  <th className="p-6 text-left text-xs font-bold text-slate-400 uppercase tracking-wider">Total</th>
-                  <th className="p-6 text-left text-xs font-bold text-slate-400 uppercase tracking-wider">Status</th>
-                  <th className="p-6 text-left text-xs font-bold text-slate-400 uppercase tracking-wider">Pengiriman & Resi</th>
-                  <th className="p-6 text-left text-xs font-bold text-slate-400 uppercase tracking-wider">Label Logistik</th>
-                  <th className="p-6 text-left text-xs font-bold text-slate-400 uppercase tracking-wider">Ubah Status</th>
+                  <th className="p-5 pl-6 text-center w-12">
+                    <button
+                      type="button"
+                      onClick={toggleSelectAll}
+                      className="text-slate-400 hover:text-white cursor-pointer"
+                      title="Pilih semua pesanan"
+                    >
+                      {selectedOrderIds.length > 0 && selectedOrderIds.length === filteredOrders.length ? (
+                        <CheckSquare size={18} className="text-[#00BFA5]" />
+                      ) : (
+                        <Square size={18} />
+                      )}
+                    </button>
+                  </th>
+                  <th className="p-5 text-left text-xs font-bold text-slate-400 uppercase tracking-wider">Order ID</th>
+                  <th className="p-5 text-left text-xs font-bold text-slate-400 uppercase tracking-wider">Pelanggan</th>
+                  <th className="p-5 text-left text-xs font-bold text-slate-400 uppercase tracking-wider">Item & Ukuran</th>
+                  <th className="p-5 text-left text-xs font-bold text-slate-400 uppercase tracking-wider">Total</th>
+                  <th className="p-5 text-left text-xs font-bold text-slate-400 uppercase tracking-wider">Status</th>
+                  <th className="p-5 text-left text-xs font-bold text-slate-400 uppercase tracking-wider">Pengiriman & Resi</th>
+                  <th className="p-5 text-left text-xs font-bold text-slate-400 uppercase tracking-wider">Label Logistik</th>
+                  <th className="p-5 text-left text-xs font-bold text-slate-400 uppercase tracking-wider">Ubah Status</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/5">
-                {orders.map((order) => {
+                {filteredOrders.map((order) => {
                   const s = (order.status || "").toLowerCase();
                   const hasShipping = order.shippingCourier || order.trackingNumber;
 
                   return (
                     <tr
                       key={order.id}
-                      className="hover:bg-white/5 transition-all duration-200 group"
+                      className={`hover:bg-white/5 transition-all duration-200 group ${
+                        selectedOrderIds.includes(order.id) ? "bg-[#00BFA5]/5" : ""
+                      }`}
                     >
-                      <td className="p-6 text-white/60 font-mono text-sm">
+                      <td className="p-5 pl-6 text-center">
+                        <input
+                          type="checkbox"
+                          checked={selectedOrderIds.includes(order.id)}
+                          onChange={() => toggleSelectOrder(order.id)}
+                          className="w-4 h-4 rounded accent-[#00BFA5] cursor-pointer"
+                        />
+                      </td>
+                      <td className="p-5 text-white/60 font-mono text-sm">
                         {order.orderNumber || `#${order.id}`}
                       </td>
                       <td className="p-6">
@@ -455,11 +608,47 @@ export default function Orders() {
         </div>
       )}
 
-      {/* Modal Cetak Label Thermal Pengiriman & Packing Slip */}
+      {/* Floating Action Bar untuk Cetak Massal */}
+      {selectedOrderIds.length > 0 && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 bg-[#14141E] border border-[#00BFA5]/40 rounded-2xl px-5 py-3 shadow-2xl shadow-black/80 flex items-center gap-3 sm:gap-4 animate-in fade-in slide-in-from-bottom-4">
+          <div className="flex items-center gap-2 text-xs sm:text-sm text-white font-medium">
+            <span className="w-6 h-6 rounded-full bg-[#00BFA5] text-black font-black text-xs flex items-center justify-center">
+              {selectedOrderIds.length}
+            </span>
+            <span className="hidden sm:inline">Pesanan terpilih</span>
+          </div>
+
+          <div className="h-4 w-px bg-white/10" />
+
+          <button
+            onClick={() => setShowBulkModal(true)}
+            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#00BFA5] hover:bg-[#00BFA5]/90 text-black text-xs font-black transition cursor-pointer shadow-lg shadow-[#00BFA5]/20 active:scale-95"
+          >
+            <Printer size={15} />
+            Cetak {selectedOrderIds.length} Label Thermal (A6)
+          </button>
+
+          <button
+            onClick={() => setSelectedOrderIds([])}
+            className="text-xs text-slate-400 hover:text-white px-2 py-1 transition cursor-pointer"
+          >
+            Batal
+          </button>
+        </div>
+      )}
+
+      {/* Modal Cetak Label Thermal Pengiriman Satuan */}
       <ShippingLabelModal
         isOpen={!!labelOrder}
         onClose={() => setLabelOrder(null)}
         order={labelOrder}
+      />
+
+      {/* Modal Cetak Massal Label Thermal Pengiriman */}
+      <BulkShippingLabelModal
+        isOpen={showBulkModal}
+        onClose={() => setShowBulkModal(false)}
+        orders={filteredOrders.filter((o) => selectedOrderIds.includes(o.id))}
       />
     </div>
   );
