@@ -102,12 +102,31 @@ export default function Header() {
             </Link>
           )}
 
-          <div className="flex items-center gap-2 text-sm text-emerald-50/80">
-            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white/10">
-              <User size={15} />
+          <Link
+            to="/dashboard/profile"
+            className="flex items-center gap-2 rounded-lg py-1 px-2 text-sm text-emerald-50/90 transition hover:bg-white/10"
+            title="Buka Pengaturan Profil"
+          >
+            {user?.avatar_url || user?.avatarUrl ? (
+              <img
+                src={user.avatar_url || user.avatarUrl}
+                alt={user?.full_name || "Avatar"}
+                className="h-8 w-8 rounded-full object-cover ring-2 ring-emerald-400/50"
+                onError={(e) => {
+                  e.currentTarget.style.display = "none";
+                  e.currentTarget.nextElementSibling?.classList.remove("hidden");
+                }}
+              />
+            ) : null}
+            <span
+              className={`flex h-8 w-8 items-center justify-center rounded-full bg-emerald-500/20 text-xs font-bold text-emerald-300 ring-1 ring-emerald-400/40 ${
+                user?.avatar_url || user?.avatarUrl ? "hidden" : ""
+              }`}
+            >
+              {user?.full_name?.charAt(0)?.toUpperCase() || "U"}
             </span>
-            <span className="max-w-35 truncate">{user?.full_name}</span>
-          </div>
+            <span className="max-w-35 truncate font-medium">{user?.full_name}</span>
+          </Link>
 
           <button
             type="button"
@@ -133,12 +152,34 @@ export default function Header() {
       {/* Mobile menu */}
       {isMenuOpen ? (
         <div className="border-t border-white/10 bg-emerald-950 px-4 py-4 sm:px-6 lg:hidden">
-          <div className="mb-3 flex items-center gap-2 border-b border-white/10 pb-3 text-sm text-emerald-50/80">
-            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10">
-              <User size={16} />
+          <Link
+            to="/dashboard/profile"
+            onClick={() => setIsMenuOpen(false)}
+            className="mb-3 flex items-center gap-3 border-b border-white/10 pb-3 text-sm text-emerald-50/90 hover:text-white"
+          >
+            {user?.avatar_url || user?.avatarUrl ? (
+              <img
+                src={user.avatar_url || user.avatarUrl}
+                alt={user?.full_name || "Avatar"}
+                className="h-9 w-9 rounded-full object-cover ring-2 ring-emerald-400/50"
+                onError={(e) => {
+                  e.currentTarget.style.display = "none";
+                  e.currentTarget.nextElementSibling?.classList.remove("hidden");
+                }}
+              />
+            ) : null}
+            <span
+              className={`flex h-9 w-9 items-center justify-center rounded-full bg-emerald-500/20 text-sm font-bold text-emerald-300 ring-1 ring-emerald-400/40 ${
+                user?.avatar_url || user?.avatarUrl ? "hidden" : ""
+              }`}
+            >
+              {user?.full_name?.charAt(0)?.toUpperCase() || "U"}
             </span>
-            <span>Halo, {user?.full_name}</span>
-          </div>
+            <div className="flex flex-col">
+              <span className="font-semibold text-white">{user?.full_name}</span>
+              <span className="text-xs text-emerald-400">Kelola Profil & Keamanan &rarr;</span>
+            </div>
+          </Link>
 
           <div className="flex flex-col gap-1">
             {user?.role === "logistics" && (

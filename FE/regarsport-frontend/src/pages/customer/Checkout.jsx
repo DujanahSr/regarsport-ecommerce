@@ -19,11 +19,22 @@ export default function Checkout() {
   const { user } = useAuth();
 
   const [recipientName, setRecipientName] = useState(user?.fullName || user?.full_name || "");
-  const [phone, setPhone] = useState("");
-  const [city, setCity] = useState("");
-  const [postalCode, setPostalCode] = useState("");
-  const [streetAddress, setStreetAddress] = useState("");
+  const [phone, setPhone] = useState(user?.phoneNumber || user?.phone_number || "");
+  const [city, setCity] = useState(user?.city || "");
+  const [postalCode, setPostalCode] = useState(user?.postalCode || user?.postal_code || "");
+  const [streetAddress, setStreetAddress] = useState(user?.address || "");
   const [shippingNotes, setShippingNotes] = useState("");
+
+  // Auto-fill dari data profil pengguna jika baru dimuat
+  useEffect(() => {
+    if (user) {
+      if (!recipientName) setRecipientName(user.fullName || user.full_name || "");
+      if (!phone && (user.phoneNumber || user.phone_number)) setPhone(user.phoneNumber || user.phone_number);
+      if (!city && user.city) setCity(user.city);
+      if (!postalCode && (user.postalCode || user.postal_code)) setPostalCode(user.postalCode || user.postal_code);
+      if (!streetAddress && user.address) setStreetAddress(user.address);
+    }
+  }, [user]);
 
   const [loading, setLoading] = useState(false);
   const [validationError, setValidationError] = useState("");
@@ -206,6 +217,17 @@ export default function Checkout() {
               Wajib diisi lengkap untuk resi kurir
             </span>
           </div>
+
+          {(user?.address || user?.phoneNumber) && (
+            <div className="flex items-center justify-between rounded-xl bg-emerald-50 border border-emerald-100 px-3.5 py-2 text-xs text-emerald-800">
+              <span className="flex items-center gap-1.5 font-medium">
+                ✨ Alamat & kontak terisi otomatis dari profil akun Anda.
+              </span>
+              <Link to="/dashboard/profile" className="font-bold underline hover:text-emerald-950">
+                Kelola Profil
+              </Link>
+            </div>
+          )}
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {/* Nama Penerima */}

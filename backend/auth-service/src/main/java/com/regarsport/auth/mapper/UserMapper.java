@@ -15,6 +15,11 @@ public class UserMapper {
                 user.getEmail(),
                 user.getRole() != null ? user.getRole().name() : null,
                 user.getAvatarUrl(),
+                user.getPhoneNumber(),
+                user.getAddress(),
+                user.getCity(),
+                user.getPostalCode(),
+                user.getBio(),
                 user.getActive() != null ? user.getActive() : true,
                 user.getCreatedAt()
         );

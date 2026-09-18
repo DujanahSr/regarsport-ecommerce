@@ -133,9 +133,43 @@ public class AuthService {
         if (request.avatarUrl() != null) {
             user.setAvatarUrl(request.avatarUrl().trim());
         }
+        if (request.phoneNumber() != null) {
+            user.setPhoneNumber(request.phoneNumber().trim());
+        }
+        if (request.address() != null) {
+            user.setAddress(request.address().trim());
+        }
+        if (request.city() != null) {
+            user.setCity(request.city().trim());
+        }
+        if (request.postalCode() != null) {
+            user.setPostalCode(request.postalCode().trim());
+        }
+        if (request.bio() != null) {
+            user.setBio(request.bio().trim());
+        }
 
         User updatedUser = userRepository.save(user);
         return userMapper.toResponse(updatedUser);
+    }
+
+    @Transactional
+    public void changePassword(String email, ChangePasswordRequest request) {
+        log.info("Processing password change for user: {}", email);
+        User user = userRepository.findByEmailIgnoreCase(email)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + email));
+
+        if (!passwordEncoder.matches(request.currentPassword(), user.getPassword())) {
+            throw new BadRequestException("Password saat ini yang Anda masukkan salah");
+        }
+
+        if (request.newPassword() == null || request.newPassword().trim().length() < 6) {
+            throw new BadRequestException("Password baru minimal 6 karakter");
+        }
+
+        user.setPassword(passwordEncoder.encode(request.newPassword().trim()));
+        userRepository.save(user);
+        log.info("Password successfully changed for user: {}", email);
     }
 
     public PageResponse<UserResponse> getAllUsers(String search, String roleStr, int page, int size) {

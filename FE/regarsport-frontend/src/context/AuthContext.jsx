@@ -23,6 +23,12 @@ const normalizeUser = (u) => {
     fullName: u.fullName || u.full_name || "User",
     avatar_url: u.avatar_url || u.avatarUrl || "",
     avatarUrl: u.avatarUrl || u.avatar_url || "",
+    phoneNumber: u.phoneNumber || u.phone_number || "",
+    address: u.address || "",
+    city: u.city || "",
+    postalCode: u.postalCode || u.postal_code || "",
+    bio: u.bio || "",
+    createdAt: u.createdAt || u.created_at || "",
     active: u.active ?? true,
   };
 };

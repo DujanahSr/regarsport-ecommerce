@@ -62,4 +62,15 @@ public class AuthController {
         UserResponse response = authService.updateProfile(userDetails.getUsername(), request);
         return ResponseEntity.ok(ApiResponse.success("Profile updated successfully", response));
     }
+
+    @PutMapping("/password")
+    @Operation(summary = "Change user password", description = "Change current authenticated user's password",
+            security = @SecurityRequirement(name = "bearerAuth"))
+    public ResponseEntity<ApiResponse<Void>> changePassword(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @Valid @RequestBody ChangePasswordRequest request
+    ) {
+        authService.changePassword(userDetails.getUsername(), request);
+        return ResponseEntity.ok(ApiResponse.success("Password berhasil diperbarui", null));
+    }
 }
