@@ -24,6 +24,10 @@ import {
   Printer,
   FileText,
   RotateCcw,
+  ExternalLink,
+  Ban,
+  Phone,
+  HelpCircle,
 } from "lucide-react";
 import toast from "react-hot-toast";
 
@@ -71,12 +75,54 @@ export default function OrderDetail() {
   const [submittingReview, setSubmittingReview] = useState(false);
   const [reviewedProductIds, setReviewedProductIds] = useState(new Set());
 
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [cancelReason, setCancelReason] = useState("Ingin mengubah varian ukuran produk");
+  const [cancelling, setCancelling] = useState(false);
+
   const handleCopyResi = (resi) => {
     if (!resi) return;
     navigator.clipboard.writeText(resi);
     setCopiedResi(true);
     toast.success("Nomor resi berhasil disalin!");
     setTimeout(() => setCopiedResi(false), 2000);
+  };
+
+  const getCourierTrackingUrl = (courier, resi) => {
+    const c = (courier || "").toLowerCase();
+    const cleanResi = encodeURIComponent((resi || "").trim());
+    if (c.includes("j&t") || c.includes("jet")) return `https://www.jet.co.id/track`;
+    if (c.includes("jne")) return `https://www.jne.co.id/id/tracking/trace`;
+    if (c.includes("sicepat")) return `https://www.sicepat.com/checkAwb`;
+    if (c.includes("anteraja")) return `https://anteraja.id/tracking`;
+    if (c.includes("pos")) return `https://www.posindonesia.co.id/id/tracking`;
+    if (c.includes("ninja")) return `https://www.ninjaxpress.co/id-id/tracking`;
+    return `https://cekresi.com/?noresi=${cleanResi}`;
+  };
+
+  const handleCancelOrder = async (e) => {
+    e.preventDefault();
+    try {
+      setCancelling(true);
+      await api.patch(`/orders/${id}/cancel`, { reason: cancelReason });
+      toast.success("Pesanan berhasil dibatalkan");
+      setShowCancelModal(false);
+      getOrder(true);
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Gagal membatalkan pesanan");
+    } finally {
+      setCancelling(false);
+    }
+  };
+
+  const handleWhatsAppSupport = () => {
+    if (!order) return;
+    const orderNum = order.orderNumber || `#${order.id}`;
+    const recipient = order.recipientName || order.customerName || "Pelanggan";
+    const itemNames = (order.items || []).map((it) => it.productName || it.name || "Apparel").join(", ");
+    const text = encodeURIComponent(
+      `Halo Customer Service PT RegarSport Indonesia,\n\nSaya ingin konsultasi Garansi / Tukar Ukuran untuk pesanan:\n• No Order: ${orderNum}\n• Atas Nama: ${recipient}\n• Produk: ${itemNames}\n\nMohon petunjuk prosedur klaim penukaran ukuran atau garansi. Terima kasih!`
+    );
+    window.open(`https://wa.me/6281234567890?text=${text}`, "_blank");
   };
 
   const handleCompleteOrder = async () => {
@@ -336,9 +382,16 @@ export default function OrderDetail() {
             </button>
 
             {isCancelled ? (
-              <span className="rounded-full bg-rose-50 px-3.5 py-1.5 text-xs font-bold text-rose-600 ring-1 ring-rose-200">
-                Dibatalkan
-              </span>
+              <div className="flex flex-col items-end gap-1">
+                <span className="rounded-full bg-rose-50 px-3.5 py-1.5 text-xs font-bold text-rose-600 ring-1 ring-rose-200">
+                  Dibatalkan
+                </span>
+                {order.cancellationReason && (
+                  <span className="text-[10px] text-slate-500 italic max-w-xs text-right">
+                    Alasan: {order.cancellationReason}
+                  </span>
+                )}
+              </div>
             ) : isExpired ? (
               <div className="flex items-center gap-2">
                 <span className="rounded-full bg-rose-50 px-3.5 py-1.5 text-xs font-bold text-rose-600 ring-1 ring-rose-200">
@@ -353,14 +406,24 @@ export default function OrderDetail() {
                 </Link>
               </div>
             ) : isPending ? (
-              <button
-                type="button"
-                onClick={() => setShowModal(true)}
-                className="flex items-center gap-2 rounded-2xl bg-emerald-600 px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-emerald-600/20 transition hover:-translate-y-0.5 hover:bg-emerald-700 active:scale-95 cursor-pointer"
-              >
-                <CreditCard size={16} />
-                Bayar Sekarang
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setShowCancelModal(true)}
+                  className="flex items-center gap-1.5 rounded-2xl bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 px-4 py-2.5 text-xs font-bold transition active:scale-95 cursor-pointer"
+                >
+                  <Ban size={14} />
+                  <span>Batalkan Pesanan</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowModal(true)}
+                  className="flex items-center gap-2 rounded-2xl bg-emerald-600 px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-emerald-600/20 transition hover:-translate-y-0.5 hover:bg-emerald-700 active:scale-95 cursor-pointer"
+                >
+                  <CreditCard size={16} />
+                  Bayar Sekarang
+                </button>
+              </div>
             ) : (
               <span className="rounded-full bg-emerald-50 px-3.5 py-1.5 text-xs font-bold text-emerald-700 ring-1 ring-emerald-200 flex items-center gap-1.5">
                 <CheckCircle2 size={14} />
@@ -504,51 +567,148 @@ export default function OrderDetail() {
           </div>
         )}
 
-        {/* Kartu Informasi Pengiriman & Resi */}
+        {/* Kartu Informasi Pengiriman & Pelacakan Ekspedisi Visual */}
         {(order.shippingCourier || order.trackingNumber || (order.status || "").toUpperCase() === "SHIPPED") && (
-          <div className="rounded-2xl border border-emerald-500/30 bg-emerald-50/60 p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-xs">
-            <div className="flex items-center gap-3.5">
-              <div className="h-12 w-12 rounded-2xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-md shadow-emerald-600/20">
-                <Truck size={24} />
+          <div className="rounded-3xl border border-emerald-500/30 bg-emerald-50/40 p-6 shadow-xs space-y-6">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <div className="flex items-center gap-3.5">
+                <div className="h-12 w-12 rounded-2xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-md shadow-emerald-600/20">
+                  <Truck size={24} />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-black uppercase tracking-wider bg-emerald-200/80 text-emerald-900 px-2.5 py-0.5 rounded-full">
+                      {order.shippingCourier || "Ekspedisi Partner"}
+                    </span>
+                    <span className="text-xs text-slate-500 font-medium">Nomor Resi Resmi:</span>
+                  </div>
+                  <div className="flex items-center gap-2 mt-1">
+                    <span className="font-mono text-base font-black text-slate-900 tracking-wider">
+                      {order.trackingNumber || "Menunggu penerbitan nomor resi"}
+                    </span>
+                    {order.trackingNumber && (
+                      <button
+                        type="button"
+                        onClick={() => handleCopyResi(order.trackingNumber)}
+                        className="p-1 text-slate-400 hover:text-emerald-700 rounded-lg hover:bg-emerald-100 transition cursor-pointer"
+                        title="Salin Nomor Resi"
+                      >
+                        {copiedResi ? <Check size={16} className="text-emerald-600" /> : <Copy size={16} />}
+                      </button>
+                    )}
+                  </div>
+                </div>
               </div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <span className="text-xs font-black uppercase tracking-wider bg-emerald-200/80 text-emerald-900 px-2.5 py-0.5 rounded-full">
-                    {order.shippingCourier || "Ekspedisi"}
-                  </span>
-                  <span className="text-xs text-slate-500 font-medium">Nomor Resi:</span>
-                </div>
-                <div className="flex items-center gap-2 mt-1">
-                  <span className="font-mono text-base font-extrabold text-slate-900 tracking-wider">
-                    {order.trackingNumber || "Menunggu pembaruan nomor resi"}
-                  </span>
-                  {order.trackingNumber && (
-                    <button
-                      type="button"
-                      onClick={() => handleCopyResi(order.trackingNumber)}
-                      className="p-1 text-slate-400 hover:text-emerald-700 rounded-lg hover:bg-emerald-100 transition"
-                      title="Salin Nomor Resi"
-                    >
-                      {copiedResi ? <Check size={16} className="text-emerald-600" /> : <Copy size={16} />}
-                    </button>
-                  )}
-                </div>
+
+              <div className="flex flex-wrap items-center gap-2">
+                {order.trackingNumber && (
+                  <button
+                    type="button"
+                    onClick={() => window.open(getCourierTrackingUrl(order.shippingCourier, order.trackingNumber), "_blank")}
+                    className="inline-flex items-center gap-1.5 rounded-2xl bg-white text-emerald-800 border border-emerald-200 hover:bg-emerald-100 px-4 py-2.5 text-xs font-bold shadow-xs transition active:scale-95 cursor-pointer"
+                  >
+                    <ExternalLink size={14} />
+                    <span>Lacak di Portal Kurir ↗</span>
+                  </button>
+                )}
+
+                {(order.status || "").toUpperCase() === "SHIPPED" && (
+                  <button
+                    type="button"
+                    onClick={handleCompleteOrder}
+                    disabled={completing}
+                    className="flex items-center gap-2 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-bold px-5 py-2.5 shadow-lg shadow-emerald-600/20 transition active:scale-95 disabled:opacity-50 shrink-0 cursor-pointer"
+                  >
+                    <PackageCheck size={18} />
+                    {completing ? "Menyelesaikan..." : "Konfirmasi Pesanan Diterima"}
+                  </button>
+                )}
               </div>
             </div>
 
-            {(order.status || "").toUpperCase() === "SHIPPED" && (
-              <button
-                type="button"
-                onClick={handleCompleteOrder}
-                disabled={completing}
-                className="flex items-center gap-2 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-bold px-5 py-2.5 shadow-lg shadow-emerald-600/20 transition active:scale-95 disabled:opacity-50 shrink-0"
-              >
-                <PackageCheck size={18} />
-                {completing ? "Menyelesaikan..." : "Konfirmasi Pesanan Diterima"}
-              </button>
-            )}
+            {/* Visual Tracking Ekspedisi Stepper */}
+            <div className="p-4 rounded-2xl bg-white border border-emerald-100 shadow-xs">
+              <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-4 flex items-center justify-between">
+                <span>Tahapan Pengiriman Ekspedisi</span>
+                <span className="text-emerald-700 font-semibold">RegarSport Wonogiri Hub</span>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+                {[
+                  {
+                    step: "1",
+                    title: "Pengepakan Selesai",
+                    desc: "Paket dikemas & label resi thermal dicetak di Gudang Wonogiri",
+                    active: true,
+                  },
+                  {
+                    step: "2",
+                    title: "Diserahkan ke Kurir",
+                    desc: `Paket diserahkan ke ${order.shippingCourier || "ekspedisi"}`,
+                    active: Boolean(order.trackingNumber),
+                  },
+                  {
+                    step: "3",
+                    title: "Dalam Perjalanan",
+                    desc: `Menuju hub logistik kota tujuan (${order.shippingCity || "Tujuan"})`,
+                    active: (order.status || "").toUpperCase() === "SHIPPED" || (order.status || "").toUpperCase() === "COMPLETED",
+                  },
+                  {
+                    step: "4",
+                    title: "Pesanan Diterima",
+                    desc: `Kurir mengantar ke ${order.recipientName || "Penerima"}`,
+                    active: (order.status || "").toUpperCase() === "COMPLETED",
+                  },
+                ].map((item, idx) => (
+                  <div key={idx} className="flex items-start gap-3">
+                    <div
+                      className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${
+                        item.active
+                          ? "bg-emerald-600 text-white shadow-sm"
+                          : "bg-slate-100 text-slate-400 border border-slate-200"
+                      }`}
+                    >
+                      {item.active ? <Check size={13} strokeWidth={3} /> : item.step}
+                    </div>
+                    <div>
+                      <h5 className={`text-xs font-bold ${item.active ? "text-slate-900" : "text-slate-400"}`}>
+                        {item.title}
+                      </h5>
+                      <p className="text-[10px] text-slate-500 mt-0.5 leading-relaxed">
+                        {item.desc}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         )}
+
+        {/* Kartu Bantuan WhatsApp: Garansi & Tukar Ukuran */}
+        <div className="rounded-2xl border border-teal-200/80 bg-gradient-to-r from-teal-50 to-emerald-50/50 p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="flex items-center gap-3.5">
+            <div className="w-10 h-10 rounded-xl bg-teal-600 text-white flex items-center justify-center shrink-0 shadow-sm">
+              <Phone size={20} />
+            </div>
+            <div>
+              <h4 className="text-xs sm:text-sm font-bold text-slate-900">
+                Pusat Bantuan: Garansi Resmi & Tukar Ukuran (Size Exchange)
+              </h4>
+              <p className="text-[11px] text-slate-500 mt-0.5">
+                Salah memilih ukuran jersey atau ada kendala produk? Tim Customer Care RegarSport siap membantu Anda.
+              </p>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            onClick={handleWhatsAppSupport}
+            className="flex items-center gap-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-4 py-2.5 shadow-sm transition active:scale-95 shrink-0 cursor-pointer"
+          >
+            <Phone size={14} />
+            <span>Hubungi WhatsApp CS</span>
+          </button>
+        </div>
 
         {/* Info Grid: Customer & Shipping */}
         <div className="grid gap-6 md:grid-cols-2 pt-4 border-t border-slate-100">
@@ -608,6 +768,12 @@ export default function OrderDetail() {
                   {isPending ? "Menunggu Pembayaran" : "Lunas (Settlement)"}
                 </span>
               </div>
+              {Number(order.discountAmount || 0) > 0 && (
+                <div className="flex justify-between text-emerald-700 font-semibold">
+                  <span>Kupon Promo ({order.voucherCode || "Diskon"})</span>
+                  <span>-Rp {Number(order.discountAmount).toLocaleString("id-ID")}</span>
+                </div>
+              )}
               <div className="flex justify-between border-t border-slate-200/60 pt-2 text-slate-900">
                 <span className="font-bold">Total Pembayaran</span>
                 <span className="font-black text-emerald-600 text-base">
@@ -888,6 +1054,84 @@ export default function OrderDetail() {
         onClose={() => setShowInvoiceModal(false)}
         order={order}
       />
+
+      {/* Modal Batalkan Pesanan (Customer Mandiri) */}
+      {showCancelModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="relative w-full max-w-md bg-white rounded-3xl p-6 shadow-2xl border border-slate-100 space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+              <div className="flex items-center gap-2.5">
+                <div className="p-2 rounded-xl bg-rose-50 text-rose-600 border border-rose-200">
+                  <Ban size={20} />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-slate-900">Batalkan Pesanan Ini?</h3>
+                  <p className="text-xs text-slate-400">Order #{order.orderNumber}</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowCancelModal(false)}
+                className="text-slate-400 hover:text-slate-700 p-1 rounded-lg hover:bg-slate-100"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <form onSubmit={handleCancelOrder} className="space-y-4">
+              <p className="text-xs text-slate-600 leading-relaxed">
+                Pesanan yang dibatalkan tidak dapat dipulihkan. Mohon pilih alasan pembatalan agar kami dapat meningkatkan layanan RegarSport:
+              </p>
+
+              <div className="space-y-2">
+                {[
+                  "Ingin mengubah varian ukuran produk",
+                  "Ingin mengganti alamat pengiriman",
+                  "Salah memilih metode pembayaran",
+                  "Ingin memesan model apparel lain",
+                  "Lainnya",
+                ].map((reason) => (
+                  <label
+                    key={reason}
+                    className={`flex items-center gap-2.5 p-3 rounded-xl border text-xs cursor-pointer transition-all ${
+                      cancelReason === reason
+                        ? "bg-rose-50 border-rose-300 text-rose-900 font-bold"
+                        : "bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100"
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="cancelReason"
+                      value={reason}
+                      checked={cancelReason === reason}
+                      onChange={(e) => setCancelReason(e.target.value)}
+                      className="accent-rose-600"
+                    />
+                    <span>{reason}</span>
+                  </label>
+                ))}
+              </div>
+
+              <div className="pt-2 flex items-center justify-end gap-3">
+                <button
+                  type="button"
+                  onClick={() => setShowCancelModal(false)}
+                  className="px-4 py-2.5 rounded-xl border border-slate-200 text-slate-600 text-xs font-bold hover:bg-slate-50 cursor-pointer"
+                >
+                  Kembali
+                </button>
+                <button
+                  type="submit"
+                  disabled={cancelling}
+                  className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-md shadow-rose-600/20 transition active:scale-95 disabled:opacity-50 cursor-pointer"
+                >
+                  {cancelling && <Loader2 size={14} className="animate-spin" />}
+                  <span>Konfirmasi Batalkan</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

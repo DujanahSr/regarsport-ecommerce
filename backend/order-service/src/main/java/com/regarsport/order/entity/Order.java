@@ -62,6 +62,16 @@ public class Order {
     @Column(name = "tracking_number", length = 100)
     private String trackingNumber;
 
+    @Column(name = "voucher_code", length = 50)
+    private String voucherCode;
+
+    @Column(name = "discount_amount", precision = 14, scale = 2)
+    @Builder.Default
+    private BigDecimal discountAmount = BigDecimal.ZERO;
+
+    @Column(name = "cancellation_reason", length = 255)
+    private String cancellationReason;
+
     @Column(name = "shipped_at")
     private Instant shippedAt;
 

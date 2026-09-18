@@ -2,9 +2,7 @@ package com.regarsport.order.controller;
 
 import com.regarsport.common.dto.ApiResponse;
 import com.regarsport.common.dto.PageResponse;
-import com.regarsport.order.dto.CheckoutRequest;
-import com.regarsport.order.dto.OrderResponse;
-import com.regarsport.order.dto.OrderStatusUpdateRequest;
+import com.regarsport.order.dto.*;
 import com.regarsport.order.entity.OrderStatus;
 import com.regarsport.order.service.OrderService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -14,6 +12,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/orders")
@@ -96,5 +96,57 @@ public class OrderController {
     public ResponseEntity<ApiResponse<OrderResponse>> completeOrder(@PathVariable Long id) {
         OrderResponse response = orderService.completeOrder(id);
         return ResponseEntity.ok(ApiResponse.success("Pesanan telah selesai dan berhasil diterima", response));
+    }
+
+    @PatchMapping("/{id}/cancel")
+    @Operation(summary = "Customer/Admin: Cancel order", description = "Cancel pending order with reason")
+    public ResponseEntity<ApiResponse<OrderResponse>> cancelOrder(
+            @PathVariable Long id,
+            @RequestHeader(value = "X-User-Id", defaultValue = "1") Long userId,
+            @RequestHeader(value = "X-User-Role", defaultValue = "ROLE_CUSTOMER") String role,
+            @RequestBody(required = false) CancelOrderRequest request
+    ) {
+        boolean isAdmin = "ROLE_ADMIN".equalsIgnoreCase(role) || "ADMIN".equalsIgnoreCase(role);
+        String reason = request != null ? request.reason() : "Dibatalkan oleh pelanggan";
+        OrderResponse response = orderService.cancelOrder(id, userId, isAdmin, reason);
+        return ResponseEntity.ok(ApiResponse.success("Pesanan berhasil dibatalkan", response));
+    }
+
+    // --- VOUCHER & PROMO DISCOUNTS ---
+
+    @GetMapping("/vouchers")
+    @Operation(summary = "List all vouchers", description = "Retrieve list of all promotion vouchers")
+    public ResponseEntity<ApiResponse<List<VoucherResponse>>> getAllVouchers() {
+        List<VoucherResponse> response = orderService.getAllVouchers();
+        return ResponseEntity.ok(ApiResponse.success(response));
+    }
+
+    @PostMapping("/vouchers")
+    @Operation(summary = "Admin: Create voucher", description = "Create new discount promo code")
+    public ResponseEntity<ApiResponse<VoucherResponse>> createVoucher(@Valid @RequestBody VoucherRequest request) {
+        VoucherResponse response = orderService.createVoucher(request);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponse.success("Kupon promo berhasil dibuat", response));
+    }
+
+    @PatchMapping("/vouchers/{id}/toggle")
+    @Operation(summary = "Admin: Toggle voucher active", description = "Activate or deactivate voucher")
+    public ResponseEntity<ApiResponse<VoucherResponse>> toggleVoucher(@PathVariable Long id) {
+        VoucherResponse response = orderService.toggleVoucher(id);
+        return ResponseEntity.ok(ApiResponse.success("Status kupon berhasil diperbarui", response));
+    }
+
+    @DeleteMapping("/vouchers/{id}")
+    @Operation(summary = "Admin: Delete voucher", description = "Delete voucher by ID")
+    public ResponseEntity<ApiResponse<Void>> deleteVoucher(@PathVariable Long id) {
+        orderService.deleteVoucher(id);
+        return ResponseEntity.ok(ApiResponse.success("Kupon promo berhasil dihapus", null));
+    }
+
+    @PostMapping("/vouchers/validate")
+    @Operation(summary = "Customer: Validate voucher", description = "Check if voucher code is valid and compute discount")
+    public ResponseEntity<ApiResponse<VoucherValidateResponse>> validateVoucher(@Valid @RequestBody VoucherValidateRequest request) {
+        VoucherValidateResponse response = orderService.validateVoucher(request);
+        return ResponseEntity.ok(ApiResponse.success(response));
     }
 }

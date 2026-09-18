@@ -9,7 +9,10 @@ import {
   UserCircle,
   Zap,
   Menu,
-  X
+  X,
+  Truck,
+  Layers,
+  Tag,
 } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "../../context/AuthContext";
@@ -19,19 +22,26 @@ export default function Sidebar() {
   const { user } = useAuth();
   const isLogistics = user?.role === "logistics";
 
-  const allMenuItems = [
-    { to: "/admin", icon: LayoutDashboard, label: "Dashboard", adminOnly: true },
-    { to: "/admin/categories", icon: FolderTree, label: "Categories", adminOnly: true },
-    { to: "/admin/products", icon: Package, label: "Products", adminOnly: true },
+  const adminMenuItems = [
+    { to: "/admin", icon: LayoutDashboard, label: "Dashboard" },
+    { to: "/admin/categories", icon: FolderTree, label: "Categories" },
+    { to: "/admin/products", icon: Package, label: "Products" },
+    { to: "/admin/inventory", icon: Layers, label: "Stok Gudang" },
     { to: "/admin/orders", icon: ShoppingCart, label: "Orders" },
-    { to: "/admin/users", icon: Users, label: "Users", adminOnly: true },
-    { to: "/admin/reviews", icon: Star, label: "Reviews", adminOnly: true },
+    { to: "/admin/vouchers", icon: Tag, label: "Vouchers" },
+    { to: "/admin/users", icon: Users, label: "Users" },
+    { to: "/admin/reviews", icon: Star, label: "Reviews" },
     { to: "/admin/profile", icon: UserCircle, label: "Profile" },
   ];
 
-  const menuItems = isLogistics
-    ? allMenuItems.filter((item) => !item.adminOnly)
-    : allMenuItems;
+  const logisticsMenuItems = [
+    { to: "/admin/warehouse", icon: Truck, label: "Dashboard Gudang" },
+    { to: "/admin/inventory", icon: Layers, label: "Stok Gudang" },
+    { to: "/admin/orders", icon: ShoppingCart, label: "Packing & Resi" },
+    { to: "/admin/profile", icon: UserCircle, label: "Profile" },
+  ];
+
+  const menuItems = isLogistics ? logisticsMenuItems : adminMenuItems;
 
   const menuClass = ({ isActive }) =>
     `flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${isActive

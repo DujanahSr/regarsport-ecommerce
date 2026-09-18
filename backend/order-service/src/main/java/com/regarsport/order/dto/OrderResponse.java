@@ -21,6 +21,9 @@ public record OrderResponse(
     String shippingNotes,
     String shippingCourier,
     String trackingNumber,
+    String voucherCode,
+    BigDecimal discountAmount,
+    String cancellationReason,
     OrderStatus status,
     List<OrderItemResponse> items,
     Instant shippedAt,
@@ -45,7 +48,7 @@ public record OrderResponse(
         Instant createdAt,
         Instant updatedAt
     ) {
-        this(id, orderNumber, userId, customerName, customerEmail, null, customerName, totalAmount, shippingAddress, null, null, null, shippingCourier, trackingNumber, status, items, shippedAt, completedAt, createdAt, updatedAt);
+        this(id, orderNumber, userId, customerName, customerEmail, null, customerName, totalAmount, shippingAddress, null, null, null, shippingCourier, trackingNumber, null, BigDecimal.ZERO, null, status, items, shippedAt, completedAt, createdAt, updatedAt);
     }
 
     public OrderResponse(
@@ -61,6 +64,6 @@ public record OrderResponse(
         Instant createdAt,
         Instant updatedAt
     ) {
-        this(id, orderNumber, userId, customerName, customerEmail, null, customerName, totalAmount, shippingAddress, null, null, null, null, null, status, items, null, null, createdAt, updatedAt);
+        this(id, orderNumber, userId, customerName, customerEmail, null, customerName, totalAmount, shippingAddress, null, null, null, null, null, null, BigDecimal.ZERO, null, status, items, null, null, createdAt, updatedAt);
     }
 }

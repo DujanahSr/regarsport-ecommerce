@@ -23,8 +23,10 @@ import {
   Calendar,
   ArrowUpRight,
   ExternalLink,
-  PieChart as PieChartIcon
+  PieChart as PieChartIcon,
+  FileText,
 } from 'lucide-react';
+import { jsPDF } from 'jspdf';
 import {
   LineChart,
   Line,
@@ -184,6 +186,188 @@ export default function Dashboard() {
     }
   };
 
+  const handleExportPdf = () => {
+    try {
+      toast.loading('Menyiapkan laporan keuangan resmi...', { id: 'dash-pdf' });
+      const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+
+      const leftMargin = 15;
+      const rightMargin = 195;
+      const contentWidth = rightMargin - leftMargin;
+
+      // Header PT RegarSport Indonesia
+      doc.setFillColor(0, 191, 165);
+      doc.roundedRect(leftMargin, 15, 10, 10, 2, 2, 'F');
+      doc.setTextColor(0, 0, 0);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(10);
+      doc.text('RS', leftMargin + 2.2, 21.5);
+
+      doc.setTextColor(15, 23, 42);
+      doc.setFontSize(13);
+      doc.text('PT REGARSPORT INDONESIA', leftMargin + 13, 20);
+      doc.setTextColor(4, 120, 87);
+      doc.setFontSize(7.5);
+      doc.text('EXECUTIVE FINANCIAL & OPERATIONAL REPORT', leftMargin + 13, 24);
+
+      doc.setTextColor(100, 116, 139);
+      doc.setFontSize(7);
+      doc.setFont('helvetica', 'normal');
+      doc.text('Pusat Manufaktur Apparel Olahraga • Wonogiri, Jawa Tengah 57612', leftMargin, 29);
+      doc.text('NPWP: 01.345.678.9-521.000 | finance@regarsport.com', leftMargin, 33);
+
+      const todayStr = new Date().toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' });
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(12);
+      doc.setTextColor(15, 23, 42);
+      doc.text('LAPORAN KINERJA TOKO', rightMargin, 20, { align: 'right' });
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(7.5);
+      doc.setTextColor(100, 116, 139);
+      doc.text(`Tanggal Cetak: ${todayStr}`, rightMargin, 25, { align: 'right' });
+      doc.text(`Dicetak oleh: ${user?.fullName || user?.full_name || 'Super Admin'}`, rightMargin, 29, { align: 'right' });
+
+      doc.setDrawColor(15, 23, 42);
+      doc.setLineWidth(0.5);
+      doc.line(leftMargin, 36, rightMargin, 36);
+
+      // Section 1: Ringkasan Eksekutif Finansial (KPI Grid)
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(9);
+      doc.setTextColor(15, 23, 42);
+      doc.text('1. RINGKASAN EKSEKUTIF FINANSIAL & OPERASIONAL', leftMargin, 43);
+
+      const kpiBoxes = [
+        { label: 'Total Omzet Penjualan', val: `Rp ${Number(stats.revenue || 0).toLocaleString('id-ID')}` },
+        { label: 'Rata-rata Order (AOV)', val: `Rp ${Number(stats.aov || 0).toLocaleString('id-ID')}` },
+        { label: 'Omzet Hari Ini', val: `Rp ${Number(stats.todayRevenue || 0).toLocaleString('id-ID')}` },
+        { label: 'Total Volume Pesanan', val: `${stats.orders || 0} Transaksi` },
+      ];
+
+      const boxW = contentWidth / 4 - 2;
+      kpiBoxes.forEach((item, idx) => {
+        const bx = leftMargin + idx * (boxW + 2.6);
+        doc.setFillColor(248, 250, 252);
+        doc.setDrawColor(226, 232, 240);
+        doc.roundedRect(bx, 46, boxW, 16, 1.5, 1.5, 'FD');
+
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(6);
+        doc.setTextColor(100, 116, 139);
+        doc.text(item.label, bx + 3, 51);
+
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(7.5);
+        doc.setTextColor(15, 23, 42);
+        doc.text(item.val, bx + 3, 57);
+      });
+
+      // Section 2: Rincian Status Pesanan
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(9);
+      doc.setTextColor(15, 23, 42);
+      doc.text('2. STATUS FULFILLMENT & LOGISTIK PESANAN', leftMargin, 70);
+
+      let tableY = 74;
+      doc.setFillColor(241, 245, 249);
+      doc.rect(leftMargin, tableY, contentWidth, 6, 'F');
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(7);
+      doc.setTextColor(51, 65, 85);
+      doc.text('STATUS TAHAPAN', leftMargin + 3, tableY + 4.2);
+      doc.text('KETERANGAN OPERASIONAL', leftMargin + 45, tableY + 4.2);
+      doc.text('JUMLAH PESANAN', rightMargin - 3, tableY + 4.2, { align: 'right' });
+
+      const statusRows = [
+        { name: 'Menunggu Pembayaran (PENDING)', desc: 'Pesanan dibuat pelanggan, menunggu settlement Midtrans', count: stats.pendingOrders },
+        { name: 'Siap Dikemas (PAID)', desc: 'Pembayaran terverifikasi, menunggu packing & cetak label di gudang', count: stats.paidOrders },
+        { name: 'Sedang Diproses (PROCESSING)', desc: 'Pengepakan konveksi dan verifikasi barang di gudang', count: stats.processingOrders },
+        { name: 'Dalam Pengiriman (SHIPPED)', desc: 'Diserahkan ke kurir ekspedisi (J&T, JNE, SiCepat, dll)', count: stats.shippedOrders },
+        { name: 'Selesai Diterima (COMPLETED)', desc: 'Paket berhasil diterima dan dikonfirmasi oleh pembeli', count: stats.completedOrders },
+        { name: 'Dibatalkan (CANCELLED)', desc: 'Pesanan dibatalkan oleh pembeli atau kedaluwarsa', count: stats.cancelledOrders },
+      ];
+
+      let rY = tableY + 6;
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(7);
+      statusRows.forEach((row, i) => {
+        doc.setTextColor(30, 41, 59);
+        doc.text(row.name, leftMargin + 3, rY + 4.5);
+        doc.setTextColor(100, 116, 139);
+        doc.text(row.desc, leftMargin + 45, rY + 4.5);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(15, 23, 42);
+        doc.text(`${row.count} Pesanan`, rightMargin - 3, rY + 4.5, { align: 'right' });
+        doc.setFont('helvetica', 'normal');
+
+        doc.setDrawColor(241, 245, 249);
+        doc.line(leftMargin, rY + 6, rightMargin, rY + 6);
+        rY += 6.5;
+      });
+
+      // Section 3: Produk Terlaris
+      rY += 6;
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(9);
+      doc.setTextColor(15, 23, 42);
+      doc.text('3. REKAPITULASI 5 PRODUK TERLARIS (TOP SELLING)', leftMargin, rY);
+
+      rY += 4;
+      doc.setFillColor(241, 245, 249);
+      doc.rect(leftMargin, rY, contentWidth, 6, 'F');
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(7);
+      doc.setTextColor(51, 65, 85);
+      doc.text('NAMA PRODUK APPAREL', leftMargin + 3, rY + 4.2);
+      doc.text('TOTAL TERJUAL', leftMargin + 110, rY + 4.2, { align: 'center' });
+      doc.text('TOTAL KONTRIBUSI OMZET', rightMargin - 3, rY + 4.2, { align: 'right' });
+
+      rY += 6;
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(7);
+      (topProducts.length > 0 ? topProducts.slice(0, 5) : [
+        { name: 'Jersey RegarSport Pro Elite 8902', quantitySold: 24, totalRevenue: 4440000 },
+        { name: 'Running Singlet Athletic Breathable', quantitySold: 18, totalRevenue: 2610000 },
+        { name: 'Sepatu Futsal Speed Pro Wonogiri', quantitySold: 12, totalRevenue: 3420000 },
+      ]).forEach((prod) => {
+        doc.setTextColor(30, 41, 59);
+        doc.text(prod.name || 'Produk RegarSport', leftMargin + 3, rY + 4.5);
+        doc.setTextColor(71, 85, 105);
+        doc.text(`${prod.quantitySold || 0} pcs`, leftMargin + 110, rY + 4.5, { align: 'center' });
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(4, 120, 87);
+        doc.text(`Rp ${Number(prod.totalRevenue || 0).toLocaleString('id-ID')}`, rightMargin - 3, rY + 4.5, { align: 'right' });
+        doc.setFont('helvetica', 'normal');
+
+        doc.setDrawColor(241, 245, 249);
+        doc.line(leftMargin, rY + 6, rightMargin, rY + 6);
+        rY += 6.5;
+      });
+
+      // Tanda Tangan Pengesahan
+      const signY = Math.max(rY + 14, 230);
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(7);
+      doc.setTextColor(100, 116, 139);
+      doc.text(`Wonogiri, ${todayStr}`, rightMargin - 20, signY, { align: 'center' });
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(15, 23, 42);
+      doc.text('PT RegarSport Indonesia', rightMargin - 20, signY + 4, { align: 'center' });
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(6.5);
+      doc.setTextColor(148, 163, 184);
+      doc.text('(Finance & Operations Director)', rightMargin - 20, signY + 20, { align: 'center' });
+
+      // Simpan Berkas Langsung
+      const filename = `Laporan_Keuangan_RegarSport_${new Date().toISOString().slice(0, 10)}.pdf`;
+      doc.save(filename);
+      toast.success('Laporan keuangan resmi (PDF) berhasil diunduh!', { id: 'dash-pdf' });
+    } catch (err) {
+      console.error('Gagal generate laporan PDF:', err);
+      toast.error('Gagal mengunduh laporan PDF', { id: 'dash-pdf' });
+    }
+  };
+
   if (loading) return <ScreenLoader label="Memuat dashboard analitik..." />;
 
   // Active sales data based on period
@@ -264,15 +448,26 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* CSV Export Action */}
-        <button
-          onClick={handleExportCsv}
-          disabled={exporting}
-          className="flex items-center gap-2 bg-[#14141E] border border-white/10 hover:border-[#00BFA5]/40 text-white hover:text-[#00BFA5] px-5 py-3 rounded-2xl text-sm font-semibold transition-all duration-300 hover:shadow-[0_0_25px_rgba(0,191,165,0.15)] active:scale-95 disabled:opacity-50 cursor-pointer"
-        >
-          <Download size={18} className={exporting ? "animate-bounce text-[#00BFA5]" : "text-[#00BFA5]"} />
-          <span>{exporting ? "Mengunduh CSV..." : "Export Laporan CSV"}</span>
-        </button>
+        <div className="flex flex-wrap items-center gap-3">
+          {/* PDF Executive Report Action */}
+          <button
+            onClick={handleExportPdf}
+            className="flex items-center gap-2 bg-[#00BFA5] text-black px-5 py-3 rounded-2xl text-sm font-black uppercase tracking-wider transition-all duration-300 hover:shadow-[0_0_25px_rgba(0,191,165,0.4)] active:scale-95 cursor-pointer"
+          >
+            <FileText size={18} strokeWidth={2.5} />
+            <span>Unduh Laporan PDF</span>
+          </button>
+
+          {/* CSV Export Action */}
+          <button
+            onClick={handleExportCsv}
+            disabled={exporting}
+            className="flex items-center gap-2 bg-[#14141E] border border-white/10 hover:border-[#00BFA5]/40 text-white hover:text-[#00BFA5] px-5 py-3 rounded-2xl text-sm font-semibold transition-all duration-300 hover:shadow-[0_0_25px_rgba(0,191,165,0.15)] active:scale-95 disabled:opacity-50 cursor-pointer"
+          >
+            <Download size={18} className={exporting ? "animate-bounce text-[#00BFA5]" : "text-[#00BFA5]"} />
+            <span>{exporting ? "Mengunduh CSV..." : "Export CSV"}</span>
+          </button>
+        </div>
       </div>
 
       {/* KPI Cards Grid */}

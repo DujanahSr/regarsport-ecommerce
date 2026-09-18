@@ -15,12 +15,13 @@ public record CheckoutRequest(
     String shippingCity,
     String shippingPostalCode,
     String shippingNotes,
+    String voucherCode,
 
     @NotEmpty(message = "Checkout items cannot be empty")
     @Valid
     List<CheckoutItemRequest> items
 ) {
     public CheckoutRequest(String shippingAddress, List<CheckoutItemRequest> items) {
-        this(shippingAddress, null, null, null, null, null, items);
+        this(shippingAddress, null, null, null, null, null, null, items);
     }
 }

@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/immutability */
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
-import { MapPin, Package, CreditCard, ArrowLeft, ShoppingBag, User, Phone, Building2, FileText } from "lucide-react";
+import { MapPin, Package, CreditCard, ArrowLeft, ShoppingBag, User, Phone, Building2, FileText, Tag, Check, X, Loader2 } from "lucide-react";
 import toast from "react-hot-toast";
 
 import api from "../../services/api";
@@ -24,6 +24,11 @@ export default function Checkout() {
   const [postalCode, setPostalCode] = useState(user?.postalCode || user?.postal_code || "");
   const [streetAddress, setStreetAddress] = useState(user?.address || "");
   const [shippingNotes, setShippingNotes] = useState("");
+
+  // Promo Code / Voucher State
+  const [voucherCodeInput, setVoucherCodeInput] = useState("");
+  const [appliedVoucher, setAppliedVoucher] = useState(null);
+  const [validatingVoucher, setValidatingVoucher] = useState(false);
 
   // Auto-fill dari data profil pengguna jika baru dimuat
   useEffect(() => {
@@ -53,6 +58,42 @@ export default function Checkout() {
       acc + Number(item.price || item.products?.price || 0) * item.quantity,
     0
   );
+
+  const discount = appliedVoucher ? Number(appliedVoucher.discountAmount || 0) : 0;
+  const finalTotal = Math.max(0, total - discount);
+
+  const handleApplyVoucher = async () => {
+    if (!voucherCodeInput.trim()) {
+      toast.error("Masukkan kode kupon promo terlebih dahulu");
+      return;
+    }
+    try {
+      setValidatingVoucher(true);
+      const res = await api.post("/orders/vouchers/validate", {
+        code: voucherCodeInput.trim().toUpperCase(),
+        subtotal: total,
+      });
+      const vData = res.data?.data || res.data;
+      if (vData.valid) {
+        setAppliedVoucher(vData);
+        toast.success(vData.message || "Kupon berhasil diterapkan!");
+      } else {
+        setAppliedVoucher(null);
+        toast.error(vData.message || "Kupon promo tidak valid");
+      }
+    } catch (err) {
+      setAppliedVoucher(null);
+      toast.error(err.response?.data?.message || "Gagal memvalidasi kupon promo");
+    } finally {
+      setValidatingVoucher(false);
+    }
+  };
+
+  const handleRemoveVoucher = () => {
+    setAppliedVoucher(null);
+    setVoucherCodeInput("");
+    toast.success("Kupon promo dilepas");
+  };
 
   const handleCheckout = async () => {
     try {
@@ -111,6 +152,7 @@ export default function Checkout() {
         shippingCity: city.trim(),
         shippingPostalCode: postalCode.trim(),
         shippingNotes: shippingNotes.trim(),
+        voucherCode: appliedVoucher?.code || null,
         items,
       });
 
@@ -386,13 +428,85 @@ export default function Checkout() {
             })}
           </div>
 
-          <div className="mt-6 flex items-center justify-between border-t border-slate-100 pt-5">
+          {/* Promo Code / Voucher Box */}
+          <div className="mt-6 pt-5 border-t border-slate-100">
+            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-500 mb-2.5">
+              <Tag size={15} className="text-emerald-600" />
+              <span>Kode Promo / Voucher Diskon</span>
+            </div>
+
+            {appliedVoucher ? (
+              <div className="flex items-center justify-between p-3 rounded-2xl bg-emerald-50 border border-emerald-200">
+                <div className="flex items-center gap-2">
+                  <div className="w-7 h-7 rounded-full bg-emerald-600 text-white flex items-center justify-center">
+                    <Check size={14} strokeWidth={3} />
+                  </div>
+                  <div>
+                    <div className="text-xs font-black text-emerald-900 font-mono">
+                      {appliedVoucher.code}
+                    </div>
+                    <div className="text-[11px] text-emerald-700">
+                      Diskon terpotong: -Rp {discount.toLocaleString("id-ID")}
+                    </div>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleRemoveVoucher}
+                  className="text-xs font-bold text-rose-600 hover:text-rose-800 p-1.5 rounded-lg hover:bg-rose-100 transition cursor-pointer"
+                >
+                  Lepas
+                </button>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2">
+                <input
+                  type="text"
+                  value={voucherCodeInput}
+                  onChange={(e) => setVoucherCodeInput(e.target.value.toUpperCase())}
+                  placeholder="Masukkan kode voucher (contoh: REGARJUARA)"
+                  className="flex-1 px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs font-mono font-bold text-slate-800 uppercase focus:outline-none focus:border-emerald-500"
+                />
+                <button
+                  type="button"
+                  onClick={handleApplyVoucher}
+                  disabled={validatingVoucher || !voucherCodeInput.trim()}
+                  className="flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-black text-white text-xs font-bold transition disabled:opacity-50 cursor-pointer shrink-0"
+                >
+                  {validatingVoucher && <Loader2 size={13} className="animate-spin" />}
+                  <span>Terapkan</span>
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* Rincian Harga & Total Tagihan */}
+          <div className="mt-5 pt-4 border-t border-slate-100 space-y-2 text-xs">
+            <div className="flex justify-between text-slate-600">
+              <span>Subtotal Produk</span>
+              <span className="font-semibold text-slate-800">
+                Rp {total.toLocaleString("id-ID")}
+              </span>
+            </div>
+            <div className="flex justify-between text-slate-600">
+              <span>Ongkos Kirim</span>
+              <span className="font-bold text-emerald-600">Gratis (Promo RS)</span>
+            </div>
+            {appliedVoucher && (
+              <div className="flex justify-between text-emerald-600 font-bold">
+                <span>Potongan Kupon ({appliedVoucher.code})</span>
+                <span>-Rp {discount.toLocaleString("id-ID")}</span>
+              </div>
+            )}
+          </div>
+
+          <div className="mt-4 flex items-center justify-between border-t border-slate-100 pt-4">
             <div>
               <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">
                 Total Tagihan
               </span>
               <h3 className="text-2xl font-black text-emerald-600 sm:text-3xl">
-                Rp {total.toLocaleString("id-ID")}
+                Rp {finalTotal.toLocaleString("id-ID")}
               </h3>
             </div>
 
@@ -400,7 +514,7 @@ export default function Checkout() {
               type="button"
               onClick={handleCheckout}
               disabled={loading}
-              className="flex items-center justify-center gap-2 rounded-2xl bg-emerald-600 px-8 py-3.5 text-sm font-bold text-white shadow-lg shadow-emerald-600/25 transition hover:-translate-y-0.5 hover:bg-emerald-700 hover:shadow-emerald-600/35 disabled:cursor-not-allowed disabled:translate-y-0 disabled:opacity-50 disabled:shadow-none"
+              className="flex items-center justify-center gap-2 rounded-2xl bg-emerald-600 px-8 py-3.5 text-sm font-bold text-white shadow-lg shadow-emerald-600/25 transition hover:-translate-y-0.5 hover:bg-emerald-700 hover:shadow-emerald-600/35 disabled:cursor-not-allowed disabled:translate-y-0 disabled:opacity-50 disabled:shadow-none cursor-pointer"
             >
               <CreditCard size={18} />
               {loading ? "Memproses Order..." : "Bayar Sekarang"}

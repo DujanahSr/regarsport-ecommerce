@@ -30,6 +30,10 @@ const Profile = lazy(() => import("./pages/customer/Profile"));
 const Favorites = lazy(() => import("./pages/customer/Favorites"));
 const MyOrders = lazy(() => import("./pages/customer/MyOrders"));
 const OrderDetail = lazy(() => import("./pages/customer/OrderDetail"));
+const Landing = lazy(() => import("./pages/customer/Landing"));
+const Inventory = lazy(() => import("./pages/admin/Inventory"));
+const WarehouseDashboard = lazy(() => import("./pages/admin/WarehouseDashboard"));
+const Vouchers = lazy(() => import("./pages/admin/Vouchers"));
 const AdminLayouts = lazy(() => import("./layouts/AdminLayouts"));
 const CustomerLayouts = lazy(() => import("./layouts/CustomerLayouts"));
 
@@ -53,10 +57,10 @@ export default function App() {
             <Suspense fallback={<ScreenLoader />}>
               <Routes>
 
-                {/* Redirect */}
+                {/* Public Landing Page */}
                 <Route
                   path="/"
-                  element={<Navigate to="/login" />}
+                  element={<Landing />}
                 />
 
                 {/* Auth */}
@@ -157,8 +161,27 @@ export default function App() {
                   />
 
                   <Route
+                    path="warehouse"
+                    element={<WarehouseDashboard />}
+                  />
+
+                  <Route
+                    path="inventory"
+                    element={<Inventory />}
+                  />
+
+                  <Route
                     path="orders"
                     element={<Orders />}
+                  />
+
+                  <Route
+                    path="vouchers"
+                    element={
+                      <ProtectedRoute allowedRoles={["admin"]}>
+                        <Vouchers />
+                      </ProtectedRoute>
+                    }
                   />
 
                   <Route

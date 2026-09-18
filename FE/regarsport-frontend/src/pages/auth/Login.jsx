@@ -94,7 +94,7 @@ export default function Login() {
       toast.success("Login berhasil!");
       const roleStr = (loggedInUser?.role || "").toLowerCase();
       if (roleStr.includes("logistics") || roleStr.includes("gudang")) {
-        navigate("/admin/orders");
+        navigate("/admin/warehouse");
       } else if (roleStr.includes("admin")) {
         navigate("/admin");
       } else {
