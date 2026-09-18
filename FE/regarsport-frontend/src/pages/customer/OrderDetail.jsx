@@ -274,6 +274,7 @@ export default function OrderDetail() {
   const currentRank = STATUS_RANK[rawStatus] || 1;
   const isCancelled = rawStatus === "CANCELLED";
   const isPending = rawStatus === "PENDING";
+  const isPaid = ["PAID", "PROCESSING", "SHIPPED", "COMPLETED"].includes(rawStatus);
   const orderItems = order.items || order.order_items || [];
   const totalAmount = Number(order.totalAmount || order.total_amount || 0);
 
