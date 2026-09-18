@@ -34,7 +34,8 @@
 // };
 
 export const loadMidtransSnap = () => {
-  const clientKey = import.meta.env.VITE_MIDTRANS_CLIENT_KEY;
+  const clientKey =
+    import.meta.env.VITE_MIDTRANS_CLIENT_KEY || "Mid-client-k96CUmHtMPzra5IO";
 
   if (!clientKey) {
     return Promise.resolve(null);
