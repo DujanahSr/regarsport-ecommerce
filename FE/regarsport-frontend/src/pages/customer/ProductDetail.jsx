@@ -30,6 +30,7 @@ import { useCart } from "../../context/CartContext";
 import { useAuth } from "../../context/AuthContext";
 import { useWishlist } from "../../context/WishlistContext";
 import { EmptyState, ScreenLoader } from "../../components/common/UiStates";
+import Jersey3DViewer from "../../components/customer/Jersey3DViewer";
 
 const getAvailableSizes = (prod) => {
   if (!prod) return ["L"];
@@ -604,90 +605,15 @@ export default function ProductDetail() {
                       </div>
                     </div>
 
-                    {/* Kolom Live 2D Jersey Visualizer */}
-                    <div className="bg-slate-900 rounded-2xl p-4 text-white flex flex-col items-center shadow-md relative overflow-hidden border border-slate-800">
-                      {/* View Switcher Tabs */}
-                      <div className="flex items-center gap-1.5 mb-3 z-10">
-                        <button
-                          type="button"
-                          onClick={() => setJerseyPreviewView("back")}
-                          className={`text-[10px] font-bold px-3 py-1 rounded-full transition ${
-                            jerseyPreviewView === "back"
-                              ? "bg-emerald-500 text-slate-950 shadow-xs"
-                              : "bg-slate-800 text-slate-300 hover:bg-slate-700"
-                          }`}
-                        >
-                          Tampak Belakang
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setJerseyPreviewView("front")}
-                          className={`text-[10px] font-bold px-3 py-1 rounded-full transition ${
-                            jerseyPreviewView === "front"
-                              ? "bg-emerald-500 text-slate-950 shadow-xs"
-                              : "bg-slate-800 text-slate-300 hover:bg-slate-700"
-                          }`}
-                        >
-                          Tampak Depan
-                        </button>
-                      </div>
-
-                      {/* Mockup Jersey Visual Area */}
-                      <div className="w-48 h-56 rounded-xl bg-gradient-to-b from-slate-800 to-slate-950 border border-slate-700 flex flex-col items-center justify-between p-3 relative shadow-inner">
-                        {/* Jersey Collar Visual */}
-                        <div className="w-16 h-4 border-b-2 border-emerald-400/80 rounded-b-full bg-slate-900/90" />
-
-                        {jerseyPreviewView === "back" ? (
-                          <div className="flex flex-col items-center justify-center my-auto text-center w-full">
-                            {/* Nameset */}
-                            <div className="font-mono font-black text-sm tracking-widest text-emerald-400 drop-shadow-sm uppercase truncate max-w-full px-2">
-                              {customName || "NAMA ANDA"}
-                            </div>
-
-                            {/* Back Number */}
-                            <div className="font-mono font-black text-6xl text-white tracking-tighter my-1 drop-shadow-md">
-                              {customNumber || "10"}
-                            </div>
-
-                            {/* Team Name */}
-                            <div className="font-mono text-[9px] font-bold text-slate-400 uppercase tracking-wider truncate max-w-full px-2">
-                              {customTeam || "REGARSPORT WONOGIRI"}
-                            </div>
-                          </div>
-                        ) : (
-                          <div className="flex flex-col items-center justify-between my-auto text-center w-full h-36 pt-2">
-                            <div className="flex justify-between w-full px-3">
-                              <span className="text-[8px] font-black text-emerald-400 border border-emerald-400/40 px-1 py-0.5 rounded">
-                                RS-WONOGIRI
-                              </span>
-                              {customNumber && (
-                                <span className="font-mono font-bold text-xs text-white">
-                                  #{customNumber}
-                                </span>
-                              )}
-                            </div>
-
-                            <div className="font-mono font-black text-xs text-emerald-300 tracking-wider uppercase px-2">
-                              {customTeam || "REGARSPORT INDONESIA"}
-                            </div>
-
-                            <div className="text-[8px] font-mono text-slate-500 uppercase">
-                              {customCollar}
-                            </div>
-                          </div>
-                        )}
-
-                        {/* Jersey Bottom Sublimation Tag */}
-                        <div className="w-full flex items-center justify-between text-[7.5px] font-mono text-slate-500 pt-1 border-t border-slate-800">
-                          <span>REGARSPORT DRY-FIT</span>
-                          <span>SIZE: {selectedSize}</span>
-                        </div>
-                      </div>
-
-                      <div className="text-[10px] text-emerald-400/90 font-mono mt-2.5 flex items-center gap-1">
-                        <Sparkles size={11} />
-                        <span>Live Preview Sablon Sublimasi Real-Time</span>
-                      </div>
+                    {/* Kolom Live 3D Jersey Studio Visualizer (Three.js 360°) */}
+                    <div className="w-full">
+                      <Jersey3DViewer
+                        customName={customName}
+                        customNumber={customNumber}
+                        customCollar={customCollar}
+                        customTeam={customTeam}
+                        selectedSize={selectedSize}
+                      />
                     </div>
                   </div>
                 </div>
