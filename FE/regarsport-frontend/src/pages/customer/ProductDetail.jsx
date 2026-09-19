@@ -785,6 +785,52 @@ export default function ProductDetail() {
                 <span>Bagikan ke Tim</span>
               </button>
             </div>
+
+            {/* 3 Pilar Garansi Resmi RegarSport 100% Bebas Cemas */}
+            <div className="mt-8 rounded-3xl border border-emerald-200/90 bg-gradient-to-br from-emerald-50/70 via-teal-50/40 to-white p-5 shadow-xs">
+              <div className="flex items-center gap-2.5 text-xs font-black uppercase tracking-wider text-emerald-800">
+                <ShieldCheck size={18} className="text-emerald-600" />
+                <span>Garansi Resmi RegarSport 100% Bebas Cemas</span>
+              </div>
+
+              <div className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div className="flex items-start gap-2.5 rounded-2xl bg-white/90 border border-emerald-100/80 p-3 shadow-2xs">
+                  <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-xl bg-emerald-100/70 text-emerald-700">
+                    <CheckCircle2 size={15} />
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-bold text-slate-900">Akurasi Sablon 100%</h4>
+                    <p className="text-[11px] text-slate-500 mt-0.5 leading-tight">
+                      Cetak nama, nomor, dan logo presisi sesuai pesanan.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-2.5 rounded-2xl bg-white/90 border border-emerald-100/80 p-3 shadow-2xs">
+                  <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-xl bg-emerald-100/70 text-emerald-700">
+                    <Ruler size={15} />
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-bold text-slate-900">7 Hari Tukar Ukuran</h4>
+                    <p className="text-[11px] text-slate-500 mt-0.5 leading-tight">
+                      Ukuran tidak pas? Fasilitas tukar ukuran mudah & cepat.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-2.5 rounded-2xl bg-white/90 border border-emerald-100/80 p-3 shadow-2xs">
+                  <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-xl bg-emerald-100/70 text-emerald-700">
+                    <Sparkles size={15} />
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-bold text-slate-900">Kain & Jahitan Atletik</h4>
+                    <p className="text-[11px] text-slate-500 mt-0.5 leading-tight">
+                      Bahan Dry-Fit Jacquard anti luntur & jahitan kuat bergaransi.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 

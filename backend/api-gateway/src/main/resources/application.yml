@@ -34,7 +34,7 @@ spring:
         - id: order-service
           uri: http://${ORDER_SERVICE_HOST:localhost}:8088
           predicates:
-            - Path=/api/v1/orders/**, /api/v1/cart/**, /api/v1/wishlist/**, /api/v1/admin/orders/**
+            - Path=/api/v1/orders/**, /api/v1/cart/**, /api/v1/wishlist/**, /api/v1/warranty-claims/**, /api/v1/admin/orders/**
           filters:
             - AuthenticationFilter
 

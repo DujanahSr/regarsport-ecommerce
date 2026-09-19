@@ -28,6 +28,7 @@ import {
   Ban,
   Phone,
   HelpCircle,
+  ShieldCheck,
 } from "lucide-react";
 import toast from "react-hot-toast";
 
@@ -35,6 +36,7 @@ import api from "../../services/api";
 import { EmptyState, ScreenLoader } from "../../components/common/UiStates";
 import MidtransModal from "../../components/common/MidtransModal";
 import InvoiceModal from "../../components/customer/InvoiceModal";
+import WarrantyClaimModal from "../../components/customer/WarrantyClaimModal";
 import { useAuth } from "../../context/AuthContext";
 
 const ORDER_STEPS = [
@@ -78,6 +80,10 @@ export default function OrderDetail() {
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [cancelReason, setCancelReason] = useState("Ingin mengubah varian ukuran produk");
   const [cancelling, setCancelling] = useState(false);
+
+  // Official Warranty Claim States
+  const [claims, setClaims] = useState([]);
+  const [showWarrantyModal, setShowWarrantyModal] = useState(false);
 
   const handleCopyResi = (resi) => {
     if (!resi) return;
@@ -266,6 +272,16 @@ export default function OrderDetail() {
             }).catch(() => {});
           }
         });
+      }
+
+      // Auto-fetch existing official warranty claims for this order
+      if (orderData?.id) {
+        api.get(`/warranty-claims/order/${orderData.id}`)
+          .then((r) => {
+            const list = r.data?.data || (Array.isArray(r.data) ? r.data : []);
+            setClaims(list);
+          })
+          .catch(() => setClaims([]));
       }
 
       // Auto-sync with Midtrans if still pending
@@ -684,31 +700,178 @@ export default function OrderDetail() {
           </div>
         )}
 
-        {/* Kartu Bantuan WhatsApp: Garansi & Tukar Ukuran */}
-        <div className="rounded-2xl border border-teal-200/80 bg-gradient-to-r from-teal-50 to-emerald-50/50 p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <div className="flex items-center gap-3.5">
-            <div className="w-10 h-10 rounded-xl bg-teal-600 text-white flex items-center justify-center shrink-0 shadow-sm">
-              <Phone size={20} />
-            </div>
-            <div>
-              <h4 className="text-xs sm:text-sm font-bold text-slate-900">
-                Pusat Bantuan: Garansi Resmi & Tukar Ukuran (Size Exchange)
-              </h4>
-              <p className="text-[11px] text-slate-500 mt-0.5">
-                Salah memilih ukuran jersey atau ada kendala produk? Tim Customer Care RegarSport siap membantu Anda.
-              </p>
-            </div>
-          </div>
+        {/* 3 Pilar Garansi Resmi RegarSport & Klaim Retur */}
+        {(() => {
+          const isCompleted = (order.status || "").toUpperCase() === "COMPLETED";
+          const completedDate = new Date(order.updatedAt || order.createdAt || Date.now());
+          const warrantyExpiry = new Date(completedDate.getTime() + 7 * 24 * 60 * 60 * 1000);
+          const now = new Date();
+          const diffMs = warrantyExpiry.getTime() - now.getTime();
+          const isWarrantyActive = isCompleted && diffMs > 0;
+          const daysRemaining = Math.max(0, Math.ceil(diffMs / (1000 * 60 * 60 * 24)));
+          const expiryFormatted = warrantyExpiry.toLocaleDateString("id-ID", {
+            day: "numeric",
+            month: "short",
+            year: "numeric",
+          });
 
-          <button
-            type="button"
-            onClick={handleWhatsAppSupport}
-            className="flex items-center gap-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-4 py-2.5 shadow-sm transition active:scale-95 shrink-0 cursor-pointer"
-          >
-            <Phone size={14} />
-            <span>Hubungi WhatsApp CS</span>
-          </button>
-        </div>
+          return (
+            <div className="rounded-2xl border border-emerald-200/80 bg-gradient-to-br from-emerald-50/70 via-teal-50/40 to-slate-50 p-5 sm:p-6 shadow-sm space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="flex items-start sm:items-center gap-3.5">
+                  <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-emerald-600 to-teal-700 text-white flex items-center justify-center shrink-0 shadow-md shadow-emerald-600/20">
+                    <ShieldCheck size={24} />
+                  </div>
+                  <div>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <h4 className="text-sm sm:text-base font-bold text-slate-900">
+                        Garansi Resmi RegarSport 100% Bebas Cemas
+                      </h4>
+                      {isCompleted ? (
+                        isWarrantyActive ? (
+                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300 animate-pulse">
+                            <Clock size={11} />
+                            Garansi Aktif: Sisa {daysRemaining} Hari
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-slate-200 text-slate-700">
+                            Garansi 7 Hari Berakhir
+                          </span>
+                        )
+                      ) : (
+                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-teal-100 text-teal-800 border border-teal-200">
+                          Aktif Setelah Paket Diterima
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-xs text-slate-600 mt-1 leading-relaxed">
+                      {isCompleted
+                        ? isWarrantyActive
+                          ? `Proteksi tukar ukuran (size exchange) dan ganti baru cacat produksi aktif sampai ${expiryFormatted}.`
+                          : "Periode klaim 7 hari telah lewat. Butuh bantuan khusus? Silakan hubungi CS resmi kami."
+                        : "Setiap pesanan dilindungi jaminan 100% kepuasan: salah ukuran bisa ditukar, cacat produksi diganti baru."}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-2.5 self-start sm:self-center shrink-0">
+                  {isCompleted && (
+                    <button
+                      type="button"
+                      onClick={() => setShowWarrantyModal(true)}
+                      className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white text-xs font-bold px-4 py-2.5 shadow-md shadow-emerald-600/20 transition active:scale-95 cursor-pointer"
+                    >
+                      <ShieldCheck size={15} />
+                      <span>Ajukan Klaim Garansi</span>
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    onClick={handleWhatsAppSupport}
+                    className="flex items-center gap-2 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold px-3.5 py-2.5 shadow-sm transition active:scale-95 cursor-pointer"
+                  >
+                    <Phone size={14} className="text-emerald-600" />
+                    <span>WhatsApp CS</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* 3 Pillars Quick Badges */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-3 border-t border-emerald-100/80">
+                <div className="flex items-center gap-2 bg-white/80 backdrop-blur-sm rounded-xl px-3 py-2 border border-emerald-100/60 text-[11px] text-slate-700">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
+                  <span className="font-semibold text-slate-900">100% Cacat Sablon</span>
+                  <span className="text-slate-500">diganti baru</span>
+                </div>
+                <div className="flex items-center gap-2 bg-white/80 backdrop-blur-sm rounded-xl px-3 py-2 border border-emerald-100/60 text-[11px] text-slate-700">
+                  <span className="w-2 h-2 rounded-full bg-teal-500 shrink-0" />
+                  <span className="font-semibold text-slate-900">7 Hari Tukar Ukuran</span>
+                  <span className="text-slate-500">jika kurang pas</span>
+                </div>
+                <div className="flex items-center gap-2 bg-white/80 backdrop-blur-sm rounded-xl px-3 py-2 border border-emerald-100/60 text-[11px] text-slate-700">
+                  <span className="w-2 h-2 rounded-full bg-cyan-500 shrink-0" />
+                  <span className="font-semibold text-slate-900">Jahitan Atletik Kuat</span>
+                  <span className="text-slate-500">garansi perbaikan</span>
+                </div>
+              </div>
+
+              {/* Existing Claim Tickets List */}
+              {claims && claims.length > 0 && (
+                <div className="mt-3 pt-3 border-t border-emerald-100/80 space-y-2">
+                  <h5 className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                    <FileText size={14} className="text-teal-600" />
+                    Tiket Klaim Garansi Anda ({claims.length})
+                  </h5>
+                  <div className="grid gap-2">
+                    {claims.map((c) => {
+                      const statusUpper = (c.status || "PENDING").toUpperCase();
+                      let statusBadge = "bg-amber-100 text-amber-800 border-amber-300";
+                      let statusText = "Menunggu Verifikasi CS";
+                      if (statusUpper === "APPROVED") {
+                        statusBadge = "bg-emerald-100 text-emerald-800 border-emerald-300";
+                        statusText = "Disetujui CS";
+                      } else if (statusUpper === "PROCESSING") {
+                        statusBadge = "bg-blue-100 text-blue-800 border-blue-300";
+                        statusText = "Sedang Diproses";
+                      } else if (statusUpper === "RESOLVED") {
+                        statusBadge = "bg-teal-100 text-teal-800 border-teal-300";
+                        statusText = "Klaim Selesai";
+                      } else if (statusUpper === "REJECTED") {
+                        statusBadge = "bg-rose-100 text-rose-800 border-rose-300";
+                        statusText = "Ditolak";
+                      }
+
+                      return (
+                        <div
+                          key={c.id || c.claimNumber}
+                          className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-3 rounded-xl border border-slate-200 text-xs"
+                        >
+                          <div className="space-y-0.5">
+                            <div className="flex items-center gap-2">
+                              <span className="font-mono font-bold text-slate-900 bg-slate-100 px-2 py-0.5 rounded">
+                                #{c.claimNumber}
+                              </span>
+                              <span className={`px-2 py-0.5 rounded-md font-bold text-[10px] border ${statusBadge}`}>
+                                {statusText}
+                              </span>
+                            </div>
+                            <p className="text-slate-600 text-[11px] pt-1">
+                              <span className="font-medium text-slate-800">Solusi: </span>
+                              {c.solution === "EXCHANGE_SIZE"
+                                ? `Tukar Ukuran Baru (${c.requestedSize || "Varian Baru"})`
+                                : c.solution === "REPLACEMENT"
+                                ? "Produksi Ulang 100%"
+                                : "Perbaikan Produk"}
+                            </p>
+                            {c.description && (
+                              <p className="text-slate-500 text-[11px] italic line-clamp-1">
+                                &ldquo;{c.description}&rdquo;
+                              </p>
+                            )}
+                          </div>
+
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const text = encodeURIComponent(
+                                `Halo CS PT RegarSport Indonesia,\n\nSaya ingin follow-up status Tiket Klaim Garansi:\n• No Tiket: #${c.claimNumber}\n• No Order: ${order.orderNumber || `#${order.id}`}\n• Kategori: ${c.category}\n\nMohon bantuannya untuk update proses klaim. Terima kasih!`
+                              );
+                              window.open(`https://wa.me/6281234567890?text=${text}`, "_blank");
+                            }}
+                            className="flex items-center gap-1.5 self-start sm:self-center px-3 py-1.5 rounded-lg border border-emerald-200 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-[11px] font-bold transition"
+                          >
+                            <Phone size={12} />
+                            <span>Follow Up WA CS</span>
+                          </button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        })()}
 
         {/* Info Grid: Customer & Shipping */}
         <div className="grid gap-6 md:grid-cols-2 pt-4 border-t border-slate-100">
@@ -1139,6 +1302,16 @@ export default function OrderDetail() {
           </div>
         </div>
       )}
+
+      {/* Warranty Claim Modal */}
+      <WarrantyClaimModal
+        isOpen={showWarrantyModal}
+        onClose={() => setShowWarrantyModal(false)}
+        order={order}
+        onSuccess={(newClaim) => {
+          setClaims((prev) => [newClaim, ...prev]);
+        }}
+      />
     </div>
   );
 }
