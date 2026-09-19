@@ -30,7 +30,7 @@ import { useCart } from "../../context/CartContext";
 import { useAuth } from "../../context/AuthContext";
 import { useWishlist } from "../../context/WishlistContext";
 import { EmptyState, ScreenLoader } from "../../components/common/UiStates";
-import Jersey3DViewer from "../../components/customer/Jersey3DViewer";
+import JerseyPreviewMockup from "../../components/customer/JerseyPreviewMockup";
 
 const getAvailableSizes = (prod) => {
   if (!prod) return ["L"];
@@ -605,9 +605,11 @@ export default function ProductDetail() {
                       </div>
                     </div>
 
-                    {/* Kolom Live 3D Jersey Studio Visualizer (Three.js 360°) */}
+                    {/* Kolom Live Photorealistic Jersey Mockup (Realistis Sesuai Produk) */}
                     <div className="w-full">
-                      <Jersey3DViewer
+                      <JerseyPreviewMockup
+                        productImage={product.imageUrl}
+                        productName={product.name}
                         customName={customName}
                         customNumber={customNumber}
                         customCollar={customCollar}
