@@ -34,6 +34,18 @@ public class OrderItem {
     @Column(length = 50)
     private String size;
 
+    @Column(name = "custom_name", length = 100)
+    private String customName;
+
+    @Column(name = "custom_number", length = 20)
+    private String customNumber;
+
+    @Column(name = "custom_collar", length = 50)
+    private String customCollar;
+
+    @Column(name = "custom_team", length = 100)
+    private String customTeam;
+
     @Column(nullable = false, precision = 12, scale = 2)
     private BigDecimal price;
 

@@ -826,6 +826,13 @@ export default function OrderDetail() {
                           </span>
                         )}
                       </div>
+                      {item.customName && (
+                        <div className="mt-1 flex flex-wrap items-center gap-1.5 text-[11px] font-semibold text-emerald-800 bg-emerald-50/80 px-2 py-0.5 rounded-lg border border-emerald-200 w-fit">
+                          <span>🎽 Sablon: <strong>{item.customName}</strong> #{item.customNumber || "-"}</span>
+                          {item.customCollar && <span>({item.customCollar})</span>}
+                          {item.customTeam && <span>• {item.customTeam}</span>}
+                        </div>
+                      )}
                     </div>
                   </div>
 

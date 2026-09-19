@@ -46,6 +46,14 @@ spring:
           filters:
             - AuthenticationFilter
 
+        # Notification Service Route
+        - id: notification-service
+          uri: http://${NOTIFICATION_SERVICE_HOST:localhost}:8090
+          predicates:
+            - Path=/api/v1/notifications/**
+          filters:
+            - AuthenticationFilter
+
         # Swagger Docs Aggregation Routes
         - id: auth-docs
           uri: http://${AUTH_SERVICE_HOST:localhost}:8086

@@ -23,6 +23,10 @@ public class CartMapper {
                 item.getProductName(),
                 item.getProductImage(),
                 item.getSize() != null ? item.getSize() : "L",
+                item.getCustomName(),
+                item.getCustomNumber(),
+                item.getCustomCollar(),
+                item.getCustomTeam(),
                 item.getPrice(),
                 item.getQuantity(),
                 subtotal
@@ -36,6 +40,10 @@ public class CartMapper {
                 .productName(request.productName())
                 .productImage(request.productImage())
                 .size(request.size() != null && !request.size().isBlank() ? request.size() : "L")
+                .customName(request.customName() != null ? request.customName().trim().toUpperCase() : null)
+                .customNumber(request.customNumber() != null ? request.customNumber().trim() : null)
+                .customCollar(request.customCollar() != null ? request.customCollar().trim() : null)
+                .customTeam(request.customTeam() != null ? request.customTeam().trim().toUpperCase() : null)
                 .price(request.price())
                 .quantity(request.quantity())
                 .build();

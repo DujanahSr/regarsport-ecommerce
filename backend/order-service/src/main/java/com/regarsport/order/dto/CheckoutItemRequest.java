@@ -18,6 +18,11 @@ public record CheckoutItemRequest(
 
     String size,
 
+    String customName,
+    String customNumber,
+    String customCollar,
+    String customTeam,
+
     @NotNull(message = "Price is required")
     @Positive(message = "Price must be greater than zero")
     BigDecimal price,
@@ -26,7 +31,11 @@ public record CheckoutItemRequest(
     @Min(value = 1, message = "Quantity must be at least 1")
     Integer quantity
 ) {
+    public CheckoutItemRequest(Long productId, String productName, String productImage, String size, BigDecimal price, Integer quantity) {
+        this(productId, productName, productImage, size, null, null, null, null, price, quantity);
+    }
+
     public CheckoutItemRequest(Long productId, String productName, String productImage, BigDecimal price, Integer quantity) {
-        this(productId, productName, productImage, "L", price, quantity);
+        this(productId, productName, productImage, "L", null, null, null, null, price, quantity);
     }
 }

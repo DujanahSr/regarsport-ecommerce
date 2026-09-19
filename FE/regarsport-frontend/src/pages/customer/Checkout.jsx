@@ -143,6 +143,10 @@ export default function Checkout() {
         price: Number(item.price || item.products?.price),
         quantity: Number(item.quantity),
         size: item.size || "L",
+        customName: item.customName || null,
+        customNumber: item.customNumber || null,
+        customCollar: item.customCollar || null,
+        customTeam: item.customTeam || null,
       }));
 
       const orderResponse = await api.post("/orders/checkout", {
@@ -417,6 +421,11 @@ export default function Checkout() {
                           </span>
                         )}
                       </div>
+                      {item.customName && (
+                        <p className="text-[11px] text-emerald-700 font-semibold mt-0.5">
+                          🎽 Sablon: <strong>{item.customName}</strong> #{item.customNumber || "-"} {item.customCollar && `(${item.customCollar})`}
+                        </p>
+                      )}
                     </div>
                   </div>
 

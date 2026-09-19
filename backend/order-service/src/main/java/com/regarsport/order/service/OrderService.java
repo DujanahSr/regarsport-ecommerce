@@ -87,6 +87,10 @@ public class OrderService {
                     .productName(itemReq.productName())
                     .productImage(itemReq.productImage())
                     .size(itemSize)
+                    .customName(itemReq.customName() != null ? itemReq.customName().trim().toUpperCase() : null)
+                    .customNumber(itemReq.customNumber() != null ? itemReq.customNumber().trim() : null)
+                    .customCollar(itemReq.customCollar() != null ? itemReq.customCollar().trim() : null)
+                    .customTeam(itemReq.customTeam() != null ? itemReq.customTeam().trim().toUpperCase() : null)
                     .price(itemReq.price())
                     .quantity(itemReq.quantity())
                     .subtotal(subtotal)
@@ -99,7 +103,12 @@ public class OrderService {
                     itemReq.productId(),
                     itemReq.productName(),
                     itemReq.quantity(),
-                    itemReq.price()
+                    itemReq.price(),
+                    itemSize,
+                    orderItem.getCustomName(),
+                    orderItem.getCustomNumber(),
+                    orderItem.getCustomCollar(),
+                    orderItem.getCustomTeam()
             ));
         }
 
@@ -254,6 +263,22 @@ public class OrderService {
         order.setShippedAt(Instant.now());
 
         Order updated = orderRepository.save(order);
+
+        // Publish OrderShippedEvent to RabbitMQ
+        try {
+            orderEventProducer.publishOrderShipped(new com.regarsport.common.event.OrderShippedEvent(
+                    updated.getId(),
+                    updated.getOrderNumber(),
+                    updated.getCustomerName(),
+                    updated.getCustomerEmail(),
+                    updated.getShippingCourier(),
+                    updated.getTrackingNumber(),
+                    updated.getShippedAt()
+            ));
+        } catch (Exception e) {
+            log.warn("Failed to publish OrderShippedEvent for orderId: {}", orderId, e);
+        }
+
         return orderMapper.toResponse(updated);
     }
 

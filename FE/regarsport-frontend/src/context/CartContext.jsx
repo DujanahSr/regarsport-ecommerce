@@ -49,6 +49,10 @@ export const CartProvider = ({
       const normalized = list.map((item) => ({
         ...item,
         size: item.size || "L",
+        customName: item.customName || null,
+        customNumber: item.customNumber || null,
+        customCollar: item.customCollar || null,
+        customTeam: item.customTeam || null,
         products: {
           id: item.productId,
           name: item.productName,
@@ -76,7 +80,7 @@ export const CartProvider = ({
   }, [authLoading, loadCart]);
 
   const addToCart = useCallback(
-    async (product, qty = 1, size = "L") => {
+    async (product, qty = 1, size = "L", customOptions = null) => {
       try {
         await api.post("/cart", {
           productId: product.id,
@@ -85,6 +89,10 @@ export const CartProvider = ({
           price: Number(product.price),
           quantity: Number(qty) || 1,
           size: size || "L",
+          customName: customOptions?.customName || null,
+          customNumber: customOptions?.customNumber || null,
+          customCollar: customOptions?.customCollar || null,
+          customTeam: customOptions?.customTeam || null,
         });
 
         await loadCart();

@@ -352,23 +352,30 @@ export default function ShippingLabelModal({ isOpen, onClose, order }) {
                 <span>{items.length} Macam Barang</span>
               </div>
 
-              <div className="space-y-1 max-h-36 overflow-hidden">
+              <div className="space-y-1.5 max-h-40 overflow-hidden">
                 {items.map((it, idx) => (
-                  <div key={idx} className="flex items-center justify-between text-[10px] gap-1.5">
-                    <div className="flex items-center gap-1.5 min-w-0">
-                      <span className="w-3.5 h-3.5 border border-black inline-block shrink-0 rounded-[2px]" />
-                      <span className="font-bold text-black truncate max-w-44">
-                        {it.productName || "Jersey Sport"}
-                      </span>
-                      {it.size && (
-                        <span className="font-black px-1 border border-black text-[9px] uppercase">
-                          {it.size}
+                  <div key={idx} className="border-b border-zinc-200 pb-1 last:border-b-0">
+                    <div className="flex items-center justify-between text-[10px] gap-1.5">
+                      <div className="flex items-center gap-1.5 min-w-0">
+                        <span className="w-3.5 h-3.5 border border-black inline-block shrink-0 rounded-[2px]" />
+                        <span className="font-bold text-black truncate max-w-44">
+                          {it.productName || "Jersey Sport"}
                         </span>
-                      )}
+                        {it.size && (
+                          <span className="font-black px-1 border border-black text-[9px] uppercase">
+                            {it.size}
+                          </span>
+                        )}
+                      </div>
+                      <span className="font-mono font-black text-[11px] shrink-0">
+                        {it.quantity}x
+                      </span>
                     </div>
-                    <span className="font-mono font-black text-[11px] shrink-0">
-                      {it.quantity}x
-                    </span>
+                    {it.customName && (
+                      <div className="text-[8.5px] font-black text-black pl-5 mt-0.5 font-mono">
+                        👉 SABLON: &quot;{it.customName}&quot; #{it.customNumber || "-"} {it.customCollar && `| ${it.customCollar}`} {it.customTeam && `| ${it.customTeam}`}
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>

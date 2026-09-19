@@ -27,9 +27,12 @@ public class CartService {
     @Transactional
     public CartItemResponse addToCart(Long userId, CartItemRequest request) {
         String itemSize = (request.size() != null && !request.size().isBlank()) ? request.size().trim() : "L";
-        log.info("Adding item to cart for userId: {}, productId: {}, size: {}", userId, request.productId(), itemSize);
+        String customName = (request.customName() != null && !request.customName().isBlank()) ? request.customName().trim().toUpperCase() : null;
+        log.info("Adding item to cart for userId: {}, productId: {}, size: {}, custom: {}", userId, request.productId(), itemSize, customName);
 
-        Optional<CartItem> existing = cartItemRepository.findByUserIdAndProductIdAndSize(userId, request.productId(), itemSize);
+        Optional<CartItem> existing = customName != null
+                ? cartItemRepository.findByUserIdAndProductIdAndSizeAndCustomName(userId, request.productId(), itemSize, customName)
+                : cartItemRepository.findByUserIdAndProductIdAndSize(userId, request.productId(), itemSize);
 
         CartItem item;
         if (existing.isPresent()) {

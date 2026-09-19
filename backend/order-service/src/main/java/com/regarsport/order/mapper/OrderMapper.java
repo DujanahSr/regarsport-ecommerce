@@ -53,6 +53,10 @@ public class OrderMapper {
                 item.getProductName(),
                 item.getProductImage(),
                 item.getSize() != null ? item.getSize() : "L",
+                item.getCustomName(),
+                item.getCustomNumber(),
+                item.getCustomCollar(),
+                item.getCustomTeam(),
                 item.getPrice(),
                 item.getQuantity(),
                 item.getSubtotal()

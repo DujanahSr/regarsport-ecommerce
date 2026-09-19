@@ -81,14 +81,16 @@ public class WebhookService {
         transaction.setPaymentType(payload.paymentType());
         paymentTransactionRepository.save(transaction);
 
-        // Publish event to RabbitMQ for order-service to consume
+        // Publish event to RabbitMQ for order-service and notification-service to consume
         PaymentStatusUpdatedEvent event = new PaymentStatusUpdatedEvent(
                 transaction.getOrderId(),
                 transaction.getOrderNumber(),
                 isSuccess ? "PAID" : newStatus.name(),
                 payload.paymentType(),
                 transaction.getAmount(),
-                transaction.getPaidAt() != null ? transaction.getPaidAt() : Instant.now()
+                transaction.getPaidAt() != null ? transaction.getPaidAt() : Instant.now(),
+                transaction.getCustomerName(),
+                transaction.getCustomerEmail()
         );
         paymentEventProducer.publishPaymentStatusUpdated(event);
 
