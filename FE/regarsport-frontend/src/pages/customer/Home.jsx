@@ -12,10 +12,12 @@ import {
   RotateCcw,
   Search,
   ShieldCheck,
+  SlidersHorizontal,
   Sparkles,
   TrendingUp,
   Truck,
   Users,
+  X,
 } from "lucide-react";
 
 import api from "../../services/api";
@@ -80,6 +82,8 @@ export default function Home() {
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [sortBy, setSortBy] = useState("default");
+  const [priceRange, setPriceRange] = useState("all");
   const searchTimerRef = useRef(null);
   const shopSectionRef = useRef(null);
 
@@ -148,13 +152,33 @@ export default function Home() {
     getCategories();
   }, []);
 
-  const filteredProducts = useMemo(
-    () =>
-      products.filter((product) =>
-        product.name.toLowerCase().includes(search.toLowerCase())
-      ),
-    [products, search]
-  );
+  const filteredProducts = useMemo(() => {
+    let list = products.filter((product) =>
+      product.name.toLowerCase().includes(search.toLowerCase())
+    );
+
+    // Filter Rentang Harga
+    if (priceRange === "under_100k") {
+      list = list.filter((p) => Number(p.price) < 100000);
+    } else if (priceRange === "100k_250k") {
+      list = list.filter((p) => Number(p.price) >= 100000 && Number(p.price) <= 250000);
+    } else if (priceRange === "above_250k") {
+      list = list.filter((p) => Number(p.price) > 250000);
+    }
+
+    // Pengurutan (Sorting)
+    if (sortBy === "price_asc") {
+      list = [...list].sort((a, b) => Number(a.price) - Number(b.price));
+    } else if (sortBy === "price_desc") {
+      list = [...list].sort((a, b) => Number(b.price) - Number(a.price));
+    } else if (sortBy === "name_asc") {
+      list = [...list].sort((a, b) => a.name.localeCompare(b.name));
+    } else if (sortBy === "name_desc") {
+      list = [...list].sort((a, b) => b.name.localeCompare(a.name));
+    }
+
+    return list;
+  }, [products, search, priceRange, sortBy]);
 
 
   const scrollToShop = () => {
@@ -358,17 +382,77 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Product section header */}
-        <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
+        {/* Product section header & toolbar */}
+        <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <h2 className="text-2xl font-bold text-slate-900">Semua Produk</h2>
+            <h2 className="text-2xl font-bold text-slate-900">Koleksi Produk</h2>
             <p className="mt-1 text-sm text-slate-500">
               {loading
                 ? "Memuat produk..."
                 : error
                 ? "Terjadi kendala saat memuat produk"
-                : `${filteredProducts.length} produk ditemukan`}
+                : `${filteredProducts.length} produk siap dipesan`}
             </p>
+          </div>
+
+          {/* Filter & Sort Toolbar */}
+          <div className="flex flex-wrap items-center gap-2.5">
+            {/* Price Range Pills */}
+            <div className="flex items-center gap-1 rounded-xl bg-slate-100 p-1 text-xs">
+              {[
+                { id: "all", label: "Semua Harga" },
+                { id: "under_100k", label: "< 100rb" },
+                { id: "100k_250k", label: "100rb - 250rb" },
+                { id: "above_250k", label: "> 250rb" },
+              ].map((pill) => (
+                <button
+                  key={pill.id}
+                  type="button"
+                  onClick={() => setPriceRange(pill.id)}
+                  className={`rounded-lg px-2.5 py-1.5 font-medium transition cursor-pointer ${
+                    priceRange === pill.id
+                      ? "bg-white text-emerald-700 shadow-xs font-bold"
+                      : "text-slate-600 hover:text-slate-900"
+                  }`}
+                >
+                  {pill.label}
+                </button>
+              ))}
+            </div>
+
+            {/* Sort Selector */}
+            <div className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs text-slate-700 shadow-xs">
+              <SlidersHorizontal size={13} className="text-slate-400" />
+              <span className="font-medium text-slate-500">Urut:</span>
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                className="bg-transparent font-semibold text-slate-800 outline-none cursor-pointer"
+              >
+                <option value="default">Paling Sesuai</option>
+                <option value="price_asc">Harga: Termurah</option>
+                <option value="price_desc">Harga: Termahal</option>
+                <option value="name_asc">Nama: A - Z</option>
+                <option value="name_desc">Nama: Z - A</option>
+              </select>
+            </div>
+
+            {/* Reset Filter Button */}
+            {(priceRange !== "all" || sortBy !== "default" || search) && (
+              <button
+                type="button"
+                onClick={() => {
+                  setPriceRange("all");
+                  setSortBy("default");
+                  setSearch("");
+                }}
+                className="flex items-center gap-1 rounded-xl border border-rose-200 bg-rose-50 px-2.5 py-1.5 text-xs font-semibold text-rose-600 transition hover:bg-rose-100 cursor-pointer"
+                title="Reset Semua Filter"
+              >
+                <X size={12} />
+                <span>Reset</span>
+              </button>
+            )}
           </div>
         </div>
 

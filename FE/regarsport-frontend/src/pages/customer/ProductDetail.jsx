@@ -22,6 +22,7 @@ import {
   Check,
   RotateCcw,
   Eye,
+  Share2,
 } from "lucide-react";
 import toast from "react-hot-toast";
 
@@ -245,6 +246,25 @@ export default function ProductDetail() {
     navigate("/dashboard/checkout", {
       state: { directItem },
     });
+  };
+
+  const handleShareToWhatsApp = () => {
+    const isCustomized = isJersey && isCustomJersey && (customName || customNumber || customTeam);
+    let text = `Halo rekan tim! Cek produk apparel dari RegarSport ini:\n\n`;
+    text += `🏆 *${product.name}*\n`;
+    text += `💰 *Harga*: Rp ${Number(product.price).toLocaleString("id-ID")}\n`;
+    text += `👕 *Ukuran Dipilih*: ${selectedSize}\n`;
+    if (isCustomized) {
+      text += `\n✨ *Rancangan Sablon Tim*:\n`;
+      if (customTeam.trim()) text += `• Nama Tim: ${customTeam.trim()}\n`;
+      if (customName.trim()) text += `• Nama Punggung: ${customName.trim()}\n`;
+      if (customNumber.trim()) text += `• Nomor Punggung: ${customNumber.trim()}\n`;
+      if (customCollar) text += `• Kerah: ${customCollar}\n`;
+    }
+    text += `\n🔗 *Lihat Detail Produk*: ${window.location.href}\n\nBagaimana menurut kalian? Siap kita pesan bareng?`;
+
+    const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
+    window.open(url, "_blank");
   };
 
   const [loading, setLoading] = useState(true);
@@ -753,6 +773,16 @@ export default function ProductDetail() {
               >
                 <Zap size={18} />
                 Beli Sekarang
+              </button>
+
+              <button
+                type="button"
+                onClick={handleShareToWhatsApp}
+                className="flex items-center gap-2 rounded-2xl border border-emerald-200 bg-emerald-50/70 px-4 py-3 text-sm font-bold text-emerald-800 transition hover:bg-emerald-100 hover:border-emerald-300 cursor-pointer shadow-xs active:scale-[0.98]"
+                title="Bagikan rincian dan rancangan produk ini ke WhatsApp tim Anda"
+              >
+                <Share2 size={17} className="text-emerald-600" />
+                <span>Bagikan ke Tim</span>
               </button>
             </div>
           </div>
