@@ -708,18 +708,27 @@ export default function ProductDetail() {
                 type="button"
                 onClick={async () => {
                   if (isWishlisted(product.id)) {
-                    await removeWishlist(getWishlistItemId(product.id));
+                    await removeWishlist(product.id);
                   } else {
                     await addToWishlist(product);
                   }
                 }}
-                className="flex items-center gap-2 rounded-2xl border border-slate-200 px-4 py-3 text-sm font-semibold text-slate-700 transition hover:border-rose-200 hover:bg-rose-50 hover:text-rose-600 cursor-pointer"
+                className={`group flex items-center gap-2 rounded-2xl border px-4 py-3 text-sm font-semibold transition-all cursor-pointer ${
+                  isWishlisted(product.id)
+                    ? "border-rose-200 bg-rose-50/80 text-rose-700 hover:bg-rose-100/80 shadow-xs"
+                    : "border-slate-200 bg-white text-slate-700 hover:border-rose-300 hover:bg-rose-50/50 hover:text-rose-600 shadow-xs"
+                }`}
+                title={isWishlisted(product.id) ? "Klik untuk menghapus dari wishlist" : "Simpan produk ini ke wishlist"}
               >
                 <Heart
                   size={18}
-                  className={isWishlisted(product.id) ? "fill-rose-500 text-rose-500" : ""}
+                  className={`transition-transform duration-200 group-hover:scale-110 ${
+                    isWishlisted(product.id)
+                      ? "fill-rose-500 text-rose-500"
+                      : "text-slate-400 group-hover:text-rose-500"
+                  }`}
                 />
-                {isWishlisted(product.id) ? "Hapus Wishlist" : "Wishlist"}
+                <span>{isWishlisted(product.id) ? "Tersimpan di Wishlist" : "Simpan ke Wishlist"}</span>
               </button>
 
               <button

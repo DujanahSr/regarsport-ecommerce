@@ -7,7 +7,6 @@ import {
   ChevronLeft,
   ChevronRight,
   CreditCard,
-  Heart,
   LayoutGrid,
   Package,
   RotateCcw,
@@ -20,17 +19,12 @@ import {
 } from "lucide-react";
 
 import api from "../../services/api";
-import { useWishlist } from "../../context/WishlistContext";
 import {
   EmptyState,
   SectionSkeletonGrid,
 } from "../../components/common/UiStates";
 
-const ProductCard = memo(function ProductCard({
-  product,
-  isWishlisted,
-  onToggleWishlist,
-}) {
+const ProductCard = memo(function ProductCard({ product }) {
   return (
     <div className="group relative flex flex-col overflow-hidden rounded-2xl bg-white ring-1 ring-slate-900/5 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl">
       <div className="relative aspect-4/3 overflow-hidden bg-slate-100">
@@ -43,18 +37,6 @@ const ProductCard = memo(function ProductCard({
           alt={product.name}
           className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
         />
-
-        <button
-          type="button"
-          onClick={() => onToggleWishlist(product)}
-          className="absolute top-3 right-3 flex h-9 w-9 items-center justify-center rounded-full bg-white/90 backdrop-blur shadow-sm transition hover:scale-110"
-          aria-label={isWishlisted ? "Hapus dari wishlist" : "Tambah ke wishlist"}
-        >
-          <Heart
-            size={18}
-            className={isWishlisted ? "fill-rose-500 text-rose-500" : "text-slate-500"}
-          />
-        </button>
 
         {product.stock === 0 ? (
           <span className="absolute bottom-3 left-3 rounded-full bg-slate-700 px-2.5 py-1 text-[11px] font-semibold text-white">
@@ -101,12 +83,6 @@ export default function Home() {
   const searchTimerRef = useRef(null);
   const shopSectionRef = useRef(null);
 
-  const {
-    addToWishlist,
-    removeWishlist,
-    isWishlisted,
-    getWishlistItemId,
-  } = useWishlist();
 
   const getProducts = async () => {
     try {
@@ -180,18 +156,6 @@ export default function Home() {
     [products, search]
   );
 
-  const handleToggleWishlist = useCallback(
-    async (product) => {
-      const prodId = typeof product === "object" ? product.id : product;
-      if (isWishlisted(prodId)) {
-        await removeWishlist(getWishlistItemId(prodId));
-        return;
-      }
-
-      await addToWishlist(product);
-    },
-    [addToWishlist, getWishlistItemId, isWishlisted, removeWishlist]
-  );
 
   const scrollToShop = () => {
     shopSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -440,8 +404,6 @@ export default function Home() {
               <ProductCard
                 key={product.id}
                 product={product}
-                isWishlisted={isWishlisted(product.id)}
-                onToggleWishlist={handleToggleWishlist}
               />
             ))}
           </div>
