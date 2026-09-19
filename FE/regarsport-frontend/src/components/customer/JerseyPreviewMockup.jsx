@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Sparkles, Shirt, CheckCircle2 } from 'lucide-react';
+import { Sparkles, Shirt, CheckCircle2, Shield } from 'lucide-react';
 
 export default function JerseyPreviewMockup({
   productImage = '',
@@ -214,40 +214,75 @@ export default function JerseyPreviewMockup({
           </div>
         ) : (
           /* ===================================================
-             TAMPAK DEPAN (AUTHENTIC PRODUCT PHOTO / FRONT VIEW)
+             TAMPAK DEPAN (AUTHENTIC PRODUCT PHOTO WITH CENTER CHEST NUMBER)
              =================================================== */
           <div className="flex flex-col items-center gap-3 transition-all duration-300">
-            <div className="relative w-56 sm:w-64 rounded-2xl overflow-hidden border border-slate-700/80 shadow-2xl bg-slate-900 group">
+            <div className="relative w-60 sm:w-68 rounded-2xl overflow-hidden border border-slate-700/80 shadow-2xl bg-slate-900 group">
               {productImage ? (
                 <img
                   src={productImage}
                   alt={productName || 'Jersey RegarSport'}
-                  className="w-full h-64 sm:h-72 object-cover object-center group-hover:scale-105 transition duration-500"
+                  className="w-full h-72 sm:h-80 object-cover object-center group-hover:scale-105 transition duration-500"
                 />
               ) : (
-                <div className="w-full h-64 flex flex-col items-center justify-center bg-slate-800 text-slate-400">
+                <div className="w-full h-72 flex flex-col items-center justify-center bg-slate-800 text-slate-400">
                   <Shirt size={48} className="text-slate-600 mb-2" />
                   <span className="text-xs">Foto Produk Jersey</span>
                 </div>
               )}
 
-              {/* Subtle Gradient Shadow Overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-transparent to-black/30 pointer-events-none" />
+              {/* Subtle Ambient Contrast Overlay */}
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-black/20 to-black/35 pointer-events-none" />
 
-              {/* Front Badge & Collar Indicator */}
-              <div className="absolute top-2.5 left-2.5 right-2.5 flex items-center justify-between pointer-events-none">
-                <span className="text-[9px] font-bold px-2 py-0.5 rounded-md bg-emerald-600/90 text-white backdrop-blur-xs shadow-xs">
-                  {customCollar}
+              {/* Top Collar Badge & Tournament Badge */}
+              <div className="absolute top-2.5 left-2.5 right-2.5 flex items-center justify-between pointer-events-none z-10">
+                <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-md bg-emerald-600 text-white backdrop-blur-xs shadow-xs flex items-center gap-1">
+                  <Shirt size={11} />
+                  Kerah: {customCollar}
                 </span>
+                <span className="text-[9px] font-mono font-bold px-2 py-0.5 rounded-md bg-slate-950/80 text-yellow-300 border border-yellow-400/40 backdrop-blur-xs">
+                  EDISI TURNAMEN
+                </span>
+              </div>
+
+              {/* ===================================================
+                 CENTER CHEST NUMBER & TEAM (STANDAR FIFA / EURO)
+                 Menempatkan nomor tepat di tengah dada seperti jersey timnas
+                 =================================================== */}
+              <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-10 px-4 pt-10 pb-12">
                 {customNumber && (
-                  <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-md bg-slate-900/90 text-emerald-400 border border-emerald-500/40 backdrop-blur-xs">
-                    #{customNumber}
-                  </span>
+                  <div className="flex flex-col items-center justify-center my-auto transform -translate-y-2">
+                    <span
+                      className="font-mono font-black text-5xl sm:text-6xl text-yellow-300 tracking-tight"
+                      style={{
+                        WebkitTextStroke: '2px #0f172a',
+                        filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.95))',
+                        textShadow: '0 3px 8px rgba(0,0,0,0.9), 0 0 16px rgba(253,224,71,0.5)',
+                      }}
+                    >
+                      {displayNumber}
+                    </span>
+                    <span className="text-[8px] font-mono font-bold tracking-wider text-yellow-200 uppercase bg-slate-950/90 px-2.5 py-0.5 rounded-full border border-yellow-400/40 mt-1 shadow-md">
+                      NOMOR DADA TENGAH
+                    </span>
+                  </div>
+                )}
+
+                {/* Team / Community Sponsor across chest */}
+                {customTeam && (
+                  <div className="mt-auto mb-2 text-center w-full">
+                    <span
+                      className="font-mono font-black text-[11px] sm:text-xs text-white tracking-[0.18em] uppercase bg-slate-950/90 px-3 py-1 rounded-lg border border-emerald-500/50 shadow-md inline-block max-w-[210px] truncate"
+                      style={{ textShadow: '0 2px 4px #000000' }}
+                    >
+                      {displayTeam}
+                    </span>
+                  </div>
                 )}
               </div>
 
               {/* Product Name & Sublimation Guarantee at bottom */}
-              <div className="absolute bottom-2.5 left-2.5 right-2.5 pointer-events-none">
+              <div className="absolute bottom-2.5 left-2.5 right-2.5 pointer-events-none z-10">
                 <p className="text-xs font-bold text-white truncate drop-shadow-sm">
                   {productName || 'Jersey RegarSport'}
                 </p>
@@ -258,9 +293,10 @@ export default function JerseyPreviewMockup({
               </div>
             </div>
 
-            <p className="text-[11px] text-slate-400 text-center max-w-xs">
-              Motif, corak, dan bahan jersey diproduksi persis sesuai foto katalog resmi di atas.
-            </p>
+            <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-800/90 border border-slate-700/80 text-[10px] text-slate-300 font-mono shadow-xs">
+              <span className="w-1.5 h-1.5 rounded-full bg-yellow-400 animate-pulse" />
+              <span>Standar FIFA/Proliga: Nomor tercetak di <strong>Tengah Dada</strong></span>
+            </div>
           </div>
         )}
       </div>

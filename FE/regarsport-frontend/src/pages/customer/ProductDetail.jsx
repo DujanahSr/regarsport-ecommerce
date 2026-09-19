@@ -97,6 +97,38 @@ const getProductType = (prod) => {
   return "clothing";
 };
 
+// Filter ketat agar kustomisasi sablon HANYA aktif untuk kategori Jersey / Pakaian Olahraga
+const isCustomizableJersey = (prod) => {
+  if (!prod) return false;
+  const prodType = getProductType(prod);
+  if (prodType === "shoes" || prodType === "equipment") return false;
+  const catId = Number(prod.categoryId);
+  const name = (prod.name || "").toLowerCase();
+  const catName = (prod.categoryName || "").toLowerCase();
+
+  // Pastikan sepatu, bola, deker, sarung tangan, atau tas tidak lolos
+  if (
+    catId === 2 || catId === 3 || catId === 5 ||
+    catName.includes("sepatu") || catName.includes("bola") || catName.includes("tas") || catName.includes("aksesoris") ||
+    name.includes("sepatu") || name.includes("shoes") || name.includes("bola") || name.includes("ball") || name.includes("sarung") || name.includes("tas")
+  ) {
+    return false;
+  }
+
+  // Khusus kategori Jersey & Pakaian Olahraga (Cat 1 atau 4)
+  return (
+    catId === 1 ||
+    catId === 4 ||
+    catName.includes("jersey") ||
+    catName.includes("pakaian") ||
+    catName.includes("baju") ||
+    catName.includes("kaos") ||
+    name.includes("jersey") ||
+    name.includes("baju") ||
+    name.includes("kaos")
+  );
+};
+
 export default function ProductDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -110,13 +142,20 @@ export default function ProductDetail() {
   const [showSizeChart, setShowSizeChart] = useState(false);
   const [activeChartTab, setActiveChartTab] = useState("clothing"); // clothing, shoes, equipment
 
-  // Custom Jersey Sablon State
+  // Custom Jersey Sablon State (Hanya aktif untuk kategori Jersey)
+  const isJersey = useMemo(() => isCustomizableJersey(product), [product]);
   const [isCustomJersey, setIsCustomJersey] = useState(false);
   const [customName, setCustomName] = useState("");
   const [customNumber, setCustomNumber] = useState("");
   const [customCollar, setCustomCollar] = useState("O-Neck");
   const [customTeam, setCustomTeam] = useState("");
-  const [jerseyPreviewView, setJerseyPreviewView] = useState("back"); // 'back' or 'front'
+
+  // Otomatis matikan kustomisasi jika berpindah ke produk non-jersey
+  useEffect(() => {
+    if (product && !isCustomizableJersey(product)) {
+      setIsCustomJersey(false);
+    }
+  }, [product]);
 
   const availableSizes = useMemo(() => {
     if (product?.sizeStocks && Object.keys(product.sizeStocks).length > 0) {
@@ -161,7 +200,7 @@ export default function ProductDetail() {
       toast.error(`Stok ukuran ${selectedSize} hanya tersisa ${currentSizeStock} buah`);
       return;
     }
-    const customOptions = isCustomJersey ? {
+    const customOptions = (isJersey && isCustomJersey) ? {
       customName: customName.trim().toUpperCase() || null,
       customNumber: customNumber.trim() || null,
       customCollar: customCollar || "O-Neck",
@@ -197,10 +236,10 @@ export default function ProductDetail() {
       price: Number(product.price),
       quantity: Number(qty),
       size: selectedSize,
-      customName: isCustomJersey && customName.trim() ? customName.trim().toUpperCase() : null,
-      customNumber: isCustomJersey && customNumber.trim() ? customNumber.trim() : null,
-      customCollar: isCustomJersey ? customCollar : null,
-      customTeam: isCustomJersey && customTeam.trim() ? customTeam.trim().toUpperCase() : null,
+      customName: isJersey && isCustomJersey && customName.trim() ? customName.trim().toUpperCase() : null,
+      customNumber: isJersey && isCustomJersey && customNumber.trim() ? customNumber.trim() : null,
+      customCollar: isJersey && isCustomJersey ? customCollar : null,
+      customTeam: isJersey && isCustomJersey && customTeam.trim() ? customTeam.trim().toUpperCase() : null,
     };
 
     navigate("/dashboard/checkout", {
@@ -495,132 +534,137 @@ export default function ProductDetail() {
               )}
             </div>
 
-            {/* Kustomisasi Jersey Builder (DNA Khas RegarSport) */}
-            <div className="mt-6 rounded-2xl border border-emerald-200 bg-gradient-to-br from-emerald-50/70 via-teal-50/40 to-slate-50 p-4 sm:p-5 shadow-xs">
-              <div className="flex items-start justify-between gap-3">
-                <div className="flex items-center gap-2.5">
-                  <div className="w-9 h-9 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-sm shadow-emerald-600/30">
-                    <Shirt size={18} />
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <h4 className="text-xs sm:text-sm font-black text-slate-900">
-                        Kustomisasi Sablon Jersey
-                      </h4>
-                      <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-600 text-white shadow-xs">
-                        FREE SUBLIMASI
-                      </span>
+            {/* Kustomisasi Jersey Builder (HANYA MUNCUL PADA KATEGORI JERSEY) */}
+            {isJersey && (
+              <div className="mt-6 rounded-2xl border border-emerald-200 bg-gradient-to-br from-emerald-50/70 via-teal-50/40 to-slate-50 p-4 sm:p-5 shadow-xs">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-9 h-9 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-sm shadow-emerald-600/30">
+                      <Shirt size={18} />
                     </div>
-                    <p className="text-[11px] text-slate-500 mt-0.5">
-                      Cetak nama punggung, nomor punggung, kerah, &amp; nama tim langsung dari pabrik Wonogiri.
-                    </p>
-                  </div>
-                </div>
-
-                <label className="relative inline-flex items-center cursor-pointer shrink-0 mt-1">
-                  <input
-                    type="checkbox"
-                    checked={isCustomJersey}
-                    onChange={(e) => {
-                      setIsCustomJersey(e.target.checked);
-                      if (e.target.checked && !customName && user?.fullName) {
-                        setCustomName(user.fullName.split(" ")[0].toUpperCase());
-                        setCustomNumber("10");
-                      }
-                    }}
-                    className="sr-only peer"
-                  />
-                  <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
-                </label>
-              </div>
-
-              {isCustomJersey && (
-                <div className="mt-5 pt-4 border-t border-emerald-200/80 space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
-                    {/* Kolom Form Input */}
-                    <div className="space-y-3">
-                      <div>
-                        <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-700 mb-1">
-                          Nama Punggung (Nameset):
-                        </label>
-                        <input
-                          type="text"
-                          maxLength={14}
-                          value={customName}
-                          onChange={(e) => setCustomName(e.target.value.toUpperCase())}
-                          placeholder="CONTOH: DUJANAH"
-                          className="w-full px-3.5 py-2 rounded-xl bg-white border border-slate-200 text-xs font-mono font-bold text-slate-900 uppercase focus:outline-none focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600 shadow-2xs"
-                        />
-                        <span className="text-[10px] text-slate-400 mt-0.5 block">
-                          Maksimal 14 karakter huruf kapital
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <h4 className="text-xs sm:text-sm font-black text-slate-900">
+                          Kustomisasi Sablon Jersey
+                        </h4>
+                        <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-600 text-white shadow-xs">
+                          FREE SUBLIMASI
                         </span>
                       </div>
+                      <p className="text-[11px] text-slate-500 mt-0.5">
+                        Cetak nama punggung, nomor punggung &amp; dada tengah, kerah, &amp; nama tim langsung dari pabrik Wonogiri.
+                      </p>
+                    </div>
+                  </div>
 
-                      <div className="grid grid-cols-2 gap-3">
+                  <label className="relative inline-flex items-center cursor-pointer shrink-0 mt-1">
+                    <input
+                      type="checkbox"
+                      checked={isCustomJersey}
+                      onChange={(e) => {
+                        setIsCustomJersey(e.target.checked);
+                        if (e.target.checked && !customName && user?.fullName) {
+                          setCustomName(user.fullName.split(" ")[0].toUpperCase());
+                          setCustomNumber("10");
+                        }
+                      }}
+                      className="sr-only peer"
+                    />
+                    <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
+                  </label>
+                </div>
+
+                {isCustomJersey && (
+                  <div className="mt-5 pt-4 border-t border-emerald-200/80 space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
+                      {/* Kolom Form Input */}
+                      <div className="space-y-3">
                         <div>
                           <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-700 mb-1">
-                            Nomor Punggung:
+                            Nama Punggung (Nameset):
                           </label>
                           <input
                             type="text"
-                            maxLength={2}
-                            value={customNumber}
-                            onChange={(e) => {
-                              const val = e.target.value.replace(/\D/g, "");
-                              setCustomNumber(val);
-                            }}
-                            placeholder="10"
-                            className="w-full px-3.5 py-2 rounded-xl bg-white border border-slate-200 text-xs font-mono font-bold text-slate-900 focus:outline-none focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600 text-center shadow-2xs"
+                            maxLength={14}
+                            value={customName}
+                            onChange={(e) => setCustomName(e.target.value.toUpperCase())}
+                            placeholder="CONTOH: DUJANAH"
+                            className="w-full px-3.5 py-2 rounded-xl bg-white border border-slate-200 text-xs font-mono font-bold text-slate-900 uppercase focus:outline-none focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600 shadow-2xs"
                           />
+                          <span className="text-[10px] text-slate-400 mt-0.5 block">
+                            Maksimal 14 karakter huruf kapital
+                          </span>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-3">
+                          <div>
+                            <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-700 mb-1">
+                              Nomor Punggung &amp; Dada:
+                            </label>
+                            <input
+                              type="text"
+                              maxLength={2}
+                              value={customNumber}
+                              onChange={(e) => {
+                                const val = e.target.value.replace(/\D/g, "");
+                                setCustomNumber(val);
+                              }}
+                              placeholder="10"
+                              className="w-full px-3.5 py-2 rounded-xl bg-white border border-slate-200 text-xs font-mono font-bold text-slate-900 focus:outline-none focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600 text-center shadow-2xs"
+                            />
+                            <span className="text-[10px] text-emerald-600 font-semibold mt-0.5 block">
+                              Punggung &amp; Tengah Dada (FIFA)
+                            </span>
+                          </div>
+
+                          <div>
+                            <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-700 mb-1">
+                              Model Kerah:
+                            </label>
+                            <select
+                              value={customCollar}
+                              onChange={(e) => setCustomCollar(e.target.value)}
+                              className="w-full px-2.5 py-2 rounded-xl bg-white border border-slate-200 text-xs font-bold text-slate-800 focus:outline-none focus:border-emerald-600 shadow-2xs"
+                            >
+                              <option value="O-Neck">O-Neck (Bulat)</option>
+                              <option value="V-Neck">V-Neck (Lancip)</option>
+                              <option value="Kerah Polo">Kerah Polo</option>
+                            </select>
+                          </div>
                         </div>
 
                         <div>
                           <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-700 mb-1">
-                            Model Kerah:
+                            Nama Tim / Komunitas (Opsional):
                           </label>
-                          <select
-                            value={customCollar}
-                            onChange={(e) => setCustomCollar(e.target.value)}
-                            className="w-full px-2.5 py-2 rounded-xl bg-white border border-slate-200 text-xs font-bold text-slate-800 focus:outline-none focus:border-emerald-600 shadow-2xs"
-                          >
-                            <option value="O-Neck">O-Neck (Bulat)</option>
-                            <option value="V-Neck">V-Neck (Lancip)</option>
-                            <option value="Kerah Polo">Kerah Polo</option>
-                          </select>
+                          <input
+                            type="text"
+                            maxLength={24}
+                            value={customTeam}
+                            onChange={(e) => setCustomTeam(e.target.value.toUpperCase())}
+                            placeholder="CONTOH: WONOGIRI UNITED"
+                            className="w-full px-3.5 py-2 rounded-xl bg-white border border-slate-200 text-xs font-mono font-bold text-slate-900 uppercase focus:outline-none focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600 shadow-2xs"
+                          />
                         </div>
                       </div>
 
-                      <div>
-                        <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-700 mb-1">
-                          Nama Tim / Komunitas (Opsional):
-                        </label>
-                        <input
-                          type="text"
-                          maxLength={24}
-                          value={customTeam}
-                          onChange={(e) => setCustomTeam(e.target.value.toUpperCase())}
-                          placeholder="CONTOH: WONOGIRI UNITED"
-                          className="w-full px-3.5 py-2 rounded-xl bg-white border border-slate-200 text-xs font-mono font-bold text-slate-900 uppercase focus:outline-none focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600 shadow-2xs"
+                      {/* Kolom Live Photorealistic Jersey Mockup (Realistis Sesuai Produk) */}
+                      <div className="w-full">
+                        <JerseyPreviewMockup
+                          productImage={product.imageUrl}
+                          productName={product.name}
+                          customName={customName}
+                          customNumber={customNumber}
+                          customCollar={customCollar}
+                          customTeam={customTeam}
+                          selectedSize={selectedSize}
                         />
                       </div>
                     </div>
-
-                    {/* Kolom Live Photorealistic Jersey Mockup (Realistis Sesuai Produk) */}
-                    <div className="w-full">
-                      <JerseyPreviewMockup
-                        productImage={product.imageUrl}
-                        productName={product.name}
-                        customName={customName}
-                        customNumber={customNumber}
-                        customCollar={customCollar}
-                        customTeam={customTeam}
-                        selectedSize={selectedSize}
-                      />
-                    </div>
                   </div>
-                </div>
-              )}
-            </div>
+                )}
+              </div>
+            )}
 
             <div className="mt-6">
               <span className="text-xs font-bold uppercase tracking-wider text-slate-600 block mb-2">
