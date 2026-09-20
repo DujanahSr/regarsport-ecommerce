@@ -1,6 +1,8 @@
 package com.regarsport.order.controller;
 
 import com.regarsport.common.dto.ApiResponse;
+import com.regarsport.common.dto.PageResponse;
+import com.regarsport.order.dto.UpdateClaimStatusRequest;
 import com.regarsport.order.dto.WarrantyClaimRequest;
 import com.regarsport.order.dto.WarrantyClaimResponse;
 import com.regarsport.order.service.WarrantyClaimService;
@@ -40,6 +42,27 @@ public class WarrantyClaimController {
     ) {
         List<WarrantyClaimResponse> claims = claimService.getUserClaims(userId);
         return ResponseEntity.ok(ApiResponse.success(claims));
+    }
+
+    @GetMapping("/admin")
+    @Operation(summary = "Admin: Get all warranty claims", description = "Retrieve paginated warranty claims with optional status filter")
+    public ResponseEntity<ApiResponse<PageResponse<WarrantyClaimResponse>>> getAllClaims(
+            @RequestParam(required = false) String status,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        PageResponse<WarrantyClaimResponse> response = claimService.getAllClaims(status, page, size);
+        return ResponseEntity.ok(ApiResponse.success(response));
+    }
+
+    @PatchMapping("/{claimId}/status")
+    @Operation(summary = "Admin/Gudang: Update warranty claim status", description = "Approve, reject, or update tracking for a warranty claim")
+    public ResponseEntity<ApiResponse<WarrantyClaimResponse>> updateClaimStatus(
+            @PathVariable Long claimId,
+            @Valid @RequestBody UpdateClaimStatusRequest request
+    ) {
+        WarrantyClaimResponse response = claimService.updateClaimStatus(claimId, request);
+        return ResponseEntity.ok(ApiResponse.success("Status klaim garansi berhasil diperbarui", response));
     }
 
     @GetMapping("/order/{orderId}")

@@ -848,6 +848,27 @@ export default function OrderDetail() {
                                 &ldquo;{c.description}&rdquo;
                               </p>
                             )}
+                            {c.adminNotes && (
+                              <div className="mt-1 p-2 rounded-lg bg-emerald-50/80 border border-emerald-200/60 text-[11px] text-emerald-900">
+                                <span className="font-bold">Catatan CS / Gudang: </span>
+                                <span>{c.adminNotes}</span>
+                              </div>
+                            )}
+                            {c.replacementTrackingNumber && (
+                              <div className="mt-1 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-teal-50 border border-teal-200 text-teal-900 text-[11px] font-bold">
+                                <Truck size={12} className="text-teal-700" />
+                                <span>Resi Pengganti:</span>
+                                <span className="font-mono text-teal-800">{c.replacementTrackingNumber}</span>
+                                <button
+                                  type="button"
+                                  onClick={() => handleCopyResi(c.replacementTrackingNumber)}
+                                  className="p-0.5 text-teal-600 hover:text-teal-900 rounded cursor-pointer"
+                                  title="Salin Resi Pengganti"
+                                >
+                                  <Copy size={11} />
+                                </button>
+                              </div>
+                            )}
                           </div>
 
                           <button

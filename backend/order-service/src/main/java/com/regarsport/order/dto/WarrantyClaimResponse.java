@@ -18,6 +18,8 @@ public record WarrantyClaimResponse(
     String evidenceImages,
     String status,
     String adminNotes,
+    String replacementTrackingNumber,
+    String returnTrackingNumber,
     Instant createdAt,
     Instant updatedAt
 ) {

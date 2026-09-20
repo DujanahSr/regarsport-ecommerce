@@ -1,7 +1,9 @@
 package com.regarsport.order.service;
 
+import com.regarsport.common.dto.PageResponse;
 import com.regarsport.common.exception.BadRequestException;
 import com.regarsport.common.exception.ResourceNotFoundException;
+import com.regarsport.order.dto.UpdateClaimStatusRequest;
 import com.regarsport.order.dto.WarrantyClaimRequest;
 import com.regarsport.order.dto.WarrantyClaimResponse;
 import com.regarsport.order.entity.Order;
@@ -10,6 +12,9 @@ import com.regarsport.order.repository.OrderRepository;
 import com.regarsport.order.repository.WarrantyClaimRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -84,6 +89,56 @@ public class WarrantyClaimService {
         return toResponse(claim);
     }
 
+    public PageResponse<WarrantyClaimResponse> getAllClaims(String status, int page, int size) {
+        log.info("Fetching warranty claims for admin, status: {}, page: {}, size: {}", status, page, size);
+        Pageable pageable = PageRequest.of(Math.max(0, page - 1), Math.min(100, Math.max(1, size)));
+
+        Page<WarrantyClaim> claimPage;
+        if (status != null && !status.isBlank() && !"ALL".equalsIgnoreCase(status.trim())) {
+            claimPage = claimRepository.findByStatusOrderByCreatedAtDesc(status.trim().toUpperCase(), pageable);
+        } else {
+            claimPage = claimRepository.findAllByOrderByCreatedAtDesc(pageable);
+        }
+
+        var content = claimPage.getContent().stream().map(this::toResponse).toList();
+        return new PageResponse<>(
+                content,
+                claimPage.getNumber() + 1,
+                claimPage.getSize(),
+                claimPage.getTotalElements(),
+                claimPage.getTotalPages(),
+                claimPage.isFirst(),
+                claimPage.isLast()
+        );
+    }
+
+    @Transactional
+    public WarrantyClaimResponse updateClaimStatus(Long claimId, UpdateClaimStatusRequest request) {
+        log.info("Updating warranty claim id: {} with status: {}", claimId, request.status());
+        WarrantyClaim claim = claimRepository.findById(claimId)
+                .orElseThrow(() -> new ResourceNotFoundException("Tiket klaim tidak ditemukan dengan ID: " + claimId));
+
+        if (request.status() != null && !request.status().isBlank()) {
+            claim.setStatus(request.status().trim().toUpperCase());
+        }
+        if (request.adminNotes() != null) {
+            claim.setAdminNotes(request.adminNotes().trim());
+        }
+        if (request.replacementTrackingNumber() != null && !request.replacementTrackingNumber().isBlank()) {
+            claim.setReplacementTrackingNumber(request.replacementTrackingNumber().trim());
+            if ("APPROVED".equalsIgnoreCase(claim.getStatus()) || "PROCESSING".equalsIgnoreCase(claim.getStatus())) {
+                claim.setStatus("RESOLVED");
+            }
+        }
+        if (request.returnTrackingNumber() != null && !request.returnTrackingNumber().isBlank()) {
+            claim.setReturnTrackingNumber(request.returnTrackingNumber().trim());
+        }
+
+        WarrantyClaim updated = claimRepository.save(claim);
+        log.info("Claim {} successfully updated to status: {}", updated.getClaimNumber(), updated.getStatus());
+        return toResponse(updated);
+    }
+
     private WarrantyClaimResponse toResponse(WarrantyClaim c) {
         return new WarrantyClaimResponse(
                 c.getId(),
@@ -101,6 +156,8 @@ public class WarrantyClaimService {
                 c.getEvidenceImages(),
                 c.getStatus(),
                 c.getAdminNotes(),
+                c.getReplacementTrackingNumber(),
+                c.getReturnTrackingNumber(),
                 c.getCreatedAt(),
                 c.getUpdatedAt()
         );

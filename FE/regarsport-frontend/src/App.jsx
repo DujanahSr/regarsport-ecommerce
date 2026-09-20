@@ -34,6 +34,7 @@ const Landing = lazy(() => import("./pages/customer/Landing"));
 const Inventory = lazy(() => import("./pages/admin/Inventory"));
 const WarehouseDashboard = lazy(() => import("./pages/admin/WarehouseDashboard"));
 const Vouchers = lazy(() => import("./pages/admin/Vouchers"));
+const WarrantyClaims = lazy(() => import("./pages/admin/WarrantyClaims"));
 const AdminLayouts = lazy(() => import("./layouts/AdminLayouts"));
 const CustomerLayouts = lazy(() => import("./layouts/CustomerLayouts"));
 
@@ -173,6 +174,11 @@ export default function App() {
                   <Route
                     path="orders"
                     element={<Orders />}
+                  />
+
+                  <Route
+                    path="warranty-claims"
+                    element={<WarrantyClaims />}
                   />
 
                   <Route

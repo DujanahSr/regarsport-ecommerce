@@ -41,16 +41,21 @@ export default function WarehouseDashboard() {
     lowStockList: [],
   });
 
+  const [approvedClaims, setApprovedClaims] = useState([]);
+
   const fetchWarehouseOverview = async () => {
     try {
       setLoading(true);
-      const [ordersRes, prodsRes] = await Promise.all([
+      const [ordersRes, prodsRes, claimsRes] = await Promise.all([
         api.get("/orders", { params: { size: 100 } }).catch(() => ({ data: { data: [] } })),
         api.get("/products", { params: { size: 100 } }).catch(() => ({ data: { data: [] } })),
+        api.get("/warranty-claims/admin", { params: { status: "APPROVED", size: 10 } }).catch(() => ({ data: { data: { content: [] } } })),
       ]);
 
       const orderList = ordersRes.data?.data?.content || ordersRes.data?.data || ordersRes.data || [];
       const prodList = prodsRes.data?.data?.content || prodsRes.data?.data || prodsRes.data || [];
+      const claimList = claimsRes.data?.data?.content || claimsRes.data?.data || [];
+      setApprovedClaims(claimList);
 
       let paid = 0;
       let proc = 0;
@@ -348,6 +353,77 @@ export default function WarehouseDashboard() {
             </div>
           )}
         </div>
+      </div>
+
+      {/* Retur & Penggantian Garansi Siap Diproses (Approved Claims) */}
+      <div className="p-6 rounded-2xl bg-[#14141E] border border-white/5 space-y-4">
+        <div className="flex items-center justify-between pb-3 border-b border-white/5">
+          <div className="flex items-center gap-2">
+            <ShieldCheck size={18} className="text-[#00BFA5]" />
+            <h3 className="text-base font-bold text-white">Retur & Penggantian Garansi Siap Diproses</h3>
+            {approvedClaims.length > 0 && (
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                {approvedClaims.length} Tiket Disetujui
+              </span>
+            )}
+          </div>
+          <Link
+            to="/admin/warranty-claims"
+            className="text-xs font-bold text-[#00BFA5] hover:underline flex items-center gap-1"
+          >
+            <span>Buka Semua Tiket</span>
+            <ArrowRight size={14} />
+          </Link>
+        </div>
+
+        {approvedClaims.length === 0 ? (
+          <div className="text-center py-6 text-slate-500 text-xs">
+            Tidak ada tiket klaim garansi yang menunggu pengemasan atau resi baru.
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+            {approvedClaims.map((claim) => (
+              <div
+                key={claim.id || claim.claimNumber}
+                className="p-4 rounded-xl bg-white/[0.02] border border-white/5 hover:border-[#00BFA5]/40 transition space-y-2 flex flex-col justify-between"
+              >
+                <div>
+                  <div className="flex items-center justify-between">
+                    <span className="font-mono text-xs font-bold text-[#00BFA5]">
+                      #{claim.claimNumber}
+                    </span>
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300">
+                      Disetujui CS
+                    </span>
+                  </div>
+                  <div className="text-xs font-bold text-white mt-1.5 truncate">
+                    {claim.productName}
+                  </div>
+                  <div className="text-[11px] text-amber-300 font-medium mt-0.5">
+                    {claim.solution === "EXCHANGE_SIZE"
+                      ? `Tukar Ukuran: ${claim.requestedSize || "Varian Baru"}`
+                      : claim.solution === "REPLACEMENT"
+                      ? "Produksi Ulang 100%"
+                      : "Perbaikan Garansi"}
+                  </div>
+                  {claim.adminNotes && (
+                    <div className="text-[10px] text-slate-400 mt-1 italic line-clamp-1">
+                      &ldquo;{claim.adminNotes}&rdquo;
+                    </div>
+                  )}
+                </div>
+
+                <Link
+                  to="/admin/warranty-claims"
+                  className="mt-2 w-full py-2 rounded-lg bg-emerald-600/20 hover:bg-emerald-600 text-emerald-400 hover:text-white text-center text-xs font-bold border border-emerald-500/30 transition flex items-center justify-center gap-1.5"
+                >
+                  <Truck size={13} />
+                  <span>Proses & Input Resi Pengganti</span>
+                </Link>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

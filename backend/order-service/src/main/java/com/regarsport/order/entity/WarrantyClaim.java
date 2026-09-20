@@ -70,6 +70,12 @@ public class WarrantyClaim {
     @Column(name = "admin_notes", length = 1000)
     private String adminNotes;
 
+    @Column(name = "replacement_tracking_number", length = 100)
+    private String replacementTrackingNumber;
+
+    @Column(name = "return_tracking_number", length = 100)
+    private String returnTrackingNumber;
+
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;

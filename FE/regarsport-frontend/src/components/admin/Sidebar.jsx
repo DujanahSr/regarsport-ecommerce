@@ -13,6 +13,7 @@ import {
   Truck,
   Layers,
   Tag,
+  ShieldCheck,
 } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "../../context/AuthContext";
@@ -28,6 +29,7 @@ export default function Sidebar() {
     { to: "/admin/products", icon: Package, label: "Products" },
     { to: "/admin/inventory", icon: Layers, label: "Stok Gudang" },
     { to: "/admin/orders", icon: ShoppingCart, label: "Orders" },
+    { to: "/admin/warranty-claims", icon: ShieldCheck, label: "Klaim Garansi" },
     { to: "/admin/vouchers", icon: Tag, label: "Vouchers" },
     { to: "/admin/users", icon: Users, label: "Users" },
     { to: "/admin/reviews", icon: Star, label: "Reviews" },
@@ -38,6 +40,7 @@ export default function Sidebar() {
     { to: "/admin/warehouse", icon: Truck, label: "Dashboard Gudang" },
     { to: "/admin/inventory", icon: Layers, label: "Stok Gudang" },
     { to: "/admin/orders", icon: ShoppingCart, label: "Packing & Resi" },
+    { to: "/admin/warranty-claims", icon: ShieldCheck, label: "Retur Garansi" },
     { to: "/admin/profile", icon: UserCircle, label: "Profile" },
   ];
 
