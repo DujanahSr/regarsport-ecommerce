@@ -306,7 +306,7 @@ export default function WarrantyClaims() {
       {/* Filter Tabs & Search */}
       <div className="space-y-4 mb-6">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-          <div className="flex items-center gap-2 overflow-x-auto pb-2">
+          <div className="flex items-center gap-2 overflow-x-auto pb-2 no-scrollbar">
             {[
               { label: "Semua Tiket", value: "" },
               { label: "Menunggu Review", value: "PENDING", badge: stats.pending > 0 ? stats.pending : null },

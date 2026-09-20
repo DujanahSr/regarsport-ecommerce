@@ -226,7 +226,7 @@ export default function Orders() {
       </div>
 
       {/* Quick Filter Tabs */}
-      <div className="flex items-center gap-2 overflow-x-auto pb-2 mb-6">
+      <div className="flex items-center gap-2 overflow-x-auto pb-2 mb-6 no-scrollbar">
         {[
           { label: "Semua Pesanan", value: "" },
           { label: "Perlu Dikemas", value: "PAID", badge: "Siap Kirim", badgeColor: "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30" },

@@ -13,3 +13,12 @@
 .animate-fade-in-up {
   animation: fade-in-up 0.5s ease-out;
 }
+
+/* Sembunyikan scrollbar bawaan browser tapi tetap bisa di-scroll horizontal */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
