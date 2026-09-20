@@ -10,6 +10,10 @@ import {
   ShieldCheck,
   Upload,
   X,
+  Loader2,
+  Trash2,
+  Link2,
+  Camera,
 } from "lucide-react";
 import toast from "react-hot-toast";
 import api from "../../services/api";
@@ -41,12 +45,50 @@ export default function WarrantyClaimModal({ isOpen, onClose, order, onSuccess }
   const [requestedSize, setRequestedSize] = useState("L");
   const [description, setDescription] = useState("");
   const [evidenceImage, setEvidenceImage] = useState("");
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const [useManualUrl, setUseManualUrl] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submittedClaim, setSubmittedClaim] = useState(null);
 
   const selectedItem =
     orderItems.find((it) => (it.productId || it.id) === selectedProductId) ||
     orderItems[0];
+
+  const handlePhotoUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!["image/jpeg", "image/png", "image/webp", "image/jpg"].includes(file.type)) {
+      toast.error("Format foto harus JPG, PNG, atau WEBP");
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("Ukuran foto maksimal 5MB");
+      return;
+    }
+
+    try {
+      setUploadingImage(true);
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("folder", "regarstore/warranty");
+
+      const res = await api.post("/upload", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      const url = res.data?.image_url || res.data?.data?.imageUrl;
+      if (url) {
+        setEvidenceImage(url);
+        toast.success("Foto bukti kendala berhasil diunggah ke CDN!");
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error(err.response?.data?.message || "Gagal mengunggah foto bukti");
+    } finally {
+      setUploadingImage(false);
+      e.target.value = "";
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -335,24 +377,101 @@ export default function WarrantyClaimModal({ isOpen, onClose, order, onSuccess }
               </select>
             </div>
 
-            {/* 5. Foto Bukti Kendala */}
+            {/* 4. Foto Bukti Kendala */}
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1.5">
-                4. Lampirkan URL Foto Bukti (Opsional / Dianjurkan)
-              </label>
-              <div className="relative">
-                <ImageIcon
-                  size={15}
-                  className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"
-                />
-                <input
-                  type="url"
-                  placeholder="https://... (link foto kendala atau upload)"
-                  value={evidenceImage}
-                  onChange={(e) => setEvidenceImage(e.target.value)}
-                  className="w-full rounded-2xl border border-slate-200 bg-white py-2.5 pl-10 pr-4 text-xs text-slate-800 placeholder-slate-400 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
-                />
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="block text-xs font-bold text-slate-700">
+                  4. Unggah Foto Bukti Kendala (Opsional / Dianjurkan)
+                </label>
+                <button
+                  type="button"
+                  onClick={() => setUseManualUrl(!useManualUrl)}
+                  className="text-[11px] text-emerald-600 hover:text-emerald-700 font-semibold flex items-center gap-1 cursor-pointer"
+                >
+                  <Link2 size={12} />
+                  <span>{useManualUrl ? "Upload File Gambar" : "Gunakan Link URL"}</span>
+                </button>
               </div>
+
+              {useManualUrl ? (
+                /* Mode Input URL Manual */
+                <div className="relative">
+                  <ImageIcon
+                    size={15}
+                    className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"
+                  />
+                  <input
+                    type="url"
+                    placeholder="https://... (link foto kendala atau upload)"
+                    value={evidenceImage}
+                    onChange={(e) => setEvidenceImage(e.target.value)}
+                    className="w-full rounded-2xl border border-slate-200 bg-white py-2.5 pl-10 pr-4 text-xs text-slate-800 placeholder-slate-400 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
+                  />
+                </div>
+              ) : evidenceImage ? (
+                /* Mode Preview Foto yang Berhasil Diunggah */
+                <div className="flex items-center justify-between p-3 rounded-2xl border border-emerald-300 bg-emerald-50/50">
+                  <div className="flex items-center gap-3">
+                    <img
+                      src={evidenceImage}
+                      alt="Bukti Kendala"
+                      className="w-14 h-14 object-cover rounded-xl border border-emerald-200 shadow-sm"
+                    />
+                    <div>
+                      <div className="flex items-center gap-1 text-emerald-800 font-bold text-xs">
+                        <CheckCircle2 size={13} className="text-emerald-600" />
+                        <span>Foto Berhasil Diunggah</span>
+                      </div>
+                      <p className="text-[11px] text-slate-500 line-clamp-1 mt-0.5 max-w-[220px] sm:max-w-xs">
+                        {evidenceImage}
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setEvidenceImage("")}
+                    className="p-2 rounded-xl text-rose-500 hover:bg-rose-100 hover:text-rose-700 transition cursor-pointer"
+                    title="Hapus foto"
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                </div>
+              ) : (
+                /* Mode Upload File Baru (Klik / Drop File) */
+                <label
+                  className={`flex flex-col items-center justify-center p-5 rounded-2xl border-2 border-dashed transition cursor-pointer ${
+                    uploadingImage
+                      ? "border-emerald-400 bg-emerald-50/40"
+                      : "border-slate-300 hover:border-emerald-500 hover:bg-slate-50"
+                  }`}
+                >
+                  <input
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp,image/jpg"
+                    disabled={uploadingImage}
+                    onChange={handlePhotoUpload}
+                    className="hidden"
+                  />
+                  {uploadingImage ? (
+                    <div className="flex flex-col items-center gap-2 text-emerald-700">
+                      <Loader2 size={24} className="animate-spin text-emerald-600" />
+                      <span className="text-xs font-bold">Sedang mengunggah ke Cloud CDN...</span>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center gap-1.5 text-center">
+                      <div className="w-10 h-10 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center mb-1">
+                        <Camera size={18} />
+                      </div>
+                      <span className="text-xs font-bold text-slate-800">
+                        Klik untuk Pilih Foto dari Galeri / Komputer
+                      </span>
+                      <span className="text-[11px] text-slate-500">
+                        Format JPG, PNG, atau WEBP (Maksimal 5MB)
+                      </span>
+                    </div>
+                  )}
+                </label>
+              )}
             </div>
 
             {/* 6. Deskripsi Kendala */}
