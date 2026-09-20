@@ -43,6 +43,27 @@ public class WarrantyClaimService {
             throw new BadRequestException("Anda hanya dapat mengajukan klaim untuk pesanan milik sendiri");
         }
 
+        if (order.getStatus() != com.regarsport.order.entity.OrderStatus.COMPLETED) {
+            throw new BadRequestException("Klaim garansi hanya dapat diajukan setelah pesanan selesai diterima (status COMPLETED)");
+        }
+
+        // Cek masa aktif garansi 7 hari sejak pesanan selesai
+        java.time.Instant completionTime = order.getCompletedAt() != null ? order.getCompletedAt() : order.getUpdatedAt();
+        if (completionTime != null) {
+            java.time.Instant warrantyExpiry = completionTime.plus(7, java.time.temporal.ChronoUnit.DAYS);
+            if (java.time.Instant.now().isAfter(warrantyExpiry)) {
+                throw new BadRequestException("Masa berlaku garansi 7 hari untuk pesanan ini telah berakhir");
+            }
+        }
+
+        // Cek anti-duplikasi klaim aktif
+        boolean hasActiveClaim = claimRepository.existsByOrderIdAndProductIdAndStatusIn(
+                order.getId(), request.productId(), List.of("PENDING", "APPROVED", "PROCESSING")
+        );
+        if (hasActiveClaim) {
+            throw new BadRequestException("Produk ini sudah memiliki tiket klaim garansi yang sedang diproses");
+        }
+
         // Generate unique claim ticket number: CLM-YYYYMMDD-XXXX
         String datePart = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
         String randomPart = UUID.randomUUID().toString().substring(0, 5).toUpperCase();

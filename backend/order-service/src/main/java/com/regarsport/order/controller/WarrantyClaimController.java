@@ -47,10 +47,16 @@ public class WarrantyClaimController {
     @GetMapping("/admin")
     @Operation(summary = "Admin: Get all warranty claims", description = "Retrieve paginated warranty claims with optional status filter")
     public ResponseEntity<ApiResponse<PageResponse<WarrantyClaimResponse>>> getAllClaims(
+            @RequestHeader(value = "X-User-Role", defaultValue = "ROLE_CUSTOMER") String role,
             @RequestParam(required = false) String status,
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
+        boolean isAdminOrLogistics = "ROLE_ADMIN".equalsIgnoreCase(role) || "ADMIN".equalsIgnoreCase(role)
+                || "ROLE_LOGISTICS".equalsIgnoreCase(role) || "LOGISTICS".equalsIgnoreCase(role);
+        if (!isAdminOrLogistics) {
+            throw new com.regarsport.common.exception.BadRequestException("Akses ditolak: Hanya Admin atau Staf Gudang yang dapat mengakses data seluruh klaim");
+        }
         PageResponse<WarrantyClaimResponse> response = claimService.getAllClaims(status, page, size);
         return ResponseEntity.ok(ApiResponse.success(response));
     }
@@ -59,8 +65,14 @@ public class WarrantyClaimController {
     @Operation(summary = "Admin/Gudang: Update warranty claim status", description = "Approve, reject, or update tracking for a warranty claim")
     public ResponseEntity<ApiResponse<WarrantyClaimResponse>> updateClaimStatus(
             @PathVariable Long claimId,
+            @RequestHeader(value = "X-User-Role", defaultValue = "ROLE_CUSTOMER") String role,
             @Valid @RequestBody UpdateClaimStatusRequest request
     ) {
+        boolean isAdminOrLogistics = "ROLE_ADMIN".equalsIgnoreCase(role) || "ADMIN".equalsIgnoreCase(role)
+                || "ROLE_LOGISTICS".equalsIgnoreCase(role) || "LOGISTICS".equalsIgnoreCase(role);
+        if (!isAdminOrLogistics) {
+            throw new com.regarsport.common.exception.BadRequestException("Akses ditolak: Hanya Admin atau Staf Gudang yang berwenang memperbarui status klaim");
+        }
         WarrantyClaimResponse response = claimService.updateClaimStatus(claimId, request);
         return ResponseEntity.ok(ApiResponse.success("Status klaim garansi berhasil diperbarui", response));
     }

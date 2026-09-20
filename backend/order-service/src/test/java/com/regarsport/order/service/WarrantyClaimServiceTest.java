@@ -7,6 +7,7 @@ import com.regarsport.order.dto.UpdateClaimStatusRequest;
 import com.regarsport.order.dto.WarrantyClaimRequest;
 import com.regarsport.order.dto.WarrantyClaimResponse;
 import com.regarsport.order.entity.Order;
+import com.regarsport.order.entity.OrderStatus;
 import com.regarsport.order.entity.WarrantyClaim;
 import com.regarsport.order.repository.OrderRepository;
 import com.regarsport.order.repository.WarrantyClaimRepository;
@@ -21,6 +22,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
 
@@ -52,6 +54,8 @@ class WarrantyClaimServiceTest {
                 .id(21L)
                 .orderNumber("REGAR-1789823022-69A9")
                 .userId(1L)
+                .status(OrderStatus.COMPLETED)
+                .completedAt(Instant.now().minus(1, ChronoUnit.DAYS))
                 .build();
 
         sampleClaim = WarrantyClaim.builder()
@@ -91,6 +95,7 @@ class WarrantyClaimServiceTest {
         );
 
         when(orderRepository.findById(21L)).thenReturn(Optional.of(sampleOrder));
+        when(claimRepository.existsByOrderIdAndProductIdAndStatusIn(anyLong(), anyLong(), any())).thenReturn(false);
         when(claimRepository.save(any(WarrantyClaim.class))).thenAnswer(invocation -> {
             WarrantyClaim saved = invocation.getArgument(0);
             saved.setId(1L);
@@ -134,10 +139,61 @@ class WarrantyClaimServiceTest {
 
         when(orderRepository.findById(21L)).thenReturn(Optional.of(sampleOrder));
 
-        // User 99 tries to claim order belonging to user 1
         assertThatThrownBy(() -> claimService.createClaim(99L, request))
                 .isInstanceOf(BadRequestException.class)
                 .hasMessageContaining("hanya dapat mengajukan klaim untuk pesanan milik sendiri");
+
+        verify(claimRepository, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("Should throw BadRequestException when order status is not COMPLETED")
+    void testCreateClaim_OrderNotCompleted() {
+        sampleOrder.setStatus(OrderStatus.SHIPPED);
+        WarrantyClaimRequest request = new WarrantyClaimRequest(
+                21L, "REGAR-1789823022-69A9", 4L, "Jersey", "img.jpg", "SIZE_EXCHANGE", "EXCHANGE_SIZE", "L", "desc", "img.jpg"
+        );
+
+        when(orderRepository.findById(21L)).thenReturn(Optional.of(sampleOrder));
+
+        assertThatThrownBy(() -> claimService.createClaim(1L, request))
+                .isInstanceOf(BadRequestException.class)
+                .hasMessageContaining("hanya dapat diajukan setelah pesanan selesai diterima");
+
+        verify(claimRepository, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("Should throw BadRequestException when 7-day warranty window has expired")
+    void testCreateClaim_WarrantyExpired() {
+        // Order completed 8 days ago
+        sampleOrder.setCompletedAt(Instant.now().minus(8, ChronoUnit.DAYS));
+        WarrantyClaimRequest request = new WarrantyClaimRequest(
+                21L, "REGAR-1789823022-69A9", 4L, "Jersey", "img.jpg", "SIZE_EXCHANGE", "EXCHANGE_SIZE", "L", "desc", "img.jpg"
+        );
+
+        when(orderRepository.findById(21L)).thenReturn(Optional.of(sampleOrder));
+
+        assertThatThrownBy(() -> claimService.createClaim(1L, request))
+                .isInstanceOf(BadRequestException.class)
+                .hasMessageContaining("telah berakhir");
+
+        verify(claimRepository, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("Should throw BadRequestException when active claim already exists for the product")
+    void testCreateClaim_DuplicateActiveClaim() {
+        WarrantyClaimRequest request = new WarrantyClaimRequest(
+                21L, "REGAR-1789823022-69A9", 4L, "Jersey", "img.jpg", "SIZE_EXCHANGE", "EXCHANGE_SIZE", "L", "desc", "img.jpg"
+        );
+
+        when(orderRepository.findById(21L)).thenReturn(Optional.of(sampleOrder));
+        when(claimRepository.existsByOrderIdAndProductIdAndStatusIn(eq(21L), eq(4L), any())).thenReturn(true);
+
+        assertThatThrownBy(() -> claimService.createClaim(1L, request))
+                .isInstanceOf(BadRequestException.class)
+                .hasMessageContaining("sudah memiliki tiket klaim garansi yang sedang diproses");
 
         verify(claimRepository, never()).save(any());
     }
