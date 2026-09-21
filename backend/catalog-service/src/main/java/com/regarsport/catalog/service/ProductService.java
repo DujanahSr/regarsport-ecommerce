@@ -54,6 +54,20 @@ public class ProductService {
             productPage = productRepository.searchByCategoryAndName(categoryId, trimmedSearch, pageable);
         } else if (trimmedSearch != null) {
             productPage = productRepository.searchByName(trimmedSearch, pageable);
+            if (productPage.isEmpty() && trimmedSearch.contains(" ")) {
+                // Multi-word fallback: search by individual meaningful words
+                String[] words = trimmedSearch.split("\\s+");
+                for (String word : words) {
+                    String w = word.trim();
+                    if (w.length() >= 3 && !w.equalsIgnoreCase("jersey") && !w.equalsIgnoreCase("dan")) {
+                        Page<Product> fallbackPage = productRepository.searchByName(w, pageable);
+                        if (!fallbackPage.isEmpty()) {
+                            productPage = fallbackPage;
+                            break;
+                        }
+                    }
+                }
+            }
         } else if (hasCategory) {
             productPage = productRepository.findByCategoryId(categoryId, pageable);
         } else {

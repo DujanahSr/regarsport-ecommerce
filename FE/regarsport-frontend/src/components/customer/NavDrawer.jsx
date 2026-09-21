@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 
-export default function NavDrawer({ isOpen, onClose, onOpenSearch }) {
+export default function NavDrawer({ isOpen, onClose, onOpenSearch, onSelectCategory }) {
   const { user, logout } = useAuth();
 
   // Close on ESC key
@@ -40,13 +40,35 @@ export default function NavDrawer({ isOpen, onClose, onOpenSearch }) {
   if (!isOpen) return null;
 
   const categories = [
-    { name: "JERSEY SEPAKBOLA & FUTSAL", tag: "POPULER", link: "/dashboard" },
-    { name: "JERSEY BOLA VOLI (PRO LIGA)", tag: "HOT", link: "/dashboard" },
-    { name: "JERSEY BADMINTON & TENIS", link: "/dashboard" },
-    { name: "JERSEY BASKET & STREETBALL", link: "/dashboard" },
-    { name: "CUSTOM TIM & ESPORTS", tag: "CUSTOM", link: "/dashboard" },
-    { name: "SEMUA KOLEKSI READY STOCK", link: "/dashboard" },
+    { name: "JERSEY SEPAKBOLA & FUTSAL", tag: "POPULER", key: "SEPAKBOLA", categoryId: 1 },
+    { name: "JERSEY BOLA VOLI (PRO LIGA)", tag: "HOT", key: "BOLA VOLI", categoryId: 2 },
+    { name: "JERSEY BADMINTON & TENIS", key: "BADMINTON", categoryId: 3 },
+    { name: "JERSEY BASKET & STREETBALL", key: "BASKET", categoryId: 5 },
+    { name: "CUSTOM TIM & ESPORTS", tag: "CUSTOM", key: "ESPORTS", categoryId: 4 },
   ];
+
+  const handleCategoryClick = (cat) => {
+    onClose();
+    if (onSelectCategory) {
+      onSelectCategory(cat.key);
+      setTimeout(() => {
+        const el = document.getElementById("produk");
+        if (el) {
+          el.scrollIntoView({ behavior: "smooth" });
+        }
+      }, 100);
+    }
+  };
+
+  const handleScrollTo = (id) => {
+    onClose();
+    setTimeout(() => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth" });
+      }
+    }, 100);
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex">
@@ -100,11 +122,11 @@ export default function NavDrawer({ isOpen, onClose, onOpenSearch }) {
               KATEGORI OLAHRAGA
             </p>
             {categories.map((cat, idx) => (
-              <Link
+              <button
                 key={idx}
-                to={cat.link}
-                onClick={onClose}
-                className="group flex items-center justify-between py-3 px-3 rounded-xl hover:bg-white/5 transition-all text-slate-200 hover:text-white"
+                type="button"
+                onClick={() => handleCategoryClick(cat)}
+                className="w-full group flex items-center justify-between py-3 px-3 rounded-xl hover:bg-white/5 transition-all text-slate-200 hover:text-white cursor-pointer text-left"
               >
                 <div className="flex items-center gap-2.5">
                   <span className="font-condensed text-lg font-bold tracking-wide group-hover:translate-x-1 transition-transform">
@@ -119,39 +141,59 @@ export default function NavDrawer({ isOpen, onClose, onOpenSearch }) {
                 <div className="w-7 h-7 rounded-full bg-white/5 group-hover:bg-white/20 flex items-center justify-center text-slate-400 group-hover:text-white transition-colors">
                   <ChevronRight size={14} />
                 </div>
-              </Link>
+              </button>
             ))}
+
+            {/* Direct Full Store Catalog Link */}
+            <div className="pt-2">
+              <Link
+                to="/dashboard"
+                onClick={onClose}
+                className="w-full py-3 px-4 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-between text-xs font-mono uppercase tracking-wider text-emerald-300 hover:text-white transition-all group"
+              >
+                <span>Buka Katalog Toko Lengkap (50+ Produk)</span>
+                <span className="group-hover:translate-x-1 transition-transform">→</span>
+              </Link>
+            </div>
           </div>
 
-          {/* Info & Trust Section */}
+          {/* Info & Section Navigation */}
           <div className="pt-4 border-t border-white/10 space-y-2">
             <p className="text-[11px] font-bold uppercase tracking-widest text-slate-400 mb-2">
-              LAYANAN & INFORMASI
+              NAVIGASI HALAMAN
             </p>
-            <Link
-              to="/dashboard/about"
-              onClick={onClose}
-              className="flex items-center gap-3 py-2 px-3 text-xs font-semibold text-slate-300 hover:text-white hover:bg-white/5 rounded-lg transition-colors"
+            <button
+              type="button"
+              onClick={() => handleScrollTo("produk")}
+              className="w-full flex items-center gap-3 py-2 px-3 text-xs font-semibold text-slate-300 hover:text-white hover:bg-white/5 rounded-lg transition-colors text-left cursor-pointer"
             >
-              <Sparkles size={16} className="text-emerald-400" />
-              <span>Tentang Atelier &amp; Workshop Cicendo Bandung</span>
-            </Link>
-            <a
-              href="#keunggulan"
-              onClick={onClose}
-              className="flex items-center gap-3 py-2 px-3 text-xs font-semibold text-slate-300 hover:text-white hover:bg-white/5 rounded-lg transition-colors"
+              <Sparkles size={16} className="text-emerald-400 shrink-0" />
+              <span>Koleksi Rekomendasi Jersey</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => handleScrollTo("tentang")}
+              className="w-full flex items-center gap-3 py-2 px-3 text-xs font-semibold text-slate-300 hover:text-white hover:bg-white/5 rounded-lg transition-colors text-left cursor-pointer"
             >
-              <ShieldCheck size={16} className="text-emerald-400" />
-              <span>Garansi 100% Tukar Ukuran 7 Hari</span>
-            </a>
+              <ShieldCheck size={16} className="text-emerald-400 shrink-0" />
+              <span>Atelier &amp; Workshop Cicendo Bandung</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => handleScrollTo("testimoni")}
+              className="w-full flex items-center gap-3 py-2 px-3 text-xs font-semibold text-slate-300 hover:text-white hover:bg-white/5 rounded-lg transition-colors text-left cursor-pointer"
+            >
+              <Sparkles size={16} className="text-emerald-400 shrink-0" />
+              <span>Testimoni Kapten Tim Se-Indonesia</span>
+            </button>
             <a
               href="https://wa.me/6281234567890?text=Halo%20RegarSport,%20saya%20ingin%20konsultasi%20desain%20jersey"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-3 py-2 px-3 text-xs font-semibold text-slate-300 hover:text-white hover:bg-white/5 rounded-lg transition-colors"
             >
-              <Phone size={16} className="text-emerald-400" />
-              <span>Hubungi CS Tim Apparel (WhatsApp)</span>
+              <Phone size={16} className="text-emerald-400 shrink-0" />
+              <span>Konsultasi Desain Gratis (WhatsApp)</span>
             </a>
           </div>
         </div>

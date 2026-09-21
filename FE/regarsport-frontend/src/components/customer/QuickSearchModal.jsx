@@ -67,12 +67,12 @@ export default function QuickSearchModal({ isOpen, onClose }) {
   if (!isOpen) return null;
 
   const quickPills = [
-    "Jersey Sepakbola",
-    "Jersey Voli Pro Liga",
-    "Jersey Badminton",
-    "Dry-Fit Microfiber",
-    "Sublimasi Full-Print",
-    "Custom Tim",
+    "Sepakbola",
+    "Bola Voli",
+    "Badminton",
+    "Esports",
+    "Basket",
+    "Dry-Fit",
   ];
 
   const visualCategories = [
@@ -80,20 +80,24 @@ export default function QuickSearchModal({ isOpen, onClose }) {
       name: "SEPAKBOLA & FUTSAL",
       image: "/images/cat-football.jpg",
       tag: "Terlaris",
+      categoryId: 1,
     },
     {
       name: "BOLA VOLI PRO",
       image: "/images/cat-volleyball.jpg",
       tag: "Hot",
+      categoryId: 2,
     },
     {
       name: "BADMINTON ELITE",
       image: "/images/cat-badminton.jpg",
+      categoryId: 3,
     },
     {
       name: "KOMUNITAS & ESPORTS",
       image: "/images/cat-esports.jpg",
       tag: "Custom",
+      categoryId: 4,
     },
   ];
 
@@ -222,7 +226,7 @@ export default function QuickSearchModal({ isOpen, onClose }) {
                 {visualCategories.map((cat, idx) => (
                   <Link
                     key={idx}
-                    to="/dashboard"
+                    to={`/dashboard?categoryId=${cat.categoryId}`}
                     onClick={onClose}
                     className="group relative aspect-4/5 rounded-2xl overflow-hidden bg-black/5 shadow-sm border border-black/5 flex flex-col justify-end p-3 transition-all hover:scale-[1.02]"
                   >

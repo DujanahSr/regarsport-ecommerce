@@ -181,8 +181,19 @@ export default function Landing() {
             </div>
           </Link>
 
-          {/* Right: Auth, Wishlist & Cart Drawer Trigger */}
+          {/* Right: Direct Store Catalog CTA, WhatsApp & Auth */}
           <div className="flex items-center gap-2 sm:gap-3">
+            {/* Direct Link to Store Catalog */}
+            <Link
+              to="/dashboard"
+              className="flex items-center gap-2 py-2 px-3.5 rounded-full bg-white/10 hover:bg-white/20 text-xs font-bold uppercase tracking-wider text-white transition-all border border-white/10 hover:border-emerald-400/50"
+              title="Buka Seluruh Koleksi di Katalog Toko"
+            >
+              <ShoppingBag size={15} className="text-emerald-400" />
+              <span className="hidden sm:inline">KATALOG TOKO</span>
+            </Link>
+
+            {/* User Auth Buttons */}
             {user ? (
               <Link
                 to={
@@ -192,45 +203,27 @@ export default function Landing() {
                     ? "/admin/warehouse"
                     : "/dashboard"
                 }
-                className="hidden sm:flex items-center gap-2 py-2 px-3.5 rounded-full bg-white/10 hover:bg-white/20 text-xs font-bold uppercase tracking-wider text-white transition-colors"
+                className="flex items-center gap-2 py-2 px-3.5 rounded-full bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500/30 text-xs font-bold uppercase tracking-wider transition-colors border border-emerald-500/40"
               >
                 <User size={15} />
                 <span>{user.fullName ? user.fullName.split(" ")[0] : "Akun"}</span>
               </Link>
             ) : (
-              <Link
-                to="/login"
-                className="hidden sm:inline-block py-2 px-4 rounded-full text-xs font-bold uppercase tracking-wider text-slate-300 hover:text-white hover:bg-white/10 transition-colors"
-              >
-                MASUK
-              </Link>
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                <Link
+                  to="/login"
+                  className="py-2 px-3 sm:px-4 rounded-full text-xs font-bold uppercase tracking-wider text-slate-300 hover:text-white hover:bg-white/10 transition-colors"
+                >
+                  MASUK
+                </Link>
+                <Link
+                  to="/register"
+                  className="py-2 px-3 sm:px-4 rounded-full bg-emerald-500 hover:bg-emerald-400 text-[#0F1712] font-black text-xs uppercase tracking-wider transition-all shadow-md shadow-emerald-500/20"
+                >
+                  DAFTAR TIM
+                </Link>
+              </div>
             )}
-
-            {/* Wishlist Link */}
-            <Link
-              to="/dashboard/favorites"
-              className="relative p-2 rounded-full hover:bg-white/10 text-slate-300 hover:text-white transition-colors"
-              title="Koleksi Favorit"
-            >
-              <Heart size={19} />
-              {wishlistItems.length > 0 && (
-                <span className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full bg-[#B9382B] text-[9px] font-black flex items-center justify-center text-white">
-                  {wishlistItems.length}
-                </span>
-              )}
-            </Link>
-
-            {/* Cart Slide-Over Trigger */}
-            <button
-              onClick={() => setIsCartOpen(true)}
-              className="relative flex items-center gap-2 py-2 px-3 sm:px-4 rounded-full bg-[#FAF8F4] text-[#111613] hover:bg-white font-extrabold text-xs tracking-wider uppercase transition-all hover:scale-105 shadow-md cursor-pointer"
-            >
-              <ShoppingBag size={16} />
-              <span className="hidden sm:inline">KERANJANG</span>
-              <span className="w-5 h-5 rounded-full bg-[#111613] text-white text-[10px] font-black flex items-center justify-center ml-0.5">
-                {cartCount}
-              </span>
-            </button>
           </div>
         </div>
       </header>
@@ -915,6 +908,7 @@ export default function Landing() {
         isOpen={isNavOpen}
         onClose={() => setIsNavOpen(false)}
         onOpenSearch={() => setIsSearchOpen(true)}
+        onSelectCategory={(catKey) => setSelectedCategory(catKey)}
       />
 
       {/* 2. Right Cart Slide-Over Drawer */}

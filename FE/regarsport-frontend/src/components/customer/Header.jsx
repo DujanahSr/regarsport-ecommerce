@@ -51,16 +51,31 @@ export default function Header() {
   ];
 
   return (
-    <header className="sticky top-0 z-50 bg-emerald-950 text-white shadow-lg shadow-emerald-950/20">
-      <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-4 sm:px-6">
-        <Link to="/dashboard" className="flex shrink-0 items-center gap-2.5">
-          <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-500/15 ring-1 ring-emerald-400/30">
-            <Dumbbell size={20} className="text-emerald-400" />
-          </span>
-          <span className="text-xl font-bold tracking-tight">
-            Regar<span className="text-emerald-400">Sport</span>
-          </span>
-        </Link>
+    <header className="sticky top-0 z-50 bg-[#162018] text-white shadow-lg border-b border-white/10">
+      <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
+        <div className="flex items-center gap-4">
+          <Link
+            to="/"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/5 hover:bg-white/15 text-xs font-mono tracking-wider uppercase text-slate-300 hover:text-white transition-colors border border-white/10"
+            title="Kembali ke Beranda Utama"
+          >
+            <span>← Beranda</span>
+          </Link>
+
+          <Link to="/dashboard" className="flex shrink-0 items-center gap-2.5">
+            <div className="w-8 h-8 bg-[#B9382B] rounded-lg flex items-center justify-center shadow-md">
+              <span className="text-white font-black text-xs">R</span>
+            </div>
+            <div>
+              <span className="font-condensed text-xl font-black uppercase tracking-wider text-white block leading-none">
+                REGARSPORT
+              </span>
+              <span className="text-[9px] font-bold uppercase tracking-widest text-emerald-400/90 block">
+                ATELIER CICENDO BANDUNG
+              </span>
+            </div>
+          </Link>
+        </div>
 
         {/* Desktop nav */}
         <nav className="hidden items-center gap-2 lg:flex">
