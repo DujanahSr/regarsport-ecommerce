@@ -9,6 +9,10 @@ import {
   ShoppingCart,
   ArrowRight,
   Package,
+  ShieldCheck,
+  Truck,
+  Sparkles,
+  ChevronLeft,
 } from "lucide-react";
 import { useCart } from "../../context/CartContext";
 import {
@@ -43,66 +47,97 @@ export default function Cart() {
     cartItems.length > 0 && selectedItems.length === cartItems.length;
 
   return (
-    <div className="bg-slate-50 min-h-screen">
-      <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 sm:py-12">
+    <div className="bg-[#FAF8F4] min-h-screen text-[#111613] font-sans-body py-8 sm:py-12 animate-fade-in">
+      <div className="mx-auto max-w-5xl px-4 sm:px-6">
 
-        {/* Page Header */}
+        {/* Tactical Breadcrumb & Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold tracking-tight text-slate-900">
-            Keranjang Belanja
-          </h1>
-          {!loading && cartItems.length > 0 && (
-            <p className="mt-1 text-sm text-slate-500">
-              {cartItems.length} produk dalam keranjang
-            </p>
-          )}
+          <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
+            <Link
+              to="/dashboard"
+              className="inline-flex items-center gap-1.5 rounded-full bg-white px-3.5 py-1.5 text-xs font-mono font-bold text-slate-700 border border-[#162018]/15 hover:border-[#162018] hover:text-[#162018] transition shadow-2xs group"
+            >
+              <ChevronLeft size={14} className="transition-transform group-hover:-translate-x-0.5" />
+              <span>Lanjut Belanja Jersey</span>
+            </Link>
+
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-[#162018] px-3.5 py-1 text-[11px] font-bold tracking-wider text-emerald-400 uppercase font-mono shadow-xs">
+              <Sparkles size={12} className="text-amber-400" />
+              Atelier Cicendo Bandung // Keranjang Resmi
+            </span>
+          </div>
+
+          <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-2 border-b border-[#162018]/10 pb-4">
+            <div>
+              <h1 className="font-condensed text-3xl sm:text-4xl font-black uppercase tracking-tight text-[#162018]">
+                Keranjang Belanja
+              </h1>
+              <p className="mt-1 text-xs sm:text-sm text-slate-500">
+                Pilih jersey dan apparel yang ingin Anda proses ke sesi checkout dan produksi.
+              </p>
+            </div>
+
+            {!loading && cartItems.length > 0 && (
+              <span className="font-mono text-xs font-bold text-slate-600 bg-white px-3 py-1.5 rounded-xl border border-[#162018]/10 w-fit">
+                {cartItems.length} Jenis Produk Terdaftar
+              </span>
+            )}
+          </div>
         </div>
 
         {loading ? (
           <CardSkeletonList count={3} />
         ) : cartItems.length === 0 ? (
-          <EmptyState
-            title="Keranjang masih kosong"
-            description="Tambahkan produk ke keranjang untuk melanjutkan checkout."
-            action={
+          <div className="rounded-3xl border border-[#162018]/10 bg-white p-8 sm:p-14 text-center shadow-xs">
+            <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-2xl bg-[#162018]/5 text-[#162018] ring-8 ring-[#162018]/5 mb-4">
+              <ShoppingCart size={36} className="text-slate-400" />
+            </div>
+            <h2 className="font-condensed text-2xl sm:text-3xl font-black uppercase tracking-tight text-[#162018]">
+              Keranjang Masih Kosong
+            </h2>
+            <p className="mt-2 text-sm text-slate-500 max-w-md mx-auto">
+              Belum ada jersey atau kit olahraga yang Anda tambahkan. Jelajahi katalog resmi untuk memilih apparel tim Anda.
+            </p>
+            <div className="mt-6">
               <Link
                 to="/dashboard"
-                className="inline-flex items-center gap-2 rounded-xl bg-emerald-950 px-6 py-3 text-sm font-semibold text-white transition hover:bg-emerald-900"
+                className="inline-flex items-center gap-2 rounded-2xl bg-[#B9382B] hover:bg-[#982D22] px-6 py-3.5 text-xs font-black font-condensed tracking-wider uppercase text-white shadow-md shadow-[#B9382B]/20 transition active:scale-95"
               >
                 <ShoppingCart size={16} />
-                Belanja Sekarang
+                <span>Buka Katalog Toko Sekarang</span>
               </Link>
-            }
-          />
+            </div>
+          </div>
         ) : (
-          <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_360px]">
+          <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_360px] items-start">
 
-            {/* Left Column */}
+            {/* Left Column: Items List */}
             <div className="space-y-4">
 
-              {/* Select All */}
-              <div className="flex items-center gap-3 rounded-2xl bg-white px-5 py-4 ring-1 ring-slate-900/5 shadow-sm">
+              {/* Select All Bar */}
+              <div className="flex items-center justify-between rounded-2xl bg-white px-5 py-4 border border-[#162018]/10 shadow-2xs">
                 <button
                   type="button"
                   onClick={selectAllItems}
-                  className="flex items-center gap-3 transition hover:opacity-75"
+                  className="flex items-center gap-3 transition hover:opacity-80 cursor-pointer"
                   aria-label={isAllSelected ? "Batal pilih semua" : "Pilih semua produk"}
                 >
                   {isAllSelected ? (
-                    <CheckSquare size={22} className="text-emerald-600" />
+                    <CheckSquare size={20} className="text-[#162018]" />
                   ) : (
-                    <Square size={22} className="text-slate-400" />
+                    <Square size={20} className="text-slate-400" />
                   )}
-                  <span className="text-sm font-semibold text-slate-700">
-                    Pilih Semua
+                  <span className="text-xs sm:text-sm font-bold text-[#162018] uppercase tracking-wider font-mono">
+                    Pilih Semua ({cartItems.length} Produk)
                   </span>
                 </button>
-                <span className="ml-auto rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-semibold text-slate-500">
-                  {cartItems.length} produk
+
+                <span className="rounded-full bg-[#FAF8F4] border border-[#162018]/10 px-3 py-1 text-[11px] font-mono font-bold text-slate-600">
+                  {selectedItems.length} dipilih
                 </span>
               </div>
 
-              {/* Cart Items */}
+              {/* Cart Items Cards */}
               {cartItems.map((item) => {
                 const isSelected = selectedItems.includes(item.id);
                 const subtotal = Number(item.products.price) * item.quantity;
@@ -110,161 +145,197 @@ export default function Cart() {
                 return (
                   <div
                     key={item.id}
-                    className={`group relative flex gap-4 rounded-2xl bg-white px-5 py-4 ring-1 shadow-sm transition duration-200 hover:shadow-md ${
+                    className={`group relative flex flex-col sm:flex-row gap-4 rounded-2xl bg-white p-4 sm:p-5 border transition-all duration-200 ${
                       isSelected
-                        ? "ring-emerald-500/40"
-                        : "ring-slate-900/5"
+                        ? "border-[#162018] shadow-sm ring-1 ring-[#162018]/20"
+                        : "border-[#162018]/10 hover:border-[#162018]/30 shadow-2xs"
                     }`}
                   >
-                    {/* Checkbox */}
-                    <button
-                      type="button"
-                      onClick={() => toggleSelectItem(item.id)}
-                      className="mt-1 shrink-0 transition hover:opacity-75"
-                      aria-label={isSelected ? "Batal pilih" : "Pilih produk"}
-                    >
-                      {isSelected ? (
-                        <CheckSquare size={22} className="text-emerald-600" />
-                      ) : (
-                        <Square size={22} className="text-slate-400" />
-                      )}
-                    </button>
+                    <div className="flex items-start gap-3">
+                      {/* Checkbox */}
+                      <button
+                        type="button"
+                        onClick={() => toggleSelectItem(item.id)}
+                        className="mt-1 shrink-0 transition hover:opacity-75 cursor-pointer"
+                        aria-label={isSelected ? "Batal pilih" : "Pilih produk"}
+                      >
+                        {isSelected ? (
+                          <CheckSquare size={20} className="text-[#162018]" />
+                        ) : (
+                          <Square size={20} className="text-slate-400" />
+                        )}
+                      </button>
 
-                    {/* Image */}
-                    <div className="h-24 w-24 shrink-0 overflow-hidden rounded-xl bg-slate-100">
-                      <img
-                        src={item.products.image_url || "https://placehold.co/200x200"}
-                        alt={item.products.name}
-                        className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
-                      />
+                      {/* Product Thumbnail */}
+                      <div className="h-24 w-24 shrink-0 overflow-hidden rounded-xl bg-[#F3EFE7] border border-[#162018]/10">
+                        <img
+                          src={item.products.image_url || "https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=400&q=80"}
+                          alt={item.products.name}
+                          className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
+                          onError={(e) => {
+                            e.currentTarget.onerror = null;
+                            e.currentTarget.src = "https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=400&q=80";
+                          }}
+                        />
+                      </div>
                     </div>
 
-                    {/* Info */}
+                    {/* Product Info */}
                     <div className="flex flex-1 flex-col justify-between gap-3 min-w-0">
                       <div>
-                        <h2 className="line-clamp-2 font-semibold text-slate-900">
-                          {item.products.name}
-                        </h2>
-                        <div className="mt-1 flex flex-wrap items-center gap-2">
-                          <p className="text-lg font-bold text-emerald-600">
+                        <div className="flex items-start justify-between gap-4">
+                          <h2 className="font-condensed text-lg font-bold uppercase tracking-tight text-[#162018] line-clamp-2">
+                            {item.products.name}
+                          </h2>
+                          <button
+                            type="button"
+                            onClick={() => removeFromCart(item.id)}
+                            className="text-slate-400 hover:text-rose-600 transition p-1 rounded-lg hover:bg-rose-50 cursor-pointer shrink-0"
+                            title="Hapus dari keranjang"
+                            aria-label="Hapus produk"
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        </div>
+
+                        {/* Price & Size Tag */}
+                        <div className="mt-1.5 flex flex-wrap items-center gap-2">
+                          <p className="font-condensed text-lg font-black text-[#B9382B]">
                             Rp {Number(item.products.price).toLocaleString("id-ID")}
                           </p>
+
                           {item.size && (
-                            <span className="inline-flex items-center rounded-lg bg-emerald-50 px-2 py-0.5 text-xs font-extrabold text-emerald-700 border border-emerald-200/70">
-                              Ukuran: {item.size}
+                            <span className="inline-flex items-center rounded-md bg-[#162018] px-2 py-0.5 text-[11px] font-mono font-black text-white">
+                              SIZE {item.size}
                             </span>
                           )}
+
+                          <span className="inline-flex items-center gap-1 text-[10px] font-mono text-slate-400">
+                            <Package size={11} />
+                            Stok: {item.products.stock} pcs
+                          </span>
                         </div>
+
+                        {/* Custom Jersey Nameset Badge */}
                         {item.customName && (
-                          <div className="mt-1 flex flex-wrap items-center gap-1.5 text-[11px] font-semibold text-emerald-800 bg-emerald-50/80 px-2 py-0.5 rounded-lg border border-emerald-200 w-fit">
-                            <span>🎽 Sablon: <strong>{item.customName}</strong> #{item.customNumber || "-"}</span>
+                          <div className="mt-2 flex flex-wrap items-center gap-1.5 text-[11px] font-mono font-bold text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200/80 w-fit">
+                            <span>🎽 SABLON: {item.customName} #{item.customNumber || "-"}</span>
                             {item.customCollar && <span>({item.customCollar})</span>}
                             {item.customTeam && <span>• {item.customTeam}</span>}
                           </div>
                         )}
-                        <p className="mt-0.5 flex items-center gap-1 text-xs text-slate-400">
-                          <Package size={12} />
-                          Stok: {item.products.stock}
-                        </p>
                       </div>
 
-                      <div className="flex flex-wrap items-center justify-between gap-3">
-                        {/* Qty Control */}
-                        <div className="flex items-center gap-1 rounded-xl border border-slate-200 bg-slate-50 p-1">
+                      {/* Quantity Control & Subtotal */}
+                      <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-slate-100">
+                        <div className="flex items-center gap-1 rounded-xl border border-[#162018]/15 bg-[#FAF8F4] p-1">
                           <button
                             type="button"
                             onClick={() => decreaseQty(item.id, item.quantity)}
-                            className="flex h-7 w-7 items-center justify-center rounded-lg text-slate-600 transition hover:bg-white hover:text-emerald-700 hover:shadow-sm disabled:opacity-40"
+                            className="flex h-7 w-7 items-center justify-center rounded-lg text-slate-700 transition hover:bg-white disabled:opacity-30 cursor-pointer"
                             disabled={item.quantity <= 1}
                             aria-label="Kurangi jumlah"
                           >
-                            <Minus size={14} />
+                            <Minus size={13} />
                           </button>
-                          <span className="min-w-7 text-center text-sm font-bold text-slate-900">
+                          <span className="min-w-8 text-center text-xs font-mono font-bold text-slate-900">
                             {item.quantity}
                           </span>
                           <button
                             type="button"
                             onClick={() => increaseQty(item.id, item.quantity)}
-                            className="flex h-7 w-7 items-center justify-center rounded-lg text-slate-600 transition hover:bg-white hover:text-emerald-700 hover:shadow-sm disabled:opacity-40"
+                            className="flex h-7 w-7 items-center justify-center rounded-lg text-slate-700 transition hover:bg-white disabled:opacity-30 cursor-pointer"
                             disabled={item.quantity >= item.products.stock}
                             aria-label="Tambah jumlah"
                           >
-                            <Plus size={14} />
+                            <Plus size={13} />
                           </button>
                         </div>
 
-                        {/* Subtotal */}
-                        <p className="text-sm font-semibold text-slate-700">
+                        <p className="text-xs font-mono text-slate-500">
                           Subtotal:{" "}
-                          <span className="text-emerald-700">
+                          <span className="font-bold text-sm text-[#162018] ml-1">
                             Rp {subtotal.toLocaleString("id-ID")}
                           </span>
                         </p>
                       </div>
                     </div>
-
-                    {/* Delete */}
-                    <button
-                      type="button"
-                      onClick={() => removeFromCart(item.id)}
-                      className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-full text-slate-400 transition hover:bg-rose-50 hover:text-rose-500"
-                      aria-label="Hapus produk"
-                    >
-                      <Trash2 size={16} />
-                    </button>
                   </div>
                 );
               })}
             </div>
 
-            {/* Right Column — Summary */}
-            <div className="h-fit rounded-2xl bg-white ring-1 ring-slate-900/5 shadow-sm lg:sticky lg:top-6">
-              <div className="border-b border-slate-100 px-6 py-5">
-                <h2 className="text-lg font-bold text-slate-900">
+            {/* Right Column: Tactical Order Summary */}
+            <div className="rounded-3xl border border-[#162018]/10 bg-white p-6 shadow-sm sticky top-20 space-y-5">
+              <div className="border-b border-[#162018]/10 pb-4">
+                <span className="text-[10px] font-mono uppercase tracking-wider text-slate-400 block">
+                  Estimasi Biaya
+                </span>
+                <h2 className="font-condensed text-xl font-black uppercase tracking-tight text-[#162018]">
                   Ringkasan Belanja
                 </h2>
               </div>
 
-              <div className="px-6 py-5 space-y-4">
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-slate-500">Produk dipilih</span>
-                  <span className="font-semibold text-slate-900">
-                    {selectedItems.length} item
-                  </span>
+              <div className="space-y-3 text-xs font-mono">
+                <div className="flex items-center justify-between text-slate-600">
+                  <span>Produk Terpilih</span>
+                  <span className="font-bold text-slate-900">{selectedItems.length} Item</span>
                 </div>
 
-                <div className="h-px bg-slate-100" />
-
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-slate-500">Total</span>
-                  <span className="text-2xl font-bold text-emerald-600">
-                    Rp {total.toLocaleString("id-ID")}
-                  </span>
+                <div className="flex items-center justify-between text-slate-600">
+                  <span>Atelier Produksi</span>
+                  <span className="font-bold text-emerald-700">Cicendo, Bandung</span>
                 </div>
 
-                {selectedItems.length > 0 ? (
-                  <Link
-                    to="/dashboard/checkout"
-                    state={{ selectedItems }}
-                    className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-950 py-3 text-sm font-semibold text-white transition hover:bg-emerald-900 hover:gap-3"
-                  >
-                    Checkout ({selectedItems.length})
-                    <ArrowRight size={15} />
-                  </Link>
-                ) : (
-                  <button
-                    type="button"
-                    disabled
-                    className="mt-2 w-full rounded-xl bg-slate-100 py-3 text-sm font-semibold text-slate-400 cursor-not-allowed"
-                  >
-                    Pilih produk untuk checkout
-                  </button>
-                )}
+                <div className="flex items-center justify-between text-slate-600">
+                  <span>Garansi Ukuran</span>
+                  <span className="font-bold text-emerald-700">100% Tukar Baru</span>
+                </div>
 
-                <p className="text-center text-xs text-slate-400">
-                  Harga belum termasuk ongkos kirim
-                </p>
+                <div className="h-px bg-slate-100 my-2" />
+
+                <div className="flex items-baseline justify-between pt-1">
+                  <span className="font-sans font-bold text-sm text-[#162018]">Total Pembayaran</span>
+                  <div className="text-right">
+                    <span className="font-condensed text-2xl font-black text-[#B9382B]">
+                      Rp {total.toLocaleString("id-ID")}
+                    </span>
+                    <span className="block text-[10px] text-slate-400 font-sans">
+                      *Belum termasuk voucher diskon checkout
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {selectedItems.length > 0 ? (
+                <Link
+                  to="/dashboard/checkout"
+                  state={{ selectedItems }}
+                  className="flex w-full items-center justify-center gap-2 rounded-2xl bg-[#B9382B] hover:bg-[#982D22] py-4 text-xs font-black font-condensed tracking-wider uppercase text-white shadow-lg shadow-[#B9382B]/25 transition active:scale-[0.98] cursor-pointer"
+                >
+                  <span>Lanjut ke Checkout ({selectedItems.length})</span>
+                  <ArrowRight size={15} />
+                </Link>
+              ) : (
+                <button
+                  type="button"
+                  disabled
+                  className="w-full rounded-2xl bg-slate-100 py-3.5 text-xs font-bold uppercase tracking-wider text-slate-400 cursor-not-allowed text-center"
+                >
+                  Pilih Produk Terlebih Dahulu
+                </button>
+              )}
+
+              {/* Security & Logistics Assurances */}
+              <div className="pt-4 border-t border-[#162018]/10 space-y-2">
+                <div className="flex items-center gap-2 text-[11px] text-slate-600">
+                  <ShieldCheck size={14} className="text-emerald-600 shrink-0" />
+                  <span>Midtrans Official Payment Gateway</span>
+                </div>
+                <div className="flex items-center gap-2 text-[11px] text-slate-600">
+                  <Truck size={14} className="text-emerald-600 shrink-0" />
+                  <span>Ekspedisi Cepat: J&T, JNE, SiCepat</span>
+                </div>
               </div>
             </div>
 

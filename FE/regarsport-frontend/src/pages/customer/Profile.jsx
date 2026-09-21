@@ -31,6 +31,8 @@ import {
   Trash2,
   FileText,
   Cloud,
+  Compass,
+  Award,
 } from "lucide-react";
 
 import api from "../../services/api";
@@ -196,7 +198,7 @@ export default function Profile() {
     fetchRoleData();
   }, [user]);
 
-  // Image selection handler - Otomatis upload ke Cloudinary dan simpan ke database secara instan!
+  // Image selection handler - Upload ke Cloudinary dan simpan ke database
   const handleSelectImage = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -327,7 +329,7 @@ export default function Profile() {
     }
 
     if (form.postalCode.trim() && !/^\d{5}$/.test(form.postalCode.trim())) {
-      toast.error("Kode pos harus berupa 5 digit angka (contoh: 57612)");
+      toast.error("Kode pos harus berupa 5 digit angka (contoh: 40171)");
       return;
     }
 
@@ -432,7 +434,7 @@ export default function Profile() {
 
   // Password strength helper
   const getPasswordStrength = (pass) => {
-    if (!pass) return { score: 0, text: "Belum diisi", color: "bg-slate-200" };
+    if (!pass) return { score: 0, text: "Belum diisi", color: "bg-stone-200" };
     let score = 0;
     if (pass.length >= 6) score += 1;
     if (pass.length >= 10) score += 1;
@@ -471,29 +473,33 @@ export default function Profile() {
 
   const roleConfig = {
     customer: {
-      title: "Akun Pelanggan Resmi",
+      title: "KORPS KAPTEEN RESMI",
+      subTitle: "MEMBER ATELIER CICENDO BANDUNG",
       badgeClass: isAdminRoute
         ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
-        : "bg-emerald-50 text-emerald-700 border border-emerald-200",
+        : "bg-[#162018] text-white border border-[#243327]",
       icon: ShoppingBag,
     },
     logistics: {
-      title: "Divisi Operasional Gudang & Logistik",
+      title: "DIVISI OPERASIONAL LOGISTIK",
+      subTitle: "ATELIER CICENDO BANDUNG HUB",
       badgeClass: isAdminRoute
         ? "bg-purple-500/20 text-purple-400 border border-purple-500/30"
-        : "bg-purple-50 text-purple-700 border border-purple-200",
+        : "bg-purple-900 text-purple-200 border border-purple-700",
       icon: Truck,
     },
     admin: {
-      title: "Super Administrator / Owner",
+      title: "SUPER ADMINISTRATOR / OWNER",
+      subTitle: "REGARSPORT CENTRAL HEADQUARTERS",
       badgeClass: isAdminRoute
         ? "bg-teal-500/20 text-teal-400 border border-teal-500/30"
-        : "bg-indigo-50 text-indigo-700 border border-indigo-200",
+        : "bg-stone-900 text-stone-100 border border-stone-700",
       icon: Shield,
     },
   }[user.role] || {
-    title: "Pengguna RegarSport",
-    badgeClass: "bg-slate-100 text-slate-700 border border-slate-200",
+    title: "PENGGUNA RESMI",
+    subTitle: "REGARSPORT ATELIER",
+    badgeClass: "bg-stone-100 text-stone-700 border border-stone-200",
     icon: User,
   };
 
@@ -501,865 +507,884 @@ export default function Profile() {
 
   const cardBg = isAdminRoute
     ? "bg-[#14141E] border border-white/10 text-white"
-    : "bg-white shadow-sm ring-1 ring-slate-900/5 text-slate-900";
+    : "bg-white border border-stone-200/80 shadow-xs text-stone-900";
 
-  const subText = isAdminRoute ? "text-white/60" : "text-slate-500";
-  const headingText = isAdminRoute ? "text-white" : "text-slate-900";
+  const subText = isAdminRoute ? "text-white/60" : "text-stone-500";
+  const headingText = isAdminRoute ? "text-white" : "text-stone-900";
   const inputBg = isAdminRoute
     ? "bg-white/5 border-white/10 text-white placeholder-white/30 focus:border-[#00BFA5] focus:ring-[#00BFA5]/20"
-    : "bg-slate-50/70 border-slate-200 text-slate-800 placeholder-slate-400 focus:border-emerald-500 focus:bg-white focus:ring-emerald-500/20";
+    : "bg-[#FAF8F4] border-stone-300 text-stone-900 placeholder-stone-400 focus:border-[#162018] focus:bg-white focus:ring-2 focus:ring-[#162018]/10";
 
   return (
-    <div className={`mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-10 ${isAdminRoute ? "text-white" : "text-slate-900"}`}>
-      {/* Top Banner / Hero Profile Card */}
-      <div className={`rounded-3xl p-6 sm:p-8 transition-all ${cardBg} mb-8`}>
-        <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-          {/* Avatar and Basic Identity */}
-          <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 text-center sm:text-left">
-            {/* Avatar with Camera Trigger & Cloudinary Indicator */}
-            <div className="relative group">
-              <div className="relative h-28 w-28 sm:h-32 sm:w-32 rounded-3xl overflow-hidden ring-4 ring-emerald-500/20 shadow-xl bg-linear-to-br from-emerald-500/10 to-teal-500/10 flex items-center justify-center">
-                {previewUrl && !avatarError ? (
-                  <img
-                    src={previewUrl}
-                    alt={user.fullName || "Avatar"}
-                    className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
-                    onError={() => setAvatarError(true)}
-                  />
-                ) : (
-                  <span className="text-4xl font-extrabold text-emerald-500 tracking-wider">
-                    {user.fullName?.charAt(0)?.toUpperCase() || "U"}
-                  </span>
-                )}
+    <div className={`min-h-screen ${isAdminRoute ? "text-white" : "bg-[#FAF8F4] text-stone-900"} py-8 px-4 sm:px-6 lg:px-8`}>
+      <div className="mx-auto max-w-5xl space-y-6">
+        
+        {/* Tactical Captain Identity Card */}
+        <div className={`relative overflow-hidden rounded-3xl p-6 sm:p-8 transition-all ${
+          isAdminRoute
+            ? "bg-[#14141E] border border-white/10 text-white"
+            : "bg-[#162018] text-white border border-[#243327] shadow-xl"
+        }`}>
+          {/* Topographic Background Overlay */}
+          <div className="absolute inset-0 bg-topography opacity-10 pointer-events-none" />
+          <div className="absolute top-0 right-0 w-96 h-96 bg-linear-to-bl from-emerald-500/10 via-transparent to-transparent pointer-events-none" />
 
-                {/* Loading overlay while uploading */}
-                {uploadingAvatar && (
-                  <div className="absolute inset-0 bg-black/60 backdrop-blur-xs flex flex-col items-center justify-center text-white text-xs gap-1.5 z-20">
-                    <div className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                    <span>Upload CDN...</span>
-                  </div>
-                )}
+          <div className="relative z-10 flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+            {/* Avatar & Captain Identity */}
+            <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 text-center sm:text-left">
+              
+              {/* Tactical Avatar Frame */}
+              <div className="relative group shrink-0">
+                <div className="relative h-28 w-28 sm:h-32 sm:w-32 rounded-2xl overflow-hidden ring-2 ring-emerald-500/40 bg-stone-950/80 shadow-2xl flex items-center justify-center border border-white/10">
+                  {previewUrl && !avatarError ? (
+                    <img
+                      src={previewUrl}
+                      alt={user.fullName || "Avatar"}
+                      className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
+                      onError={() => setAvatarError(true)}
+                    />
+                  ) : (
+                    <span className="font-condensed text-4xl font-extrabold text-emerald-400 tracking-wider">
+                      {user.fullName?.charAt(0)?.toUpperCase() || "U"}
+                    </span>
+                  )}
+
+                  {/* Loading overlay while uploading */}
+                  {uploadingAvatar && (
+                    <div className="absolute inset-0 bg-black/75 backdrop-blur-xs flex flex-col items-center justify-center text-white text-xs gap-1.5 z-20">
+                      <div className="h-5 w-5 animate-spin rounded-full border-2 border-emerald-400 border-t-transparent" />
+                      <span className="font-mono text-[10px] tracking-wider uppercase">Cloudinary CDN...</span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Camera Trigger Button */}
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={savingProfile || uploadingAvatar}
+                  className="absolute -bottom-2 -right-2 flex h-9 w-9 items-center justify-center rounded-xl bg-[#B9382B] hover:bg-[#9E2D22] text-white shadow-lg transition transform hover:scale-110 active:scale-95 disabled:opacity-50 border border-white/20"
+                  title="Ganti Foto Profil"
+                >
+                  <Camera size={15} />
+                </button>
+
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/png, image/jpeg, image/webp, image/gif"
+                  onChange={handleSelectImage}
+                  className="hidden"
+                />
               </div>
 
-              {/* Camera Trigger Button Overlay */}
-              <button
-                type="button"
-                onClick={() => fileInputRef.current?.click()}
-                disabled={savingProfile || uploadingAvatar}
-                className="absolute -bottom-2 -right-2 flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg shadow-emerald-600/30 transition transform hover:scale-110 active:scale-95 disabled:opacity-50"
-                title="Unggah Foto Avatar Baru"
-              >
-                <Camera size={18} />
-              </button>
+              {/* Identity & Captain Metadata */}
+              <div className="space-y-2.5">
+                <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
+                  <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full font-mono text-[10px] font-extrabold tracking-wider uppercase ${
+                    isAdminRoute ? "bg-white/10 text-emerald-300" : "bg-white/10 text-emerald-400 border border-white/10"
+                  }`}>
+                    <RoleIcon size={12} />
+                    {roleConfig.title}
+                  </span>
 
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/png, image/jpeg, image/webp, image/gif"
-                onChange={handleSelectImage}
-                className="hidden"
-              />
+                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full font-mono text-[10px] font-bold text-emerald-300 bg-emerald-500/20 border border-emerald-500/30 uppercase tracking-widest">
+                    <CheckCircle2 size={11} />
+                    TERVERIFIKASI
+                  </span>
+                </div>
+
+                <div>
+                  <h1 className="font-condensed text-2xl sm:text-3xl font-black uppercase tracking-tight text-white">
+                    {user.fullName || user.full_name}
+                  </h1>
+                  <p className="font-mono text-xs text-stone-400 tracking-wider uppercase">
+                    {roleConfig.subTitle}
+                  </p>
+                </div>
+
+                <div className="flex flex-wrap items-center justify-center sm:justify-start gap-4 font-mono text-xs text-stone-300">
+                  <span className="flex items-center gap-1.5">
+                    <Mail size={13} className="text-emerald-400" />
+                    {user.email}
+                  </span>
+                  <span className="flex items-center gap-1.5">
+                    <Calendar size={13} className="text-emerald-400" />
+                    BERGABUNG: <strong className="text-white">{joinDate}</strong>
+                  </span>
+                </div>
+
+                {/* Bio snippet */}
+                {user.bio ? (
+                  <p className="text-xs italic line-clamp-2 max-w-md pt-1 text-stone-400">
+                    &ldquo;{user.bio}&rdquo;
+                  </p>
+                ) : null}
+
+                {/* Cloudinary CDN Indicator & Delete Action */}
+                <div className="flex items-center justify-center sm:justify-start gap-3 pt-1">
+                  <span className="inline-flex items-center gap-1.5 font-mono text-[11px] text-emerald-400/90">
+                    <Cloud size={12} />
+                    Cloudinary CDN Synchronized
+                  </span>
+
+                  {(user.avatarUrl || user.avatar_url || imageFile) && (
+                    <button
+                      type="button"
+                      onClick={handleRemoveAvatar}
+                      disabled={savingProfile}
+                      className="inline-flex items-center gap-1 font-mono text-[11px] font-bold text-rose-400 hover:text-rose-300 transition"
+                    >
+                      <Trash2 size={11} />
+                      Hapus Foto
+                    </button>
+                  )}
+                </div>
+              </div>
             </div>
 
-            {/* Name, Role & Email */}
-            <div className="space-y-2">
-              <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
-                <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold ${roleConfig.badgeClass}`}>
-                  <RoleIcon size={14} />
-                  {roleConfig.title}
-                </span>
+            {/* Quick Action Button */}
+            <div className="flex flex-col sm:flex-row lg:flex-col gap-2 shrink-0 self-center lg:self-center">
+              {user.role === "customer" && (
+                <Link
+                  to="/dashboard"
+                  className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#B9382B] hover:bg-[#9E2D22] px-5 py-3 font-condensed text-sm font-bold uppercase tracking-wider text-white shadow-lg shadow-black/30 transition transform hover:-translate-y-0.5"
+                >
+                  <ShoppingBag size={16} />
+                  <span>Jelajahi Katalog Toko</span>
+                </Link>
+              )}
 
-                <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium ${isAdminRoute ? "bg-white/10 text-emerald-300" : "bg-emerald-50 text-emerald-700 border border-emerald-100"}`}>
-                  <CheckCircle2 size={12} />
-                  Akun Aktif
-                </span>
-              </div>
+              {user.role === "logistics" && (
+                <Link
+                  to="/admin/orders"
+                  className="inline-flex items-center justify-center gap-2 rounded-xl bg-purple-600 hover:bg-purple-700 px-5 py-3 font-condensed text-sm font-bold uppercase tracking-wider text-white shadow-lg transition"
+                >
+                  <Truck size={16} />
+                  <span>Antrean Pesanan Gudang</span>
+                </Link>
+              )}
 
-              <h1 className={`text-2xl sm:text-3xl font-extrabold tracking-tight ${headingText}`}>
-                {user.fullName || user.full_name}
-              </h1>
-
-              <div className={`flex flex-wrap items-center justify-center sm:justify-start gap-4 text-xs sm:text-sm ${subText}`}>
-                <span className="flex items-center gap-1.5">
-                  <Mail size={14} className="text-emerald-500" />
-                  {user.email}
-                </span>
-                <span className="flex items-center gap-1.5">
-                  <Calendar size={14} className="text-emerald-500" />
-                  Bergabung: <strong className={headingText}>{joinDate}</strong>
-                </span>
-              </div>
-
-              {/* Bio snippet */}
-              {user.bio ? (
-                <p className={`text-xs italic line-clamp-2 max-w-md pt-1 ${subText}`}>
-                  &ldquo;{user.bio}&rdquo;
-                </p>
-              ) : null}
-
-              {/* Cloudinary CDN Indicator & Delete Action */}
-              <div className="flex items-center justify-center sm:justify-start gap-3 pt-2">
-                <span className={`inline-flex items-center gap-1.5 text-[11px] font-medium ${isAdminRoute ? "text-emerald-400/80" : "text-emerald-700"}`}>
-                  <Cloud size={13} />
-                  Foto Terhubung ke Cloudinary CDN
-                </span>
-
-                {(user.avatarUrl || user.avatar_url || imageFile) && (
-                  <button
-                    type="button"
-                    onClick={handleRemoveAvatar}
-                    disabled={savingProfile}
-                    className="inline-flex items-center gap-1 text-[11px] font-semibold text-rose-500 hover:text-rose-600 transition"
-                  >
-                    <Trash2 size={12} />
-                    Hapus Foto
-                  </button>
-                )}
-              </div>
+              {user.role === "admin" && (
+                <Link
+                  to="/admin"
+                  className="inline-flex items-center justify-center gap-2 rounded-xl bg-teal-500 hover:bg-teal-400 px-5 py-3 font-condensed text-sm font-bold uppercase tracking-wider text-stone-950 shadow-lg transition"
+                >
+                  <Sparkles size={16} />
+                  <span>Buka Admin Dashboard</span>
+                </Link>
+              )}
             </div>
           </div>
 
-          {/* Role-Specific Quick Action Pill */}
-          <div className="flex flex-col sm:flex-row lg:flex-col gap-2 shrink-0 self-center lg:self-center">
+          {/* Tactical Metric Grid */}
+          <div className="mt-8 grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4 border-t border-white/10 pt-6">
             {user.role === "customer" && (
-              <Link
-                to="/dashboard"
-                className="flex items-center justify-center gap-2 rounded-2xl bg-emerald-600 px-5 py-2.5 text-xs sm:text-sm font-bold text-white shadow-md shadow-emerald-600/20 hover:bg-emerald-700 transition"
-              >
-                <ShoppingBag size={16} />
-                <span>Mulai Belanja</span>
-              </Link>
+              <>
+                <div className="rounded-2xl p-4 bg-white/5 border border-white/10 backdrop-blur-xs">
+                  <div className="flex items-center gap-1.5 font-mono text-[11px] font-bold text-stone-400 uppercase mb-1">
+                    <ShoppingBag size={13} className="text-emerald-400" />
+                    Total Transaksi
+                  </div>
+                  <div className="font-condensed text-2xl sm:text-3xl font-black text-white">
+                    {loadingStats ? "..." : roleStats.totalOrders} <span className="font-sans text-xs font-normal text-stone-400">Pesanan</span>
+                  </div>
+                </div>
+
+                <div className="rounded-2xl p-4 bg-white/5 border border-white/10 backdrop-blur-xs">
+                  <div className="flex items-center gap-1.5 font-mono text-[11px] font-bold text-stone-400 uppercase mb-1">
+                    <Award size={13} className="text-amber-400" />
+                    Akumulasi Belanja
+                  </div>
+                  <div className="font-condensed text-2xl sm:text-3xl font-black text-white">
+                    {loadingStats ? "..." : `Rp ${roleStats.totalSpent.toLocaleString("id-ID")}`}
+                  </div>
+                </div>
+
+                <div className="col-span-2 md:col-span-1 rounded-2xl p-4 bg-white/5 border border-white/10 backdrop-blur-xs">
+                  <div className="flex items-center gap-1.5 font-mono text-[11px] font-bold text-stone-400 uppercase mb-1">
+                    <Package size={13} className="text-emerald-400" />
+                    Pesanan Aktif
+                  </div>
+                  <div className="font-condensed text-2xl sm:text-3xl font-black text-white">
+                    {loadingStats ? "..." : roleStats.activeOrders} <span className="font-sans text-xs font-normal text-stone-400">Dalam Proses</span>
+                  </div>
+                </div>
+              </>
             )}
 
             {user.role === "logistics" && (
-              <Link
-                to="/admin/orders"
-                className="flex items-center justify-center gap-2 rounded-2xl bg-purple-600 px-5 py-2.5 text-xs sm:text-sm font-bold text-white shadow-md shadow-purple-600/20 hover:bg-purple-700 transition"
-              >
-                <Truck size={16} />
-                <span>Antrean Pesanan Gudang</span>
-              </Link>
+              <>
+                <div className="rounded-2xl p-4 bg-white/5 border border-white/10">
+                  <div className="flex items-center gap-1.5 font-mono text-[11px] font-bold text-purple-300 uppercase mb-1">
+                    <Package size={13} />
+                    Perlu Dikemas (Paid)
+                  </div>
+                  <div className="font-condensed text-2xl font-black text-white">
+                    {loadingStats ? "..." : roleStats.warehousePending} <span className="text-xs font-normal text-stone-400">Siap Kemas</span>
+                  </div>
+                </div>
+
+                <div className="rounded-2xl p-4 bg-white/5 border border-white/10">
+                  <div className="flex items-center gap-1.5 font-mono text-[11px] font-bold text-purple-300 uppercase mb-1">
+                    <Truck size={13} />
+                    Dalam Pengiriman
+                  </div>
+                  <div className="font-condensed text-2xl font-black text-white">
+                    {loadingStats ? "..." : roleStats.warehouseShipped} <span className="text-xs font-normal text-stone-400">Di Kurir</span>
+                  </div>
+                </div>
+
+                <div className="col-span-2 md:col-span-1 rounded-2xl p-4 bg-white/5 border border-white/10">
+                  <div className="flex items-center gap-1.5 font-mono text-[11px] font-bold text-purple-300 uppercase mb-1">
+                    <Building2 size={13} />
+                    Fasilitas Gudang
+                  </div>
+                  <div className="font-condensed text-lg font-bold text-white truncate">
+                    Atelier Cicendo Bandung Hub
+                  </div>
+                </div>
+              </>
             )}
 
             {user.role === "admin" && (
-              <Link
-                to="/admin"
-                className="flex items-center justify-center gap-2 rounded-2xl bg-teal-500 px-5 py-2.5 text-xs sm:text-sm font-bold text-slate-950 shadow-md hover:bg-teal-400 transition"
-              >
-                <Sparkles size={16} />
-                <span>Buka Admin Dashboard</span>
-              </Link>
+              <>
+                <div className="rounded-2xl p-4 bg-white/5 border border-white/10">
+                  <div className="flex items-center gap-1.5 font-mono text-[11px] font-bold text-teal-400 uppercase mb-1">
+                    <Sparkles size={13} />
+                    Total Omzet
+                  </div>
+                  <div className="font-condensed text-2xl font-black text-white">
+                    {loadingStats ? "..." : `Rp ${Number(roleStats.adminRevenue || 0).toLocaleString("id-ID")}`}
+                  </div>
+                </div>
+
+                <div className="rounded-2xl p-4 bg-white/5 border border-white/10">
+                  <div className="flex items-center gap-1.5 font-mono text-[11px] font-bold text-teal-400 uppercase mb-1">
+                    <ShoppingBag size={13} />
+                    Total Pesanan
+                  </div>
+                  <div className="font-condensed text-2xl font-black text-white">
+                    {loadingStats ? "..." : roleStats.adminTotalOrders} <span className="text-xs font-normal text-stone-400">Order</span>
+                  </div>
+                </div>
+
+                <div className="col-span-2 md:col-span-1 rounded-2xl p-4 bg-white/5 border border-white/10">
+                  <div className="flex items-center gap-1.5 font-mono text-[11px] font-bold text-teal-400 uppercase mb-1">
+                    <User size={13} />
+                    Pengguna
+                  </div>
+                  <div className="font-condensed text-2xl font-black text-white">
+                    {loadingStats ? "..." : roleStats.adminTotalUsers} <span className="text-xs font-normal text-stone-400">Akun</span>
+                  </div>
+                </div>
+              </>
             )}
           </div>
         </div>
 
-        {/* Dynamic Metric Counter Cards per Role */}
-        <div className={`mt-8 grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4 border-t ${isAdminRoute ? "border-white/10" : "border-slate-100"} pt-6`}>
-          {user.role === "customer" && (
-            <>
-              <div className={`rounded-2xl p-4 ${isAdminRoute ? "bg-white/5" : "bg-emerald-50/50 border border-emerald-100/60"}`}>
-                <div className="flex items-center gap-2 text-xs text-emerald-600 font-semibold mb-1">
-                  <ShoppingBag size={14} />
-                  Total Transaksi
-                </div>
-                <div className={`text-xl sm:text-2xl font-black ${headingText}`}>
-                  {loadingStats ? "..." : roleStats.totalOrders} <span className="text-xs font-normal text-slate-400">Pesanan</span>
-                </div>
-              </div>
-
-              <div className={`rounded-2xl p-4 ${isAdminRoute ? "bg-white/5" : "bg-emerald-50/50 border border-emerald-100/60"}`}>
-                <div className="flex items-center gap-2 text-xs text-emerald-600 font-semibold mb-1">
-                  <Sparkles size={14} />
-                  Total Akumulasi Belanja
-                </div>
-                <div className={`text-xl sm:text-2xl font-black ${headingText}`}>
-                  {loadingStats ? "..." : `Rp ${roleStats.totalSpent.toLocaleString("id-ID")}`}
-                </div>
-              </div>
-
-              <div className={`col-span-2 md:col-span-1 rounded-2xl p-4 ${isAdminRoute ? "bg-white/5" : "bg-emerald-50/50 border border-emerald-100/60"}`}>
-                <div className="flex items-center gap-2 text-xs text-emerald-600 font-semibold mb-1">
-                  <Package size={14} />
-                  Pesanan Aktif Berjalan
-                </div>
-                <div className={`text-xl sm:text-2xl font-black ${headingText}`}>
-                  {loadingStats ? "..." : roleStats.activeOrders} <span className="text-xs font-normal text-slate-400">Dalam Proses</span>
-                </div>
-              </div>
-            </>
-          )}
-
-          {user.role === "logistics" && (
-            <>
-              <div className={`rounded-2xl p-4 ${isAdminRoute ? "bg-white/5" : "bg-purple-50/60 border border-purple-100"}`}>
-                <div className="flex items-center gap-2 text-xs text-purple-600 font-semibold mb-1">
-                  <Package size={14} />
-                  Perlu Dikemas (Paid)
-                </div>
-                <div className={`text-xl sm:text-2xl font-black ${headingText}`}>
-                  {loadingStats ? "..." : roleStats.warehousePending} <span className="text-xs font-normal text-slate-400">Siap Kemas</span>
-                </div>
-              </div>
-
-              <div className={`rounded-2xl p-4 ${isAdminRoute ? "bg-white/5" : "bg-purple-50/60 border border-purple-100"}`}>
-                <div className="flex items-center gap-2 text-xs text-purple-600 font-semibold mb-1">
-                  <Truck size={14} />
-                  Dalam Pengiriman (Resi)
-                </div>
-                <div className={`text-xl sm:text-2xl font-black ${headingText}`}>
-                  {loadingStats ? "..." : roleStats.warehouseShipped} <span className="text-xs font-normal text-slate-400">Di Kurir</span>
-                </div>
-              </div>
-
-              <div className={`col-span-2 md:col-span-1 rounded-2xl p-4 ${isAdminRoute ? "bg-white/5" : "bg-purple-50/60 border border-purple-100"}`}>
-                <div className="flex items-center gap-2 text-xs text-purple-600 font-semibold mb-1">
-                  <Building2 size={14} />
-                  Fasilitas Gudang
-                </div>
-                <div className={`text-base sm:text-lg font-bold truncate ${headingText}`}>
-                  Hub Wonogiri Central
-                </div>
-              </div>
-            </>
-          )}
-
-          {user.role === "admin" && (
-            <>
-              <div className={`rounded-2xl p-4 ${isAdminRoute ? "bg-white/5" : "bg-slate-100/70 border border-slate-200"}`}>
-                <div className="flex items-center gap-2 text-xs text-teal-400 font-semibold mb-1">
-                  <Sparkles size={14} />
-                  Total Omzet Penjualan
-                </div>
-                <div className={`text-xl sm:text-2xl font-black ${headingText}`}>
-                  {loadingStats ? "..." : `Rp ${Number(roleStats.adminRevenue || 0).toLocaleString("id-ID")}`}
-                </div>
-              </div>
-
-              <div className={`rounded-2xl p-4 ${isAdminRoute ? "bg-white/5" : "bg-slate-100/70 border border-slate-200"}`}>
-                <div className="flex items-center gap-2 text-xs text-teal-400 font-semibold mb-1">
-                  <ShoppingBag size={14} />
-                  Total Pesanan Masuk
-                </div>
-                <div className={`text-xl sm:text-2xl font-black ${headingText}`}>
-                  {loadingStats ? "..." : roleStats.adminTotalOrders} <span className="text-xs font-normal text-slate-400">Pesanan</span>
-                </div>
-              </div>
-
-              <div className={`col-span-2 md:col-span-1 rounded-2xl p-4 ${isAdminRoute ? "bg-white/5" : "bg-slate-100/70 border border-slate-200"}`}>
-                <div className="flex items-center gap-2 text-xs text-teal-400 font-semibold mb-1">
-                  <User size={14} />
-                  Pengguna Terdaftar
-                </div>
-                <div className={`text-xl sm:text-2xl font-black ${headingText}`}>
-                  {loadingStats ? "..." : roleStats.adminTotalUsers} <span className="text-xs font-normal text-slate-400">Akun</span>
-                </div>
-              </div>
-            </>
-          )}
-        </div>
-      </div>
-
-      {/* Tabs Navigation Bar */}
-      <div className="flex border-b border-slate-200 dark:border-white/10 mb-6 gap-2 sm:gap-4 overflow-x-auto pb-1">
-        <button
-          type="button"
-          onClick={() => setActiveTab("info")}
-          className={`flex items-center gap-2 px-4 py-3 text-sm font-bold border-b-2 transition whitespace-nowrap ${
-            activeTab === "info"
-              ? isAdminRoute
-                ? "border-[#00BFA5] text-[#00BFA5]"
-                : "border-emerald-600 text-emerald-600"
-              : `${subText} border-transparent hover:${headingText}`
-          }`}
-        >
-          <User size={16} />
-          <span>Informasi Akun & Kontak</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => setActiveTab("security")}
-          className={`flex items-center gap-2 px-4 py-3 text-sm font-bold border-b-2 transition whitespace-nowrap ${
-            activeTab === "security"
-              ? isAdminRoute
-                ? "border-[#00BFA5] text-[#00BFA5]"
-                : "border-emerald-600 text-emerald-600"
-              : `${subText} border-transparent hover:${headingText}`
-          }`}
-        >
-          <KeyRound size={16} />
-          <span>Keamanan & Sandi</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => setActiveTab("activity")}
-          className={`flex items-center gap-2 px-4 py-3 text-sm font-bold border-b-2 transition whitespace-nowrap ${
-            activeTab === "activity"
-              ? isAdminRoute
-                ? "border-[#00BFA5] text-[#00BFA5]"
-                : "border-emerald-600 text-emerald-600"
-              : `${subText} border-transparent hover:${headingText}`
-          }`}
-        >
-          <Clock size={16} />
-          <span>Ringkasan Aktivitas</span>
-        </button>
-      </div>
-
-      {/* Tab 1: Informasi Profil & Kontak */}
-      {activeTab === "info" && (
-        <form onSubmit={handleSaveProfile} className={`rounded-3xl p-6 sm:p-8 ${cardBg}`}>
-          <div className="border-b border-slate-100 dark:border-white/10 pb-4 mb-6">
-            <h2 className={`text-xl font-bold tracking-tight ${headingText}`}>
-              Kelola Data Profil & Kontak Pengiriman
-            </h2>
-            <p className={`text-sm mt-1 ${subText}`}>
-              Data kontak dan alamat Anda akan otomatis tersinkronisasi saat melakukan checkout pesanan.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            {/* Nama Lengkap */}
-            <div>
-              <label className="block text-xs font-bold text-slate-700 dark:text-white/80 mb-1.5 flex items-center gap-1.5">
-                <User size={14} className="text-emerald-500" />
-                Nama Lengkap <span className="text-rose-500">*</span>
-              </label>
-              <input
-                type="text"
-                value={form.fullName}
-                onChange={(e) => setForm({ ...form, fullName: e.target.value })}
-                placeholder="Nama lengkap Anda"
-                className={`w-full rounded-2xl px-4 py-3 text-sm transition outline-none ${inputBg}`}
-                required
-              />
-            </div>
-
-            {/* Email (Read Only) */}
-            <div>
-              <label className="block text-xs font-bold text-slate-700 dark:text-white/80 mb-1.5 flex items-center justify-between">
-                <span className="flex items-center gap-1.5">
-                  <Mail size={14} className="text-emerald-500" />
-                  Alamat Email Akun
-                </span>
-                <span className="text-[11px] font-bold text-emerald-600 bg-emerald-50 dark:bg-emerald-500/20 px-2 py-0.5 rounded-full">
-                  Terverifikasi
-                </span>
-              </label>
-              <input
-                type="email"
-                value={user.email}
-                disabled
-                className={`w-full rounded-2xl px-4 py-3 text-sm opacity-70 cursor-not-allowed ${inputBg}`}
-              />
-              <p className={`text-[11px] mt-1 ${subText}`}>
-                Email akun bersifat permanen dan digunakan untuk autentikasi keamanan.
-              </p>
-            </div>
-
-            {/* No. WhatsApp / HP */}
-            <div>
-              <label className="block text-xs font-bold text-slate-700 dark:text-white/80 mb-1.5 flex items-center gap-1.5">
-                <Phone size={14} className="text-emerald-500" />
-                Nomor WhatsApp / HP Aktif
-              </label>
-              <input
-                type="tel"
-                value={form.phoneNumber}
-                onChange={(e) => setForm({ ...form, phoneNumber: e.target.value })}
-                placeholder="Contoh: 081234567890"
-                className={`w-full rounded-2xl px-4 py-3 text-sm font-mono transition outline-none ${inputBg}`}
-              />
-              <p className={`text-[11px] mt-1 ${subText}`}>
-                Penting untuk koordinasi kurir saat pengiriman dan otomatis mengisi checkout.
-              </p>
-            </div>
-
-            {/* Kota / Kabupaten */}
-            <div>
-              <label className="block text-xs font-bold text-slate-700 dark:text-white/80 mb-1.5 flex items-center gap-1.5">
-                <Building2 size={14} className="text-emerald-500" />
-                Kota / Kabupaten
-              </label>
-              <input
-                type="text"
-                value={form.city}
-                onChange={(e) => setForm({ ...form, city: e.target.value })}
-                placeholder="Contoh: Wonogiri, Solo, Jakarta Selatan"
-                className={`w-full rounded-2xl px-4 py-3 text-sm transition outline-none ${inputBg}`}
-              />
-            </div>
-
-            {/* Kode Pos */}
-            <div>
-              <label className="block text-xs font-bold text-slate-700 dark:text-white/80 mb-1.5 flex items-center gap-1.5">
-                <MapPin size={14} className="text-emerald-500" />
-                Kode Pos Pengiriman
-              </label>
-              <input
-                type="text"
-                maxLength={5}
-                value={form.postalCode}
-                onChange={(e) => setForm({ ...form, postalCode: e.target.value.replace(/\D/g, "") })}
-                placeholder="5 digit angka (contoh: 57612)"
-                className={`w-full rounded-2xl px-4 py-3 text-sm font-mono transition outline-none ${inputBg}`}
-              />
-            </div>
-
-            {/* Bio / Motto */}
-            <div>
-              <label className="block text-xs font-bold text-slate-700 dark:text-white/80 mb-1.5 flex items-center gap-1.5">
-                <FileText size={14} className="text-emerald-500" />
-                Bio / Status Pribadi
-              </label>
-              <input
-                type="text"
-                maxLength={150}
-                value={form.bio}
-                onChange={(e) => setForm({ ...form, bio: e.target.value })}
-                placeholder="Contoh: Pencinta jersey olahraga & apparel RegarSport"
-                className={`w-full rounded-2xl px-4 py-3 text-sm transition outline-none ${inputBg}`}
-              />
-            </div>
-
-            {/* Alamat Lengkap Pengiriman (Full Width) */}
-            <div className="md:col-span-2">
-              <label className="block text-xs font-bold text-slate-700 dark:text-white/80 mb-1.5 flex items-center gap-1.5">
-                <MapPin size={14} className="text-emerald-500" />
-                Alamat Lengkap Pengiriman (Jalan, No. Rumah, RT/RW, Kecamatan)
-              </label>
-              <textarea
-                rows={3}
-                value={form.address}
-                onChange={(e) => setForm({ ...form, address: e.target.value })}
-                placeholder="Masukkan detail alamat jalan, patokan, nomor rumah, RT/RW, dan kelurahan/kecamatan..."
-                className={`w-full rounded-2xl p-4 text-sm transition outline-none resize-y ${inputBg}`}
-              />
-              <p className={`text-[11px] mt-1 ${subText}`}>
-                Alamat ini akan otomatis dijadikan alamat tujuan pengiriman default saat Anda checkout belanja.
-              </p>
-            </div>
-          </div>
-
-          {/* Action Buttons */}
-          <div className="mt-8 flex flex-wrap items-center gap-3 pt-6 border-t border-slate-100 dark:border-white/10">
-            <button
-              type="submit"
-              disabled={savingProfile || uploadingAvatar}
-              className={`flex items-center gap-2 rounded-2xl px-6 py-3 text-sm font-bold text-white shadow-lg transition transform hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-50 disabled:cursor-not-allowed ${
-                isAdminRoute
-                  ? "bg-[#00BFA5] hover:bg-[#00A892] text-slate-950 shadow-[#00BFA5]/20"
-                  : "bg-emerald-600 hover:bg-emerald-700 shadow-emerald-600/20"
-              }`}
-            >
-              <Save size={16} />
-              {savingProfile ? "Menyimpan ke Server..." : "Simpan Perubahan Profil"}
-            </button>
-
-            <button
-              type="button"
-              onClick={handleResetProfile}
-              disabled={savingProfile}
-              className={`flex items-center gap-2 rounded-2xl px-5 py-3 text-sm font-semibold border transition ${
-                isAdminRoute
-                  ? "border-white/10 hover:bg-white/5 text-white/80"
-                  : "border-slate-200 hover:bg-slate-50 text-slate-700"
-              }`}
-            >
-              <RotateCcw size={16} />
-              <span>Reset</span>
-            </button>
-          </div>
-        </form>
-      )}
-
-      {/* Tab 2: Keamanan Akun & Sandi */}
-      {activeTab === "security" && (
-        <div className="grid gap-6 lg:grid-cols-3">
-          <form
-            onSubmit={handleChangePassword}
-            className={`lg:col-span-2 rounded-3xl p-6 sm:p-8 ${cardBg}`}
+        {/* Tactical Tabs Navigation */}
+        <div className="flex border-b border-stone-200 dark:border-white/10 gap-2 sm:gap-4 overflow-x-auto pb-1">
+          <button
+            type="button"
+            onClick={() => setActiveTab("info")}
+            className={`flex items-center gap-2 px-4 py-3 font-condensed text-sm font-bold uppercase tracking-wider border-b-2 transition whitespace-nowrap ${
+              activeTab === "info"
+                ? isAdminRoute
+                  ? "border-[#00BFA5] text-[#00BFA5]"
+                  : "border-[#162018] text-[#162018]"
+                : "border-transparent text-stone-400 hover:text-stone-700 dark:hover:text-white"
+            }`}
           >
-            <div className="border-b border-slate-100 dark:border-white/10 pb-4 mb-6">
-              <h2 className={`text-xl font-bold tracking-tight ${headingText}`}>
-                Ubah Kata Sandi Akun
+            <User size={16} />
+            <span>01. Data Diri & Alamat Pengiriman</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveTab("security")}
+            className={`flex items-center gap-2 px-4 py-3 font-condensed text-sm font-bold uppercase tracking-wider border-b-2 transition whitespace-nowrap ${
+              activeTab === "security"
+                ? isAdminRoute
+                  ? "border-[#00BFA5] text-[#00BFA5]"
+                  : "border-[#162018] text-[#162018]"
+                : "border-transparent text-stone-400 hover:text-stone-700 dark:hover:text-white"
+            }`}
+          >
+            <KeyRound size={16} />
+            <span>02. Keamanan & Sandi</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveTab("activity")}
+            className={`flex items-center gap-2 px-4 py-3 font-condensed text-sm font-bold uppercase tracking-wider border-b-2 transition whitespace-nowrap ${
+              activeTab === "activity"
+                ? isAdminRoute
+                  ? "border-[#00BFA5] text-[#00BFA5]"
+                  : "border-[#162018] text-[#162018]"
+                : "border-transparent text-stone-400 hover:text-stone-700 dark:hover:text-white"
+            }`}
+          >
+            <Clock size={16} />
+            <span>03. Riwayat & Aktivitas</span>
+          </button>
+        </div>
+
+        {/* Tab 1: Informasi Profil & Kontak */}
+        {activeTab === "info" && (
+          <form onSubmit={handleSaveProfile} className={`rounded-3xl p-6 sm:p-8 ${cardBg}`}>
+            <div className="border-b border-stone-200/80 dark:border-white/10 pb-4 mb-6">
+              <h2 className="font-condensed text-xl font-bold uppercase tracking-wide">
+                Identitas Kapten & Alamat Ekspedisi
               </h2>
-              <p className={`text-sm mt-1 ${subText}`}>
-                Pastikan akun Anda tetap terlindungi dengan memperbarui kata sandi secara berkala.
+              <p className={`text-xs mt-1 ${subText}`}>
+                Data kontak dan alamat Anda akan otomatis disinkronkan saat proses checkout pesanan jersey di Atelier Cicendo.
               </p>
             </div>
 
-            <div className="space-y-4">
-              {/* Kata Sandi Saat Ini */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              {/* Nama Lengkap */}
               <div>
-                <label className="block text-xs font-bold text-slate-700 dark:text-white/80 mb-1.5 flex items-center gap-1.5">
-                  <Lock size={14} className="text-emerald-500" />
-                  Kata Sandi Saat Ini <span className="text-rose-500">*</span>
+                <label className="block font-mono text-[11px] font-bold uppercase tracking-wider text-stone-700 dark:text-white/80 mb-1.5 flex items-center gap-1.5">
+                  <User size={13} className="text-emerald-500" />
+                  Nama Lengkap <span className="text-rose-500">*</span>
                 </label>
-                <div className="relative">
-                  <input
-                    type={showCurrentPassword ? "text" : "password"}
-                    value={passwordForm.currentPassword}
-                    onChange={(e) =>
-                      setPasswordForm({ ...passwordForm, currentPassword: e.target.value })
-                    }
-                    placeholder="Masukkan kata sandi lama Anda"
-                    className={`w-full rounded-2xl px-4 py-3 pr-12 text-sm transition outline-none ${inputBg}`}
-                    required
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowCurrentPassword(!showCurrentPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-white"
-                  >
-                    {showCurrentPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                  </button>
-                </div>
+                <input
+                  type="text"
+                  value={form.fullName}
+                  onChange={(e) => setForm({ ...form, fullName: e.target.value })}
+                  placeholder="Nama lengkap Anda"
+                  className={`w-full rounded-xl px-4 py-3 text-sm transition outline-none ${inputBg}`}
+                  required
+                />
               </div>
 
-              {/* Kata Sandi Baru */}
+              {/* Email (Read Only) */}
               <div>
-                <label className="block text-xs font-bold text-slate-700 dark:text-white/80 mb-1.5 flex items-center gap-1.5">
-                  <KeyRound size={14} className="text-emerald-500" />
-                  Kata Sandi Baru <span className="text-rose-500">*</span>
+                <label className="block font-mono text-[11px] font-bold uppercase tracking-wider text-stone-700 dark:text-white/80 mb-1.5 flex items-center justify-between">
+                  <span className="flex items-center gap-1.5">
+                    <Mail size={13} className="text-emerald-500" />
+                    Alamat Email Terdaftar
+                  </span>
+                  <span className="font-mono text-[10px] font-bold text-emerald-600 bg-emerald-50 dark:bg-emerald-500/20 px-2 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-500/30">
+                    TERVERIFIKASI
+                  </span>
                 </label>
-                <div className="relative">
-                  <input
-                    type={showNewPassword ? "text" : "password"}
-                    value={passwordForm.newPassword}
-                    onChange={(e) =>
-                      setPasswordForm({ ...passwordForm, newPassword: e.target.value })
-                    }
-                    placeholder="Minimal 6 karakter kombinasi"
-                    className={`w-full rounded-2xl px-4 py-3 pr-12 text-sm transition outline-none ${inputBg}`}
-                    required
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowNewPassword(!showNewPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-white"
-                  >
-                    {showNewPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                  </button>
-                </div>
-
-                {/* Password Strength Meter */}
-                {passwordForm.newPassword && (
-                  <div className="mt-2.5 space-y-1.5">
-                    <div className="flex items-center justify-between text-[11px]">
-                      <span className={subText}>Kekuatan Sandi:</span>
-                      <span className="font-bold text-slate-800 dark:text-white">{strength.text}</span>
-                    </div>
-                    <div className="h-1.5 w-full rounded-full bg-slate-200 dark:bg-white/10 overflow-hidden">
-                      <div
-                        className={`h-full transition-all duration-300 ${strength.color}`}
-                        style={{ width: `${(strength.score / 4) * 100}%` }}
-                      />
-                    </div>
-                  </div>
-                )}
+                <input
+                  type="email"
+                  value={user.email}
+                  disabled
+                  className={`w-full rounded-xl px-4 py-3 text-sm opacity-70 cursor-not-allowed ${inputBg}`}
+                />
+                <p className={`text-[11px] mt-1 ${subText}`}>
+                  Alamat email terikat pada sistem keamanan akun dan digunakan untuk konfirmasi faktur.
+                </p>
               </div>
 
-              {/* Konfirmasi Kata Sandi Baru */}
+              {/* No. WhatsApp / HP */}
               <div>
-                <label className="block text-xs font-bold text-slate-700 dark:text-white/80 mb-1.5 flex items-center gap-1.5">
-                  <ShieldCheck size={14} className="text-emerald-500" />
-                  Konfirmasi Kata Sandi Baru <span className="text-rose-500">*</span>
+                <label className="block font-mono text-[11px] font-bold uppercase tracking-wider text-stone-700 dark:text-white/80 mb-1.5 flex items-center gap-1.5">
+                  <Phone size={13} className="text-emerald-500" />
+                  Nomor WhatsApp / Kontak Aktif
                 </label>
-                <div className="relative">
-                  <input
-                    type={showConfirmPassword ? "text" : "password"}
-                    value={passwordForm.confirmPassword}
-                    onChange={(e) =>
-                      setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })
-                    }
-                    placeholder="Ulangi kata sandi baru"
-                    className={`w-full rounded-2xl px-4 py-3 pr-12 text-sm transition outline-none ${inputBg}`}
-                    required
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-white"
-                  >
-                    {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                  </button>
-                </div>
+                <input
+                  type="tel"
+                  value={form.phoneNumber}
+                  onChange={(e) => setForm({ ...form, phoneNumber: e.target.value })}
+                  placeholder="Contoh: 081234567890"
+                  className={`w-full rounded-xl px-4 py-3 text-sm font-mono transition outline-none ${inputBg}`}
+                />
+                <p className={`text-[11px] mt-1 ${subText}`}>
+                  Digunakan untuk konfirmasi resi kurir dan koordinasi mockup nameset jersey.
+                </p>
+              </div>
 
-                {/* Match indicator */}
-                {passwordForm.confirmPassword && (
-                  <p
-                    className={`text-[11px] mt-1.5 flex items-center gap-1 font-semibold ${
-                      passwordForm.newPassword === passwordForm.confirmPassword
-                        ? "text-emerald-600"
-                        : "text-rose-500"
-                    }`}
-                  >
-                    {passwordForm.newPassword === passwordForm.confirmPassword ? (
-                      <>
-                        <Check size={13} />
-                        Kata sandi baru cocok
-                      </>
-                    ) : (
-                      <>
-                        <AlertCircle size={13} />
-                        Konfirmasi kata sandi belum sama
-                      </>
-                    )}
-                  </p>
-                )}
+              {/* Kota / Kabupaten */}
+              <div>
+                <label className="block font-mono text-[11px] font-bold uppercase tracking-wider text-stone-700 dark:text-white/80 mb-1.5 flex items-center gap-1.5">
+                  <Building2 size={13} className="text-emerald-500" />
+                  Kota / Kabupaten
+                </label>
+                <input
+                  type="text"
+                  value={form.city}
+                  onChange={(e) => setForm({ ...form, city: e.target.value })}
+                  placeholder="Contoh: Bandung, Jakarta Selatan, Surabaya"
+                  className={`w-full rounded-xl px-4 py-3 text-sm transition outline-none ${inputBg}`}
+                />
+              </div>
+
+              {/* Kode Pos */}
+              <div>
+                <label className="block font-mono text-[11px] font-bold uppercase tracking-wider text-stone-700 dark:text-white/80 mb-1.5 flex items-center gap-1.5">
+                  <Compass size={13} className="text-emerald-500" />
+                  Kode Pos
+                </label>
+                <input
+                  type="text"
+                  maxLength={5}
+                  value={form.postalCode}
+                  onChange={(e) => setForm({ ...form, postalCode: e.target.value.replace(/\D/g, "") })}
+                  placeholder="Contoh: 40171"
+                  className={`w-full rounded-xl px-4 py-3 text-sm font-mono transition outline-none ${inputBg}`}
+                />
+              </div>
+
+              {/* Bio / Motto */}
+              <div>
+                <label className="block font-mono text-[11px] font-bold uppercase tracking-wider text-stone-700 dark:text-white/80 mb-1.5 flex items-center gap-1.5">
+                  <FileText size={13} className="text-emerald-500" />
+                  Nama Tim Olahraga / Bio Singkat
+                </label>
+                <input
+                  type="text"
+                  maxLength={150}
+                  value={form.bio}
+                  onChange={(e) => setForm({ ...form, bio: e.target.value })}
+                  placeholder="Contoh: Kapten Garuda FC // Bandung"
+                  className={`w-full rounded-xl px-4 py-3 text-sm transition outline-none ${inputBg}`}
+                />
+              </div>
+
+              {/* Alamat Lengkap Pengiriman (Full Width) */}
+              <div className="md:col-span-2">
+                <label className="block font-mono text-[11px] font-bold uppercase tracking-wider text-stone-700 dark:text-white/80 mb-1.5 flex items-center gap-1.5">
+                  <MapPin size={13} className="text-emerald-500" />
+                  Alamat Lengkap Pengiriman (Jalan, Nomor, Patokan, RT/RW, Kecamatan)
+                </label>
+                <textarea
+                  rows={3}
+                  value={form.address}
+                  onChange={(e) => setForm({ ...form, address: e.target.value })}
+                  placeholder="Contoh: Jl. Pasir Kaliki No. 123, RT 02/05, Kel. Pasirkaliki, Kec. Cicendo..."
+                  className={`w-full rounded-xl p-4 text-sm transition outline-none resize-y ${inputBg}`}
+                />
+                <p className={`text-[11px] mt-1 ${subText}`}>
+                  Alamat ini otomatis menjadi rujukan ekspedisi kurir saat melakukan checkout.
+                </p>
               </div>
             </div>
 
-            <div className="mt-8 pt-6 border-t border-slate-100 dark:border-white/10">
+            {/* Action Buttons */}
+            <div className="mt-8 flex flex-wrap items-center gap-3 pt-6 border-t border-stone-200/80 dark:border-white/10">
               <button
                 type="submit"
-                disabled={changingPassword}
-                className={`flex items-center gap-2 rounded-2xl px-6 py-3 text-sm font-bold text-white shadow-lg transition transform hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-50 disabled:cursor-not-allowed ${
+                disabled={savingProfile || uploadingAvatar}
+                className={`inline-flex items-center gap-2 rounded-xl px-6 py-3 font-condensed text-sm font-bold uppercase tracking-wider text-white shadow-lg transition transform hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-50 disabled:cursor-not-allowed ${
                   isAdminRoute
-                    ? "bg-[#00BFA5] hover:bg-[#00A892] text-slate-950 shadow-[#00BFA5]/20"
-                    : "bg-emerald-600 hover:bg-emerald-700 shadow-emerald-600/20"
+                    ? "bg-[#00BFA5] hover:bg-[#00A892] text-stone-950 shadow-[#00BFA5]/20"
+                    : "bg-[#162018] hover:bg-stone-900 shadow-stone-900/20"
                 }`}
               >
-                <Lock size={16} />
-                {changingPassword ? "Menyimpan Sandi..." : "Perbarui Kata Sandi Sekarang"}
+                <Save size={16} />
+                <span>{savingProfile ? "Menyimpan ke Server..." : "Simpan Perubahan Profil"}</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={handleResetProfile}
+                disabled={savingProfile}
+                className={`inline-flex items-center gap-2 rounded-xl px-5 py-3 font-condensed text-sm font-bold uppercase tracking-wider border transition ${
+                  isAdminRoute
+                    ? "border-white/10 hover:bg-white/5 text-white/80"
+                    : "border-stone-300 hover:bg-stone-100 text-stone-700"
+                }`}
+              >
+                <RotateCcw size={16} />
+                <span>Reset</span>
               </button>
             </div>
           </form>
+        )}
 
-          {/* Security Info Card */}
-          <div className={`rounded-3xl p-6 space-y-4 ${cardBg} h-fit`}>
-            <div className="flex items-center gap-2.5 text-emerald-600 font-bold text-sm">
-              <Shield size={18} />
-              Tips Keamanan Akun
-            </div>
-            <p className={`text-xs leading-relaxed ${subText}`}>
-              Untuk melindungi transaksi dan informasi pribadi Anda, ikuti panduan berikut:
-            </p>
-            <ul className={`space-y-2.5 text-xs ${subText}`}>
-              <li className="flex items-start gap-2">
-                <CheckCircle2 size={14} className="text-emerald-500 shrink-0 mt-0.5" />
-                <span>Gunakan minimal 6 karakter kombinasi huruf dan angka.</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <CheckCircle2 size={14} className="text-emerald-500 shrink-0 mt-0.5" />
-                <span>Jangan gunakan tanggal lahir atau kata sandi yang sama dengan email lain.</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <CheckCircle2 size={14} className="text-emerald-500 shrink-0 mt-0.5" />
-                <span>Kata sandi disimpan terenkripsi dengan algoritma BCrypt berstandar enterprise.</span>
-              </li>
-            </ul>
-          </div>
-        </div>
-      )}
-
-      {/* Tab 3: Ringkasan Aktivitas & Transaksi Cepat */}
-      {activeTab === "activity" && (
-        <div className="space-y-6">
-          {user.role === "customer" && (
-            <div className={`rounded-3xl p-6 sm:p-8 ${cardBg}`}>
-              <div className="flex items-center justify-between border-b border-slate-100 dark:border-white/10 pb-4 mb-6">
-                <div>
-                  <h2 className={`text-xl font-bold tracking-tight ${headingText}`}>
-                    Pesanan Terbaru Anda
-                  </h2>
-                  <p className={`text-sm mt-1 ${subText}`}>
-                    Pantau status belanja dan pengiriman jersey RegarSport Anda secara langsung.
-                  </p>
-                </div>
-                <Link
-                  to="/dashboard/my-orders"
-                  className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold text-emerald-600 hover:text-emerald-700 transition"
-                >
-                  <span>Lihat Semua Pesanan</span>
-                  <ArrowRight size={15} />
-                </Link>
+        {/* Tab 2: Keamanan Akun & Sandi */}
+        {activeTab === "security" && (
+          <div className="grid gap-6 lg:grid-cols-3">
+            <form
+              onSubmit={handleChangePassword}
+              className={`lg:col-span-2 rounded-3xl p-6 sm:p-8 ${cardBg}`}
+            >
+              <div className="border-b border-stone-200/80 dark:border-white/10 pb-4 mb-6">
+                <h2 className="font-condensed text-xl font-bold uppercase tracking-wide">
+                  Perbarui Kata Sandi Akun
+                </h2>
+                <p className={`text-xs mt-1 ${subText}`}>
+                  Gunakan kombinasi kata sandi yang kuat untuk menjaga keamanan data pesanan Anda.
+                </p>
               </div>
 
-              {roleStats.recentOrders.length === 0 ? (
-                <div className="text-center py-10 space-y-3">
-                  <ShoppingBag size={40} className="mx-auto text-slate-300 dark:text-white/20" />
-                  <p className={`text-sm font-medium ${subText}`}>
-                    Anda belum memiliki riwayat pesanan.
-                  </p>
-                  <Link
-                    to="/dashboard"
-                    className="inline-flex items-center gap-2 rounded-2xl bg-emerald-600 px-5 py-2.5 text-xs font-bold text-white shadow-md hover:bg-emerald-700 transition"
-                  >
-                    <span>Mulai Belanja Produk Olahraga</span>
-                  </Link>
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  {roleStats.recentOrders.map((order) => (
-                    <div
-                      key={order.id}
-                      className={`flex flex-col sm:flex-row sm:items-center justify-between p-4 rounded-2xl border transition ${
-                        isAdminRoute
-                          ? "border-white/10 bg-white/5 hover:bg-white/10"
-                          : "border-slate-100 bg-slate-50/50 hover:bg-slate-50"
-                      }`}
+              <div className="space-y-4">
+                {/* Kata Sandi Saat Ini */}
+                <div>
+                  <label className="block font-mono text-[11px] font-bold uppercase tracking-wider text-stone-700 dark:text-white/80 mb-1.5 flex items-center gap-1.5">
+                    <Lock size={13} className="text-emerald-500" />
+                    Kata Sandi Saat Ini <span className="text-rose-500">*</span>
+                  </label>
+                  <div className="relative">
+                    <input
+                      type={showCurrentPassword ? "text" : "password"}
+                      value={passwordForm.currentPassword}
+                      onChange={(e) =>
+                        setPasswordForm({ ...passwordForm, currentPassword: e.target.value })
+                      }
+                      placeholder="Masukkan kata sandi lama Anda"
+                      className={`w-full rounded-xl px-4 py-3 pr-12 text-sm transition outline-none ${inputBg}`}
+                      required
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600 dark:hover:text-white"
                     >
-                      <div className="space-y-1">
-                        <div className="flex items-center gap-2">
-                          <span className="font-mono font-bold text-xs text-emerald-600">
-                            #{order.orderNumber || order.order_number || `ORD-${order.id}`}
-                          </span>
-                          <span
-                            className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                              order.status === "COMPLETED"
-                                ? "bg-emerald-100 text-emerald-800"
-                                : order.status === "SHIPPED"
-                                ? "bg-blue-100 text-blue-800"
-                                : order.status === "PAID"
-                                ? "bg-purple-100 text-purple-800"
-                                : "bg-amber-100 text-amber-800"
-                            }`}
-                          >
-                            {order.status}
-                          </span>
-                        </div>
-                        <div className={`text-xs ${subText}`}>
-                          {new Date(order.createdAt || order.created_at).toLocaleDateString("id-ID", {
-                            day: "numeric",
-                            month: "short",
-                            year: "numeric",
-                          })}
-                        </div>
+                      {showCurrentPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                    </button>
+                  </div>
+                </div>
+
+                {/* Kata Sandi Baru */}
+                <div>
+                  <label className="block font-mono text-[11px] font-bold uppercase tracking-wider text-stone-700 dark:text-white/80 mb-1.5 flex items-center gap-1.5">
+                    <KeyRound size={13} className="text-emerald-500" />
+                    Kata Sandi Baru <span className="text-rose-500">*</span>
+                  </label>
+                  <div className="relative">
+                    <input
+                      type={showNewPassword ? "text" : "password"}
+                      value={passwordForm.newPassword}
+                      onChange={(e) =>
+                        setPasswordForm({ ...passwordForm, newPassword: e.target.value })
+                      }
+                      placeholder="Minimal 6 karakter kombinasi"
+                      className={`w-full rounded-xl px-4 py-3 pr-12 text-sm transition outline-none ${inputBg}`}
+                      required
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowNewPassword(!showNewPassword)}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600 dark:hover:text-white"
+                    >
+                      {showNewPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                    </button>
+                  </div>
+
+                  {/* Password Strength Meter */}
+                  {passwordForm.newPassword && (
+                    <div className="mt-2.5 space-y-1.5">
+                      <div className="flex items-center justify-between text-[11px]">
+                        <span className={subText}>Kekuatan Sandi:</span>
+                        <span className="font-bold text-stone-800 dark:text-white">{strength.text}</span>
                       </div>
-
-                      <div className="mt-3 sm:mt-0 flex items-center justify-between sm:gap-6">
-                        <div className="text-right">
-                          <div className={`text-sm font-black ${headingText}`}>
-                            Rp {Number(order.totalAmount || 0).toLocaleString("id-ID")}
-                          </div>
-                          <div className={`text-[11px] ${subText}`}>
-                            {order.items?.length || 1} Item
-                          </div>
-                        </div>
-
-                        <Link
-                          to={`/dashboard/orders/${order.id}`}
-                          className="flex items-center gap-1 text-xs font-bold text-emerald-600 hover:text-emerald-700 bg-white dark:bg-white/10 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-white/10 transition shadow-xs"
-                        >
-                          <span>Detail</span>
-                          <ExternalLink size={12} />
-                        </Link>
+                      <div className="h-1.5 w-full rounded-full bg-stone-200 dark:bg-white/10 overflow-hidden">
+                        <div
+                          className={`h-full transition-all duration-300 ${strength.color}`}
+                          style={{ width: `${(strength.score / 4) * 100}%` }}
+                        />
                       </div>
                     </div>
-                  ))}
+                  )}
                 </div>
-              )}
-            </div>
-          )}
 
-          {user.role === "logistics" && (
-            <div className={`rounded-3xl p-6 sm:p-8 ${cardBg} space-y-6`}>
-              <div>
-                <h2 className={`text-xl font-bold tracking-tight ${headingText}`}>
-                  Pusat Operasional Logistik Gudang
-                </h2>
-                <p className={`text-sm mt-1 ${subText}`}>
-                  Fasilitas pemenuhan pesanan, cetak massal label thermal, dan scanner barcode resi kurir.
-                </p>
+                {/* Konfirmasi Kata Sandi Baru */}
+                <div>
+                  <label className="block font-mono text-[11px] font-bold uppercase tracking-wider text-stone-700 dark:text-white/80 mb-1.5 flex items-center gap-1.5">
+                    <ShieldCheck size={13} className="text-emerald-500" />
+                    Konfirmasi Kata Sandi Baru <span className="text-rose-500">*</span>
+                  </label>
+                  <div className="relative">
+                    <input
+                      type={showConfirmPassword ? "text" : "password"}
+                      value={passwordForm.confirmPassword}
+                      onChange={(e) =>
+                        setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })
+                      }
+                      placeholder="Ulangi kata sandi baru"
+                      className={`w-full rounded-xl px-4 py-3 pr-12 text-sm transition outline-none ${inputBg}`}
+                      required
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600 dark:hover:text-white"
+                    >
+                      {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                    </button>
+                  </div>
+
+                  {/* Match indicator */}
+                  {passwordForm.confirmPassword && (
+                    <p
+                      className={`text-[11px] mt-1.5 flex items-center gap-1 font-semibold ${
+                        passwordForm.newPassword === passwordForm.confirmPassword
+                          ? "text-emerald-600"
+                          : "text-rose-500"
+                      }`}
+                    >
+                      {passwordForm.newPassword === passwordForm.confirmPassword ? (
+                        <>
+                          <Check size={13} />
+                          Kata sandi baru cocok
+                        </>
+                      ) : (
+                        <>
+                          <AlertCircle size={13} />
+                          Konfirmasi kata sandi belum sama
+                        </>
+                      )}
+                    </p>
+                  )}
+                </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className={`rounded-2xl p-5 border ${isAdminRoute ? "border-white/10 bg-white/5" : "border-purple-100 bg-purple-50/40"}`}>
-                  <div className="flex items-center gap-2 text-purple-600 font-bold text-sm mb-2">
-                    <Package size={18} />
-                    Antrean Kemas (Paid)
+              <div className="mt-8 pt-6 border-t border-stone-200/80 dark:border-white/10">
+                <button
+                  type="submit"
+                  disabled={changingPassword}
+                  className={`inline-flex items-center gap-2 rounded-xl px-6 py-3 font-condensed text-sm font-bold uppercase tracking-wider text-white shadow-lg transition transform hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-50 disabled:cursor-not-allowed ${
+                    isAdminRoute
+                      ? "bg-[#00BFA5] hover:bg-[#00A892] text-stone-950 shadow-[#00BFA5]/20"
+                      : "bg-[#162018] hover:bg-stone-900 shadow-stone-900/20"
+                  }`}
+                >
+                  <Lock size={16} />
+                  <span>{changingPassword ? "Menyimpan Sandi..." : "Perbarui Kata Sandi Sekarang"}</span>
+                </button>
+              </div>
+            </form>
+
+            {/* Security Info Card */}
+            <div className={`rounded-3xl p-6 space-y-4 ${cardBg} h-fit`}>
+              <div className="flex items-center gap-2 font-condensed text-base font-bold uppercase tracking-wide text-emerald-600">
+                <Shield size={18} />
+                Protokol Keamanan Akun
+              </div>
+              <p className={`text-xs leading-relaxed ${subText}`}>
+                Untuk melindungi transaksi dan privasi belanja Anda, patuhi standar berikut:
+              </p>
+              <ul className={`space-y-2.5 text-xs ${subText}`}>
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 size={14} className="text-emerald-500 shrink-0 mt-0.5" />
+                  <span>Minimal 6 karakter kombinasi huruf besar, huruf kecil, dan angka.</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 size={14} className="text-emerald-500 shrink-0 mt-0.5" />
+                  <span>Jangan gunakan kata sandi yang sama dengan akun media sosial Anda.</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 size={14} className="text-emerald-500 shrink-0 mt-0.5" />
+                  <span>Kata sandi diamankan menggunakan hashing terenkripsi BCrypt standar perbankan.</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        )}
+
+        {/* Tab 3: Ringkasan Aktivitas & Transaksi Cepat */}
+        {activeTab === "activity" && (
+          <div className="space-y-6">
+            {user.role === "customer" && (
+              <div className={`rounded-3xl p-6 sm:p-8 ${cardBg}`}>
+                <div className="flex items-center justify-between border-b border-stone-200/80 dark:border-white/10 pb-4 mb-6">
+                  <div>
+                    <h2 className="font-condensed text-xl font-bold uppercase tracking-wide">
+                      Pesanan Terbaru Anda
+                    </h2>
+                    <p className={`text-xs mt-1 ${subText}`}>
+                      Pantau proses manufaktur dan ekspedisi jersey RegarSport Anda langsung dari Atelier Bandung.
+                    </p>
                   </div>
-                  <p className={`text-xs mb-4 ${subText}`}>
-                    Terdapat {roleStats.warehousePending} pesanan yang telah dibayar dan siap dikemas oleh staf gudang.
-                  </p>
                   <Link
-                    to="/admin/orders"
-                    className="inline-flex items-center gap-2 text-xs font-bold text-white bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-xl transition shadow-sm"
+                    to="/dashboard/my-orders"
+                    className="inline-flex items-center gap-1 font-condensed text-xs sm:text-sm font-bold uppercase tracking-wider text-[#B9382B] hover:text-[#9E2D22] transition"
                   >
-                    <span>Buka Antrean Gudang</span>
+                    <span>Lihat Semua Pesanan</span>
                     <ArrowRight size={14} />
                   </Link>
                 </div>
 
-                <div className={`rounded-2xl p-5 border ${isAdminRoute ? "border-white/10 bg-white/5" : "border-slate-100 bg-slate-50"}`}>
-                  <div className="flex items-center gap-2 text-blue-600 font-bold text-sm mb-2">
-                    <Truck size={18} />
-                    Pengiriman Berjalan
+                {roleStats.recentOrders.length === 0 ? (
+                  <div className="text-center py-12 space-y-3">
+                    <ShoppingBag size={40} className="mx-auto text-stone-300 dark:text-white/20" />
+                    <p className={`text-sm font-medium ${subText}`}>
+                      Anda belum memiliki riwayat pesanan.
+                    </p>
+                    <Link
+                      to="/dashboard"
+                      className="inline-flex items-center gap-2 rounded-xl bg-[#162018] px-5 py-2.5 font-condensed text-xs font-bold uppercase tracking-wider text-white shadow-md hover:bg-stone-900 transition"
+                    >
+                      <span>Mulai Belanja Produk Olahraga</span>
+                    </Link>
                   </div>
-                  <p className={`text-xs mb-4 ${subText}`}>
-                    Terdapat {roleStats.warehouseShipped} pesanan yang saat ini dalam perjalanan bersama kurir logistik.
+                ) : (
+                  <div className="space-y-3">
+                    {roleStats.recentOrders.map((order) => (
+                      <div
+                        key={order.id}
+                        className={`flex flex-col sm:flex-row sm:items-center justify-between p-4 rounded-2xl border transition ${
+                          isAdminRoute
+                            ? "border-white/10 bg-white/5 hover:bg-white/10"
+                            : "border-stone-200/80 bg-[#FAF8F4] hover:bg-stone-100"
+                        }`}
+                      >
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-2">
+                            <span className="font-mono font-bold text-xs text-[#162018] dark:text-emerald-400">
+                              #{order.orderNumber || order.order_number || `ORD-${order.id}`}
+                            </span>
+                            <span
+                              className={`px-2 py-0.5 rounded-full font-mono text-[10px] font-bold ${
+                                order.status === "COMPLETED"
+                                  ? "bg-emerald-100 text-emerald-800"
+                                  : order.status === "SHIPPED"
+                                  ? "bg-blue-100 text-blue-800"
+                                  : order.status === "PAID"
+                                  ? "bg-purple-100 text-purple-800"
+                                  : "bg-amber-100 text-amber-800"
+                              }`}
+                            >
+                              {order.status}
+                            </span>
+                          </div>
+                          <div className={`text-xs ${subText}`}>
+                            {new Date(order.createdAt || order.created_at).toLocaleDateString("id-ID", {
+                              day: "numeric",
+                              month: "short",
+                              year: "numeric",
+                            })}
+                          </div>
+                        </div>
+
+                        <div className="mt-3 sm:mt-0 flex items-center justify-between sm:gap-6">
+                          <div className="text-right">
+                            <div className="font-condensed text-base font-black text-stone-900 dark:text-white">
+                              Rp {Number(order.totalAmount || 0).toLocaleString("id-ID")}
+                            </div>
+                            <div className={`font-mono text-[11px] ${subText}`}>
+                              {order.items?.length || 1} Item Produk
+                            </div>
+                          </div>
+
+                          <Link
+                            to={`/dashboard/orders/${order.id}`}
+                            className="inline-flex items-center gap-1.5 font-condensed text-xs font-bold uppercase tracking-wider text-stone-800 dark:text-white bg-white dark:bg-white/10 px-3.5 py-2 rounded-xl border border-stone-200 dark:border-white/10 transition shadow-xs hover:border-stone-400"
+                          >
+                            <span>Detail</span>
+                            <ExternalLink size={12} />
+                          </Link>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {user.role === "logistics" && (
+              <div className={`rounded-3xl p-6 sm:p-8 ${cardBg} space-y-6`}>
+                <div>
+                  <h2 className="font-condensed text-xl font-bold uppercase tracking-wide">
+                    Pusat Operasional Logistik Gudang
+                  </h2>
+                  <p className={`text-xs mt-1 ${subText}`}>
+                    Fasilitas pemenuhan pesanan, cetak massal label thermal, dan scanner barcode resi kurir.
                   </p>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className={`rounded-2xl p-5 border ${isAdminRoute ? "border-white/10 bg-white/5" : "border-purple-200 bg-purple-50/50"}`}>
+                    <div className="flex items-center gap-2 text-purple-700 font-bold text-sm mb-2">
+                      <Package size={18} />
+                      Antrean Kemas (Paid)
+                    </div>
+                    <p className={`text-xs mb-4 ${subText}`}>
+                      Terdapat {roleStats.warehousePending} pesanan yang telah dibayar dan siap dikemas oleh tim gudang.
+                    </p>
+                    <Link
+                      to="/admin/orders"
+                      className="inline-flex items-center gap-2 font-condensed text-xs font-bold uppercase tracking-wider text-white bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-xl transition shadow-xs"
+                    >
+                      <span>Buka Antrean Gudang</span>
+                      <ArrowRight size={14} />
+                    </Link>
+                  </div>
+
+                  <div className={`rounded-2xl p-5 border ${isAdminRoute ? "border-white/10 bg-white/5" : "border-stone-200 bg-stone-50"}`}>
+                    <div className="flex items-center gap-2 text-blue-600 font-bold text-sm mb-2">
+                      <Truck size={18} />
+                      Pengiriman Berjalan
+                    </div>
+                    <p className={`text-xs mb-4 ${subText}`}>
+                      Terdapat {roleStats.warehouseShipped} pesanan yang saat ini dalam perjalanan bersama kurir logistik.
+                    </p>
+                    <Link
+                      to="/admin/orders"
+                      className="inline-flex items-center gap-2 font-condensed text-xs font-bold uppercase tracking-wider text-stone-800 dark:text-white bg-stone-200 dark:bg-white/10 hover:bg-stone-300 px-4 py-2 rounded-xl transition"
+                    >
+                      <span>Lacak Pengiriman</span>
+                      <ArrowRight size={14} />
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {user.role === "admin" && (
+              <div className={`rounded-3xl p-6 sm:p-8 ${cardBg} space-y-6`}>
+                <div>
+                  <h2 className="font-condensed text-xl font-bold uppercase tracking-wide">
+                    Pintasan Cepat Manajemen Toko
+                  </h2>
+                  <p className={`text-xs mt-1 ${subText}`}>
+                    Akses langsung ke modul inti pengelolaan e-commerce RegarSport.
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                  <Link
+                    to="/admin"
+                    className={`flex flex-col items-center justify-center p-5 rounded-2xl border text-center transition hover:-translate-y-1 ${
+                      isAdminRoute ? "border-white/10 bg-white/5 hover:bg-white/10" : "border-stone-200 bg-[#FAF8F4] hover:bg-stone-100"
+                    }`}
+                  >
+                    <Sparkles size={24} className="text-teal-400 mb-2" />
+                    <span className="font-condensed text-xs font-bold uppercase tracking-wider">Dashboard Omzet</span>
+                  </Link>
+
+                  <Link
+                    to="/admin/products"
+                    className={`flex flex-col items-center justify-center p-5 rounded-2xl border text-center transition hover:-translate-y-1 ${
+                      isAdminRoute ? "border-white/10 bg-white/5 hover:bg-white/10" : "border-stone-200 bg-[#FAF8F4] hover:bg-stone-100"
+                    }`}
+                  >
+                    <ShoppingBag size={24} className="text-emerald-500 mb-2" />
+                    <span className="font-condensed text-xs font-bold uppercase tracking-wider">Kelola Katalog</span>
+                  </Link>
+
                   <Link
                     to="/admin/orders"
-                    className="inline-flex items-center gap-2 text-xs font-bold text-slate-800 dark:text-white bg-slate-200 dark:bg-white/10 hover:bg-slate-300 px-4 py-2 rounded-xl transition"
+                    className={`flex flex-col items-center justify-center p-5 rounded-2xl border text-center transition hover:-translate-y-1 ${
+                      isAdminRoute ? "border-white/10 bg-white/5 hover:bg-white/10" : "border-stone-200 bg-[#FAF8F4] hover:bg-stone-100"
+                    }`}
                   >
-                    <span>Lacak Pengiriman</span>
-                    <ArrowRight size={14} />
+                    <Package size={24} className="text-purple-500 mb-2" />
+                    <span className="font-condensed text-xs font-bold uppercase tracking-wider">Semua Pesanan</span>
+                  </Link>
+
+                  <Link
+                    to="/admin/users"
+                    className={`flex flex-col items-center justify-center p-5 rounded-2xl border text-center transition hover:-translate-y-1 ${
+                      isAdminRoute ? "border-white/10 bg-white/5 hover:bg-white/10" : "border-stone-200 bg-[#FAF8F4] hover:bg-stone-100"
+                    }`}
+                  >
+                    <User size={24} className="text-blue-500 mb-2" />
+                    <span className="font-condensed text-xs font-bold uppercase tracking-wider">Daftar Pengguna</span>
                   </Link>
                 </div>
               </div>
-            </div>
-          )}
-
-          {user.role === "admin" && (
-            <div className={`rounded-3xl p-6 sm:p-8 ${cardBg} space-y-6`}>
-              <div>
-                <h2 className={`text-xl font-bold tracking-tight ${headingText}`}>
-                  Pintasan Cepat Manajemen Toko
-                </h2>
-                <p className={`text-sm mt-1 ${subText}`}>
-                  Akses langsung ke modul inti pengelolaan e-commerce RegarSport.
-                </p>
-              </div>
-
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                <Link
-                  to="/admin"
-                  className={`flex flex-col items-center justify-center p-5 rounded-2xl border text-center transition hover:-translate-y-1 ${
-                    isAdminRoute ? "border-white/10 bg-white/5 hover:bg-white/10" : "border-slate-100 bg-slate-50 hover:bg-slate-100"
-                  }`}
-                >
-                  <Sparkles size={24} className="text-teal-400 mb-2" />
-                  <span className="text-xs font-bold">Dashboard Omzet</span>
-                </Link>
-
-                <Link
-                  to="/admin/products"
-                  className={`flex flex-col items-center justify-center p-5 rounded-2xl border text-center transition hover:-translate-y-1 ${
-                    isAdminRoute ? "border-white/10 bg-white/5 hover:bg-white/10" : "border-slate-100 bg-slate-50 hover:bg-slate-100"
-                  }`}
-                >
-                  <ShoppingBag size={24} className="text-emerald-500 mb-2" />
-                  <span className="text-xs font-bold">Kelola Katalog</span>
-                </Link>
-
-                <Link
-                  to="/admin/orders"
-                  className={`flex flex-col items-center justify-center p-5 rounded-2xl border text-center transition hover:-translate-y-1 ${
-                    isAdminRoute ? "border-white/10 bg-white/5 hover:bg-white/10" : "border-slate-100 bg-slate-50 hover:bg-slate-100"
-                  }`}
-                >
-                  <Package size={24} className="text-purple-500 mb-2" />
-                  <span className="text-xs font-bold">Semua Pesanan</span>
-                </Link>
-
-                <Link
-                  to="/admin/users"
-                  className={`flex flex-col items-center justify-center p-5 rounded-2xl border text-center transition hover:-translate-y-1 ${
-                    isAdminRoute ? "border-white/10 bg-white/5 hover:bg-white/10" : "border-slate-100 bg-slate-50 hover:bg-slate-100"
-                  }`}
-                >
-                  <User size={24} className="text-blue-500 mb-2" />
-                  <span className="text-xs font-bold">Daftar Pengguna</span>
-                </Link>
-              </div>
-            </div>
-          )}
-        </div>
-      )}
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

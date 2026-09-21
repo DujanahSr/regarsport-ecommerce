@@ -204,278 +204,292 @@ export default function MyOrders() {
   };
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-12">
-      {/* Header */}
-      <div className="mb-6 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-        <div>
-          <h1 className="text-3xl font-black tracking-tight text-slate-900 sm:text-4xl">
-            Pesanan Saya
-          </h1>
-          <p className="mt-1.5 text-sm text-slate-500">
-            Kelola, pantau proses produksi/pengiriman, dan pesan ulang jersey favorit Anda.
-          </p>
-        </div>
+    <div className="bg-[#FAF8F4] min-h-screen text-[#111613] font-sans-body py-8 sm:py-12 animate-fade-in">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6">
 
-        {/* Search Input */}
-        <div className="relative w-full md:w-72">
-          <Search
-            size={16}
-            className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"
-          />
-          <input
-            type="text"
-            placeholder="Cari no. pesanan..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full rounded-2xl border border-slate-200 bg-white py-2.5 pl-10 pr-4 text-xs font-medium text-slate-800 placeholder-slate-400 shadow-xs outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
-          />
-        </div>
-      </div>
-
-      {/* Horizontal Status Filter Tabs */}
-      <div className="mb-6 flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
-        {STATUS_TABS.map((tab) => {
-          const count = countForStatus(tab.id);
-          const isActive = statusFilter === tab.id;
-          const TabIcon = tab.icon;
-
-          return (
-            <button
-              key={tab.id}
-              type="button"
-              onClick={() => {
-                setStatusFilter(tab.id);
-                setPage(1);
-              }}
-              className={`flex shrink-0 items-center gap-2 whitespace-nowrap rounded-2xl px-4 py-2.5 text-xs font-bold transition cursor-pointer ${
-                isActive
-                  ? "bg-emerald-950 text-white shadow-md shadow-emerald-950/20"
-                  : "bg-white text-slate-600 border border-slate-200 hover:border-emerald-300 hover:text-emerald-700"
-              }`}
-            >
-              <TabIcon size={14} className={isActive ? "text-emerald-400" : "text-slate-400"} />
-              <span>{tab.label}</span>
-              {count > 0 && (
-                <span
-                  className={`rounded-full px-1.5 py-0.5 text-[10px] font-black ${
-                    isActive
-                      ? "bg-emerald-500/30 text-emerald-200"
-                      : "bg-slate-100 text-slate-600"
-                  }`}
-                >
-                  {count}
-                </span>
-              )}
-            </button>
-          );
-        })}
-      </div>
-
-      {loading ? (
-        <CardSkeletonList count={3} />
-      ) : filteredOrders.length === 0 ? (
-        <EmptyState
-          title={searchQuery ? "Pesanan tidak ditemukan" : "Belum ada pesanan"}
-          description={
-            searchQuery
-              ? `Tidak ada pesanan yang sesuai dengan kata kunci "${searchQuery}".`
-              : "Pesanan yang Anda buat akan muncul di sini."
-          }
-          action={
+        {/* Top Header & Breadcrumb */}
+        <div className="mb-8">
+          <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
             <Link
               to="/dashboard"
-              className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-emerald-600/20 transition hover:-translate-y-0.5 hover:bg-emerald-700 hover:shadow-emerald-600/30"
+              className="inline-flex items-center gap-1.5 rounded-full bg-white px-3.5 py-1.5 text-xs font-mono font-bold text-slate-700 border border-[#162018]/15 hover:border-[#162018] hover:text-[#162018] transition shadow-2xs group"
             >
-              <ShoppingBag size={18} />
-              Belanja Sekarang
+              <ChevronLeft size={14} className="transition-transform group-hover:-translate-x-0.5" />
+              <span>Kembali ke Katalog Toko</span>
             </Link>
-          }
-        />
-      ) : (
-        <>
-          <div className="space-y-4">
-            {filteredOrders.map((order) => {
-              const isPending =
-                (order.status || "").toUpperCase() === "PENDING";
-              const isCompleted =
-                (order.status || "").toUpperCase() === "COMPLETED";
-              const isPaid =
-                (order.status || "").toUpperCase() === "PAID";
-              const createdAtDate = new Date(
-                order.createdAt || order.created_at
-              );
-              const isExpired =
-                isPending &&
-                !isNaN(createdAtDate.getTime()) &&
-                Date.now() - createdAtDate.getTime() > 24 * 60 * 60 * 1000;
-              const isReordering = reorderingId === order.id;
 
-              return (
-                <div
-                  key={order.id}
-                  className="rounded-2xl border border-slate-100 bg-white p-5 shadow-xs ring-1 ring-slate-900/5 transition hover:-translate-y-0.5 hover:shadow-md sm:p-6"
-                >
-                  <div className="flex flex-wrap items-center justify-between gap-3">
-                    <div>
-                      <h2 className="flex items-center gap-2 font-bold text-slate-900 text-base">
-                        <Package size={17} className="text-emerald-600" />
-                        {order.orderNumber || `Order #${order.id}`}
-                      </h2>
-                      {order.createdAt || order.created_at ? (
-                        <p className="mt-1 flex items-center gap-1.5 text-xs text-slate-400">
-                          <Calendar size={13} />
-                          {new Date(
-                            order.createdAt || order.created_at
-                          ).toLocaleString("id-ID")}
-                        </p>
-                      ) : null}
-                    </div>
-
-                    <span
-                      className={`rounded-full px-3 py-1 text-xs font-bold uppercase tracking-wider ${
-                        isExpired
-                          ? "bg-rose-50 text-rose-700 border border-rose-200"
-                          : getStatusColor(order.status)
-                      }`}
-                    >
-                      {isExpired ? "KEDALUWARSA" : order.status}
-                    </span>
-                  </div>
-
-                  <div className="mt-4 border-t border-slate-100 pt-4">
-                    <p className="text-slate-600 text-sm">
-                      Total Tagihan:{" "}
-                      <span className="ml-1 font-extrabold text-emerald-600 text-base">
-                        Rp{" "}
-                        {Number(
-                          order.totalAmount || order.total_amount
-                        ).toLocaleString("id-ID")}
-                      </span>
-                    </p>
-
-                    <p className="mt-1.5 flex items-start gap-1.5 text-xs text-slate-500">
-                      <MapPin
-                        size={14}
-                        className="mt-0.5 shrink-0 text-slate-400"
-                      />
-                      {order.shippingAddress || order.shipping_address}
-                    </p>
-
-                    <div className="mt-5 flex flex-wrap items-center gap-2.5">
-                      {/* Lihat Detail */}
-                      <Link
-                        to={`/dashboard/orders/${order.id}`}
-                        className={`inline-flex items-center gap-1.5 rounded-xl px-4 py-2.5 text-xs font-bold transition ${
-                          isPending
-                            ? "border border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
-                            : "bg-emerald-600 text-white shadow-xs shadow-emerald-600/20 hover:bg-emerald-700"
-                        }`}
-                      >
-                        <Eye size={14} />
-                        <span>Lihat Detail</span>
-                      </Link>
-
-                      {/* Bayar Sekarang (jika PENDING) */}
-                      {isPending && !isExpired && (
-                        <button
-                          type="button"
-                          onClick={() => setPayingOrder(order)}
-                          className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-600 px-4 py-2.5 text-xs font-bold text-white shadow-xs shadow-emerald-600/20 transition hover:-translate-y-0.5 hover:bg-emerald-700 cursor-pointer"
-                        >
-                          <CreditCard size={14} />
-                          <span>Bayar Sekarang</span>
-                        </button>
-                      )}
-
-                      {/* Beli Lagi (Reorder) untuk status Completed / Paid */}
-                      {(isCompleted || isPaid) && (
-                        <button
-                          type="button"
-                          onClick={() => handleReorder(order)}
-                          disabled={isReordering}
-                          className="inline-flex items-center gap-1.5 rounded-xl border border-emerald-200 bg-emerald-50 px-3.5 py-2.5 text-xs font-bold text-emerald-800 transition hover:bg-emerald-100 hover:border-emerald-300 disabled:opacity-50 cursor-pointer"
-                          title="Masukkan produk pesanan ini kembali ke keranjang"
-                        >
-                          <RotateCcw size={13} className={isReordering ? "animate-spin" : ""} />
-                          <span>{isReordering ? "Memasukkan..." : "Beli Lagi"}</span>
-                        </button>
-                      )}
-
-                      {/* Bantuan CS WhatsApp */}
-                      <button
-                        type="button"
-                        onClick={() => handleContactCS(order)}
-                        className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs font-semibold text-slate-700 transition hover:border-emerald-200 hover:bg-emerald-50/50 hover:text-emerald-700 cursor-pointer"
-                        title="Tanya Admin CS perihal pesanan ini via WhatsApp"
-                      >
-                        <MessageCircle size={14} className="text-emerald-600" />
-                        <span>Tanya CS</span>
-                      </button>
-
-                      {/* Pesan Ulang jika kedaluwarsa */}
-                      {isExpired && (
-                        <div className="flex flex-wrap items-center gap-2">
-                          <span className="text-xs text-rose-600 bg-rose-50 border border-rose-200/80 px-3 py-1.5 rounded-xl font-medium">
-                            Batas Bayar 24 Jam Berakhir
-                          </span>
-                          <Link
-                            to="/dashboard"
-                            className="inline-flex items-center gap-1.5 rounded-xl bg-slate-800 hover:bg-slate-900 px-3.5 py-1.5 text-xs font-semibold text-white transition shadow-xs"
-                          >
-                            <RotateCcw size={13} />
-                            <span>Pesan Ulang</span>
-                          </Link>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-[#162018] px-3.5 py-1 text-[11px] font-bold tracking-wider text-emerald-400 uppercase font-mono shadow-xs">
+              <Sparkles size={12} className="text-amber-400" />
+              Atelier Cicendo Bandung // Production Tracker
+            </span>
           </div>
 
-          {totalPages > 1 && (
-            <div className="mt-8 flex items-center justify-center gap-3">
-              <button
-                type="button"
-                onClick={() => setPage((p) => Math.max(p - 1, 1))}
-                disabled={page === 1}
-                className="flex items-center gap-1 rounded-xl border border-slate-200 px-4 py-2 text-sm font-medium text-slate-600 transition hover:border-emerald-200 hover:bg-emerald-50 hover:text-emerald-700 disabled:cursor-not-allowed disabled:opacity-40"
-              >
-                <ChevronLeft size={16} />
-                Sebelumnya
-              </button>
-
-              <span className="text-sm text-slate-500">
-                Halaman {page} dari {totalPages}
-              </span>
-
-              <button
-                type="button"
-                onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
-                disabled={page === totalPages}
-                className="flex items-center gap-1 rounded-xl border border-slate-200 px-4 py-2 text-sm font-medium text-slate-600 transition hover:border-emerald-200 hover:bg-emerald-50 hover:text-emerald-700 disabled:cursor-not-allowed disabled:opacity-40"
-              >
-                Berikutnya
-                <ChevronRight size={16} />
-              </button>
+          <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between border-b border-[#162018]/10 pb-5">
+            <div>
+              <h1 className="font-condensed text-3xl sm:text-4xl font-black uppercase tracking-tight text-[#162018]">
+                Pesanan Saya &amp; Pelacakan Produksi
+              </h1>
+              <p className="mt-1 text-xs sm:text-sm text-slate-500">
+                Pantau antrean sublimasi, proses jahit, resi ekspedisi, dan riwayat pesanan tim Anda secara real-time.
+              </p>
             </div>
-          )}
-        </>
-      )}
 
-      {/* Midtrans Modal directly from order history */}
-      {payingOrder && (
-        <MidtransModal
-          isOpen={Boolean(payingOrder)}
-          onClose={() => setPayingOrder(null)}
-          order={payingOrder}
-          onSuccess={() => {
-            setPayingOrder(null);
-            getOrders();
-          }}
-        />
-      )}
+            {/* Search Input */}
+            <div className="relative w-full md:w-80">
+              <Search
+                size={15}
+                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"
+              />
+              <input
+                type="text"
+                placeholder="Cari ID pesanan / alamat..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full rounded-xl border border-[#162018]/15 bg-white py-2.5 pl-10 pr-4 text-xs font-mono font-bold text-slate-900 placeholder-slate-400 shadow-2xs outline-none transition focus:border-[#162018] focus:ring-1 focus:ring-[#162018]"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Horizontal Status Filter Tabs */}
+        <div className="mb-6 flex items-center gap-2 overflow-x-auto pb-2 no-scrollbar">
+          {STATUS_TABS.map((tab) => {
+            const count = countForStatus(tab.id);
+            const isActive = statusFilter === tab.id;
+            const TabIcon = tab.icon;
+
+            return (
+              <button
+                key={tab.id}
+                type="button"
+                onClick={() => {
+                  setStatusFilter(tab.id);
+                  setPage(1);
+                }}
+                className={`flex shrink-0 items-center gap-2 whitespace-nowrap rounded-xl px-4 py-2.5 text-xs font-mono font-bold uppercase tracking-wider transition cursor-pointer ${
+                  isActive
+                    ? "bg-[#162018] text-amber-300 shadow-sm ring-1 ring-[#162018]"
+                    : "bg-white text-slate-600 border border-[#162018]/15 hover:border-[#162018] hover:text-[#162018]"
+                }`}
+              >
+                <TabIcon size={13} className={isActive ? "text-amber-400" : "text-slate-400"} />
+                <span>{tab.label}</span>
+                {count > 0 && (
+                  <span
+                    className={`rounded-full px-1.5 py-0.2 text-[10px] font-black ${
+                      isActive
+                        ? "bg-white/20 text-white"
+                        : "bg-slate-100 text-slate-700"
+                    }`}
+                  >
+                    {count}
+                  </span>
+                )}
+              </button>
+            );
+          })}
+        </div>
+
+        {loading ? (
+          <CardSkeletonList count={3} />
+        ) : filteredOrders.length === 0 ? (
+          <div className="rounded-3xl border border-[#162018]/10 bg-white p-8 sm:p-14 text-center shadow-xs">
+            <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-2xl bg-[#162018]/5 text-[#162018] ring-8 ring-[#162018]/5 mb-4">
+              <Package size={36} className="text-slate-400" />
+            </div>
+
+            <h2 className="font-condensed text-2xl sm:text-3xl font-black uppercase tracking-tight text-[#162018]">
+              {searchQuery ? "Pesanan Tidak Ditemukan" : "Belum Ada Pesanan"}
+            </h2>
+            <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-slate-500">
+              {searchQuery
+                ? `Tidak ada pesanan yang sesuai dengan kata kunci "${searchQuery}".`
+                : "Seluruh pesanan jersey dan perlengkapan tim yang Anda buat akan tercatat di sini."}
+            </p>
+
+            <div className="mt-6">
+              <Link
+                to="/dashboard"
+                className="inline-flex items-center gap-2 rounded-2xl bg-[#B9382B] hover:bg-[#982D22] px-6 py-3.5 text-xs font-black font-condensed tracking-wider uppercase text-white shadow-md shadow-[#B9382B]/20 transition active:scale-95"
+              >
+                <ShoppingBag size={15} />
+                <span>Mulai Belanja Jersey Tim</span>
+              </Link>
+            </div>
+          </div>
+        ) : (
+          <>
+            <div className="space-y-4">
+              {filteredOrders.map((order) => {
+                const isPending =
+                  (order.status || "").toUpperCase() === "PENDING";
+                const isCompleted =
+                  (order.status || "").toUpperCase() === "COMPLETED";
+                const isPaid =
+                  (order.status || "").toUpperCase() === "PAID";
+                const createdAtDate = new Date(
+                  order.createdAt || order.created_at
+                );
+                const isExpired =
+                  isPending &&
+                  !isNaN(createdAtDate.getTime()) &&
+                  Date.now() - createdAtDate.getTime() > 24 * 60 * 60 * 1000;
+                const isReordering = reorderingId === order.id;
+
+                return (
+                  <div
+                    key={order.id}
+                    className="rounded-3xl border border-[#162018]/10 bg-white p-5 sm:p-6 shadow-2xs hover:border-[#162018]/30 transition duration-200"
+                  >
+                    <div className="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-slate-100">
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <Package size={16} className="text-[#162018]" />
+                          <h2 className="font-mono font-bold text-[#162018] text-sm sm:text-base">
+                            {order.orderNumber || `Order #${order.id}`}
+                          </h2>
+                          <span className="text-[10px] font-mono uppercase tracking-wider text-slate-400 bg-[#FAF8F4] px-2 py-0.5 rounded border border-[#162018]/10">
+                            Atelier Cicendo
+                          </span>
+                        </div>
+                        {order.createdAt || order.created_at ? (
+                          <p className="mt-1 flex items-center gap-1.5 text-xs text-slate-400 font-mono">
+                            <Calendar size={12} />
+                            {new Date(
+                              order.createdAt || order.created_at
+                            ).toLocaleString("id-ID")}
+                          </p>
+                        ) : null}
+                      </div>
+
+                      <span
+                        className={`rounded-full px-3.5 py-1 text-xs font-mono font-bold uppercase tracking-wider ${
+                          isExpired
+                            ? "bg-rose-50 text-rose-700 border border-rose-200"
+                            : getStatusColor(order.status)
+                        }`}
+                      >
+                        {isExpired ? "KEDALUWARSA" : order.status}
+                      </span>
+                    </div>
+
+                    <div className="mt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                      <div>
+                        <p className="text-xs font-mono text-slate-500">
+                          Total Pembayaran:{" "}
+                          <span className="font-condensed font-black text-[#B9382B] text-xl ml-1">
+                            Rp{" "}
+                            {Number(
+                              order.totalAmount || order.total_amount
+                            ).toLocaleString("id-ID")}
+                          </span>
+                        </p>
+
+                        <p className="mt-1 flex items-start gap-1.5 text-xs text-slate-500">
+                          <MapPin
+                            size={13}
+                            className="mt-0.5 shrink-0 text-slate-400"
+                          />
+                          <span>{order.shippingAddress || order.shipping_address}</span>
+                        </p>
+                      </div>
+
+                      <div className="flex flex-wrap items-center gap-2 pt-2 sm:pt-0">
+                        {/* Rincian & Lacak */}
+                        <Link
+                          to={`/dashboard/orders/${order.id}`}
+                          className="inline-flex items-center gap-1.5 rounded-xl bg-[#162018] hover:bg-black px-4 py-2.5 text-xs font-mono font-bold uppercase tracking-wider text-white shadow-xs transition cursor-pointer"
+                        >
+                          <Eye size={13} />
+                          <span>Rincian &amp; Resi</span>
+                        </Link>
+
+                        {/* Bayar Sekarang (jika PENDING) */}
+                        {isPending && !isExpired && (
+                          <button
+                            type="button"
+                            onClick={() => setPayingOrder(order)}
+                            className="inline-flex items-center gap-1.5 rounded-xl bg-[#B9382B] hover:bg-[#982D22] px-4 py-2.5 text-xs font-mono font-bold uppercase tracking-wider text-white shadow-xs transition hover:-translate-y-0.5 cursor-pointer"
+                          >
+                            <CreditCard size={13} />
+                            <span>Bayar Sekarang</span>
+                          </button>
+                        )}
+
+                        {/* Beli Lagi (Reorder) untuk status Completed / Paid */}
+                        {(isCompleted || isPaid) && (
+                          <button
+                            type="button"
+                            onClick={() => handleReorder(order)}
+                            disabled={isReordering}
+                            className="inline-flex items-center gap-1.5 rounded-xl border border-[#162018]/15 bg-[#FAF8F4] px-3.5 py-2.5 text-xs font-mono font-bold text-slate-700 transition hover:bg-white disabled:opacity-50 cursor-pointer"
+                            title="Masukkan produk pesanan ini kembali ke keranjang"
+                          >
+                            <RotateCcw size={12} className={isReordering ? "animate-spin" : ""} />
+                            <span>{isReordering ? "Memasukkan..." : "Pesan Ulang"}</span>
+                          </button>
+                        )}
+
+                        {/* Bantuan CS WhatsApp */}
+                        <button
+                          type="button"
+                          onClick={() => handleContactCS(order)}
+                          className="inline-flex items-center gap-1.5 rounded-xl border border-emerald-300 bg-emerald-50 px-3.5 py-2.5 text-xs font-mono font-bold text-emerald-800 transition hover:bg-emerald-100 cursor-pointer"
+                          title="Tanya Admin CS perihal pesanan ini via WhatsApp"
+                        >
+                          <MessageCircle size={13} className="text-emerald-700" />
+                          <span>Tanya CS</span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {totalPages > 1 && (
+              <div className="mt-8 flex items-center justify-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => setPage((p) => Math.max(p - 1, 1))}
+                  disabled={page === 1}
+                  className="flex items-center gap-1 rounded-xl border border-[#162018]/15 bg-white px-4 py-2 text-xs font-mono font-bold text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
+                >
+                  <ChevronLeft size={14} />
+                  Sebelumnya
+                </button>
+
+                <span className="text-xs font-mono text-slate-500">
+                  Halaman {page} dari {totalPages}
+                </span>
+
+                <button
+                  type="button"
+                  onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
+                  disabled={page === totalPages}
+                  className="flex items-center gap-1 rounded-xl border border-[#162018]/15 bg-white px-4 py-2 text-xs font-mono font-bold text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
+                >
+                  Berikutnya
+                  <ChevronRight size={14} />
+                </button>
+              </div>
+            )}
+          </>
+        )}
+
+        {/* Midtrans Modal directly from order history */}
+        {payingOrder && (
+          <MidtransModal
+            isOpen={Boolean(payingOrder)}
+            onClose={() => setPayingOrder(null)}
+            order={payingOrder}
+            onSuccess={() => {
+              setPayingOrder(null);
+              getOrders();
+            }}
+          />
+        )}
+      </div>
     </div>
   );
 }

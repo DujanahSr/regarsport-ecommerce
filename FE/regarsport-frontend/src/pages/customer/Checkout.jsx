@@ -228,319 +228,352 @@ export default function Checkout() {
   }
 
   return (
-    <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6 sm:py-12">
-      <Link
-        to={directItem ? -1 : "/dashboard/cart"}
-        className="mb-6 inline-flex items-center gap-2 text-sm font-semibold text-slate-500 hover:text-slate-800 transition"
-      >
-        <ArrowLeft size={16} />
-        {directItem ? "Kembali ke Produk" : "Kembali ke Keranjang"}
-      </Link>
+    <div className="bg-[#FAF8F4] min-h-screen py-8 sm:py-12 text-[#111613] font-sans-body animate-fade-in">
+      <div className="mx-auto max-w-4xl px-4 sm:px-6">
 
-      <div className="rounded-3xl bg-white p-6 shadow-sm ring-1 ring-slate-900/5 sm:p-8">
-        <div className="flex items-center justify-between pb-6 border-b border-slate-100">
-          <div>
-            <h1 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
-              Checkout Pembayaran
-            </h1>
-            <p className="text-sm text-slate-500 mt-1">
-              Periksa rincian pesanan dan alamat pengiriman Anda sebelum membayar.
-            </p>
+        {/* Step Progress Bar */}
+        <div className="mb-6 flex items-center justify-between gap-2 max-w-md mx-auto text-xs font-mono">
+          <div className="flex items-center gap-1.5 text-emerald-700 font-bold">
+            <span className="w-5 h-5 rounded-full bg-emerald-600 text-white flex items-center justify-center text-[10px]">✓</span>
+            <span className="hidden sm:inline">1. Keranjang</span>
           </div>
-          <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-700 border border-emerald-100">
-            {checkoutItems.length} Item
-          </span>
+          <span className="h-0.5 flex-1 bg-[#162018]/15" />
+          <div className="flex items-center gap-1.5 text-[#162018] font-black">
+            <span className="w-5 h-5 rounded-full bg-[#162018] text-amber-300 flex items-center justify-center text-[10px]">2</span>
+            <span>2. Pengiriman & Tim</span>
+          </div>
+          <span className="h-0.5 flex-1 bg-[#162018]/15" />
+          <div className="flex items-center gap-1.5 text-slate-400">
+            <span className="w-5 h-5 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center text-[10px]">3</span>
+            <span className="hidden sm:inline">3. Pembayaran</span>
+          </div>
         </div>
 
-        {/* Shipping Information Section */}
-        <div className="mt-6 space-y-4">
-          <div className="flex items-center justify-between">
-            <h2 className="flex items-center gap-2 text-base font-bold text-slate-900">
-              <MapPin size={18} className="text-emerald-600" />
-              Informasi Penerima & Alamat Pengiriman
-            </h2>
-            <span className="text-xs text-slate-400 font-medium hidden sm:inline">
-              Wajib diisi lengkap untuk resi kurir
+        {/* Back navigation */}
+        <div className="mb-4">
+          <Link
+            to={directItem ? -1 : "/dashboard/cart"}
+            className="inline-flex items-center gap-1.5 rounded-full bg-white px-3.5 py-1.5 text-xs font-mono font-bold text-slate-700 border border-[#162018]/15 hover:border-[#162018] hover:text-[#162018] transition shadow-2xs group"
+          >
+            <ArrowLeft size={14} className="transition-transform group-hover:-translate-x-0.5" />
+            <span>{directItem ? "Kembali ke Produk" : "Kembali ke Keranjang"}</span>
+          </Link>
+        </div>
+
+        <div className="rounded-3xl border border-[#162018]/10 bg-white p-6 shadow-sm ring-1 ring-black/5 sm:p-8 relative overflow-hidden">
+          {/* Subtle Topographic Watermark */}
+          <div className="absolute top-0 right-0 w-80 h-80 bg-topography opacity-[0.03] pointer-events-none" />
+
+          <div className="flex flex-wrap items-center justify-between gap-3 pb-6 border-b border-[#162018]/10 relative z-10">
+            <div>
+              <span className="text-[10px] font-mono uppercase tracking-wider text-slate-400 block">
+                Atelier Cicendo Bandung // Direct Order
+              </span>
+              <h1 className="font-condensed text-2xl sm:text-3xl font-black uppercase tracking-tight text-[#162018]">
+                Checkout Pesanan &amp; Verifikasi Tim
+              </h1>
+              <p className="text-xs sm:text-sm text-slate-500 mt-1">
+                Lengkapi alamat pengiriman dan periksa rincian sablon tim sebelum melanjutkan ke Midtrans.
+              </p>
+            </div>
+            <span className="rounded-full bg-[#162018] px-3.5 py-1 text-xs font-mono font-bold text-amber-300 shadow-xs">
+              {checkoutItems.length} Item Siap Cetak
             </span>
           </div>
 
-          {(user?.address || user?.phoneNumber) && (
-            <div className="flex items-center justify-between rounded-xl bg-emerald-50 border border-emerald-100 px-3.5 py-2 text-xs text-emerald-800">
-              <span className="flex items-center gap-1.5 font-medium">
-                ✨ Alamat & kontak terisi otomatis dari profil akun Anda.
+          {/* Shipping Information Section */}
+          <div className="mt-6 space-y-4 relative z-10">
+            <div className="flex items-center justify-between">
+              <h2 className="flex items-center gap-2 text-sm sm:text-base font-bold text-[#162018] uppercase tracking-wider font-mono">
+                <MapPin size={16} className="text-emerald-600" />
+                Data Penerima &amp; Alamat Ekspedisi
+              </h2>
+              <span className="text-xs text-slate-400 font-mono hidden sm:inline">
+                *Wajib lengkap untuk resi kurir
               </span>
-              <Link to="/dashboard/profile" className="font-bold underline hover:text-emerald-950">
-                Kelola Profil
-              </Link>
-            </div>
-          )}
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {/* Nama Penerima */}
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1.5 flex items-center gap-1.5">
-                <User size={13} className="text-emerald-600" />
-                Nama Lengkap Penerima <span className="text-rose-500">*</span>
-              </label>
-              <input
-                type="text"
-                placeholder="Nama penerima paket"
-                value={recipientName}
-                onChange={(e) => setRecipientName(e.target.value)}
-                className="w-full rounded-2xl border border-slate-200 bg-slate-50/70 px-4 py-3 text-sm text-slate-800 transition placeholder:text-slate-400 focus:border-emerald-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
-                required
-              />
             </div>
 
-            {/* No WhatsApp / HP */}
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1.5 flex items-center gap-1.5">
-                <Phone size={13} className="text-emerald-600" />
-                No. WhatsApp / HP Aktif <span className="text-rose-500">*</span>
-              </label>
-              <input
-                type="tel"
-                placeholder="Contoh: 081234567890"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                className="w-full rounded-2xl border border-slate-200 bg-slate-50/70 px-4 py-3 text-sm text-slate-800 transition placeholder:text-slate-400 focus:border-emerald-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 font-mono"
-                required
-              />
-            </div>
-
-            {/* Kota / Kabupaten */}
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1.5 flex items-center gap-1.5">
-                <Building2 size={13} className="text-emerald-600" />
-                Kota / Kabupaten <span className="text-rose-500">*</span>
-              </label>
-              <input
-                type="text"
-                placeholder="Contoh: Kab. Wonogiri / Kota Surakarta"
-                value={city}
-                onChange={(e) => setCity(e.target.value)}
-                className="w-full rounded-2xl border border-slate-200 bg-slate-50/70 px-4 py-3 text-sm text-slate-800 transition placeholder:text-slate-400 focus:border-emerald-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
-                required
-              />
-            </div>
-
-            {/* Kode Pos */}
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-                Kode Pos (5 Digit) <span className="text-rose-500">*</span>
-              </label>
-              <input
-                type="text"
-                maxLength={5}
-                placeholder="Contoh: 57612"
-                value={postalCode}
-                onChange={(e) => setPostalCode(e.target.value.replace(/\D/g, ""))}
-                className="w-full rounded-2xl border border-slate-200 bg-slate-50/70 px-4 py-3 text-sm text-slate-800 transition placeholder:text-slate-400 focus:border-emerald-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 font-mono"
-                required
-              />
-            </div>
-          </div>
-
-          {/* Alamat Jalan Lengkap */}
-          <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-              Alamat Lengkap & Patokan Rumah <span className="text-rose-500">*</span>
-            </label>
-            <textarea
-              placeholder="Tuliskan nama jalan, nomor rumah, RT/RW, kelurahan, kecamatan, serta patokan (misal: Rumah pagar hitam seberang masjid)..."
-              value={streetAddress}
-              onChange={(e) => setStreetAddress(e.target.value)}
-              rows="3"
-              className="w-full rounded-2xl border border-slate-200 bg-slate-50/70 p-4 text-sm text-slate-800 transition placeholder:text-slate-400 focus:border-emerald-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 resize-none"
-              required
-            />
-          </div>
-
-          {/* Catatan untuk Kurir */}
-          <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1.5 flex items-center gap-1.5">
-              <FileText size={13} className="text-slate-400" />
-              Catatan Khusus Kurir / Pengiriman (Opsional)
-            </label>
-            <input
-              type="text"
-              placeholder="Contoh: Titip satpam komplek jika rumah kosong"
-              value={shippingNotes}
-              onChange={(e) => setShippingNotes(e.target.value)}
-              className="w-full rounded-2xl border border-slate-200 bg-slate-50/70 px-4 py-2.5 text-xs sm:text-sm text-slate-800 transition placeholder:text-slate-400 focus:border-emerald-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
-            />
-          </div>
-        </div>
-
-        {validationError ? (
-          <div className="mt-4 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-medium text-rose-600">
-            {validationError}
-          </div>
-        ) : null}
-
-        {/* Order Summary */}
-        <div className="mt-8 border-t border-slate-100 pt-6">
-          <h2 className="flex items-center gap-2 text-base font-bold text-slate-900 mb-4">
-            <Package size={18} className="text-emerald-600" />
-            Ringkasan Item Pesanan
-          </h2>
-
-          <div className="space-y-3">
-            {checkoutItems.map((item, index) => {
-              const name = item.productName || item.products?.name || item.name;
-              const img =
-                item.productImage ||
-                item.products?.image_url ||
-                item.imageUrl ||
-                item.image_url ||
-                "https://placehold.co/200x200?text=Produk";
-              const price = Number(item.price || item.products?.price || 0);
-
-              return (
-                <div
-                  key={item.id || index}
-                  className="flex items-center justify-between gap-4 rounded-2xl border border-slate-100 bg-slate-50/50 p-3.5 text-sm transition hover:border-slate-200"
-                >
-                  <div className="flex items-center gap-3 min-w-0">
-                    <img
-                      src={img}
-                      alt={name}
-                      className="h-12 w-12 shrink-0 rounded-xl object-cover bg-white border border-slate-100"
-                      onError={(e) => {
-                        e.currentTarget.onerror = null;
-                        e.currentTarget.src = "https://placehold.co/200x200?text=Produk";
-                      }}
-                    />
-                    <div className="min-w-0">
-                      <p className="font-semibold text-slate-800 truncate">{name}</p>
-                      <div className="flex items-center gap-2 mt-0.5">
-                        <p className="text-xs text-slate-400">Jumlah: {item.quantity} pcs</p>
-                        {item.size && (
-                          <span className="inline-flex items-center rounded-md bg-emerald-50 px-1.5 py-0.5 text-[10px] font-bold text-emerald-700 border border-emerald-200/60">
-                            Size: {item.size}
-                          </span>
-                        )}
-                      </div>
-                      {item.customName && (
-                        <p className="text-[11px] text-emerald-700 font-semibold mt-0.5">
-                          🎽 Sablon: <strong>{item.customName}</strong> #{item.customNumber || "-"} {item.customCollar && `(${item.customCollar})`}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-
-                  <span className="shrink-0 font-bold text-slate-900">
-                    Rp {(price * item.quantity).toLocaleString("id-ID")}
-                  </span>
-                </div>
-              );
-            })}
-          </div>
-
-          {/* Promo Code / Voucher Box */}
-          <div className="mt-6 pt-5 border-t border-slate-100">
-            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-500 mb-2.5">
-              <Tag size={15} className="text-emerald-600" />
-              <span>Kode Promo / Voucher Diskon</span>
-            </div>
-
-            {appliedVoucher ? (
-              <div className="flex items-center justify-between p-3 rounded-2xl bg-emerald-50 border border-emerald-200">
-                <div className="flex items-center gap-2">
-                  <div className="w-7 h-7 rounded-full bg-emerald-600 text-white flex items-center justify-center">
-                    <Check size={14} strokeWidth={3} />
-                  </div>
-                  <div>
-                    <div className="text-xs font-black text-emerald-900 font-mono">
-                      {appliedVoucher.code}
-                    </div>
-                    <div className="text-[11px] text-emerald-700">
-                      Diskon terpotong: -Rp {discount.toLocaleString("id-ID")}
-                    </div>
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  onClick={handleRemoveVoucher}
-                  className="text-xs font-bold text-rose-600 hover:text-rose-800 p-1.5 rounded-lg hover:bg-rose-100 transition cursor-pointer"
-                >
-                  Lepas
-                </button>
+            {(user?.address || user?.phoneNumber) && (
+              <div className="flex items-center justify-between rounded-xl bg-[#FAF8F4] border border-[#162018]/10 px-4 py-2.5 text-xs text-slate-700">
+                <span className="flex items-center gap-1.5 font-medium">
+                  ✨ Data alamat terisi otomatis dari profil kapten Anda.
+                </span>
+                <Link to="/dashboard/profile" className="font-bold font-mono text-[#162018] underline hover:text-emerald-700">
+                  Kelola Profil
+                </Link>
               </div>
-            ) : (
-              <div className="flex items-center gap-2">
+            )}
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {/* Nama Penerima */}
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5 font-mono flex items-center gap-1.5">
+                  <User size={13} className="text-slate-400" />
+                  Nama Lengkap Penerima <span className="text-rose-500">*</span>
+                </label>
                 <input
                   type="text"
-                  value={voucherCodeInput}
-                  onChange={(e) => setVoucherCodeInput(e.target.value.toUpperCase())}
-                  placeholder="Masukkan kode voucher (contoh: REGARJUARA)"
-                  className="flex-1 px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs font-mono font-bold text-slate-800 uppercase focus:outline-none focus:border-emerald-500"
+                  placeholder="Contoh: Abu Dujanah Siregar"
+                  value={recipientName}
+                  onChange={(e) => setRecipientName(e.target.value)}
+                  className="w-full rounded-xl border border-[#162018]/15 bg-[#FAF8F4] px-4 py-2.5 text-sm text-slate-900 transition placeholder:text-slate-400 focus:border-[#162018] focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#162018]"
+                  required
                 />
-                <button
-                  type="button"
-                  onClick={handleApplyVoucher}
-                  disabled={validatingVoucher || !voucherCodeInput.trim()}
-                  className="flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-black text-white text-xs font-bold transition disabled:opacity-50 cursor-pointer shrink-0"
-                >
-                  {validatingVoucher && <Loader2 size={13} className="animate-spin" />}
-                  <span>Terapkan</span>
-                </button>
               </div>
-            )}
-          </div>
 
-          {/* Rincian Harga & Total Tagihan */}
-          <div className="mt-5 pt-4 border-t border-slate-100 space-y-2 text-xs">
-            <div className="flex justify-between text-slate-600">
-              <span>Subtotal Produk</span>
-              <span className="font-semibold text-slate-800">
-                Rp {total.toLocaleString("id-ID")}
-              </span>
-            </div>
-            <div className="flex justify-between text-slate-600">
-              <span>Ongkos Kirim</span>
-              <span className="font-bold text-emerald-600">Gratis (Promo RS)</span>
-            </div>
-            {appliedVoucher && (
-              <div className="flex justify-between text-emerald-600 font-bold">
-                <span>Potongan Kupon ({appliedVoucher.code})</span>
-                <span>-Rp {discount.toLocaleString("id-ID")}</span>
+              {/* No WhatsApp / HP */}
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5 font-mono flex items-center gap-1.5">
+                  <Phone size={13} className="text-slate-400" />
+                  No. WhatsApp Aktif (Untuk Resi) <span className="text-rose-500">*</span>
+                </label>
+                <input
+                  type="tel"
+                  placeholder="Contoh: 081234567890"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  className="w-full rounded-xl border border-[#162018]/15 bg-[#FAF8F4] px-4 py-2.5 text-sm text-slate-900 transition placeholder:text-slate-400 focus:border-[#162018] focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#162018] font-mono"
+                  required
+                />
               </div>
-            )}
-          </div>
 
-          <div className="mt-4 flex items-center justify-between border-t border-slate-100 pt-4">
+              {/* Kota / Kabupaten */}
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5 font-mono flex items-center gap-1.5">
+                  <Building2 size={13} className="text-slate-400" />
+                  Kota / Kabupaten Tujuan <span className="text-rose-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  placeholder="Contoh: Kota Bandung / Jakarta Selatan"
+                  value={city}
+                  onChange={(e) => setCity(e.target.value)}
+                  className="w-full rounded-xl border border-[#162018]/15 bg-[#FAF8F4] px-4 py-2.5 text-sm text-slate-900 transition placeholder:text-slate-400 focus:border-[#162018] focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#162018]"
+                  required
+                />
+              </div>
+
+              {/* Kode Pos */}
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5 font-mono">
+                  Kode Pos (5 Digit) <span className="text-rose-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  maxLength={5}
+                  placeholder="Contoh: 40171"
+                  value={postalCode}
+                  onChange={(e) => setPostalCode(e.target.value.replace(/\D/g, ""))}
+                  className="w-full rounded-xl border border-[#162018]/15 bg-[#FAF8F4] px-4 py-2.5 text-sm text-slate-900 transition placeholder:text-slate-400 focus:border-[#162018] focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#162018] font-mono"
+                  required
+                />
+              </div>
+            </div>
+
+            {/* Alamat Jalan Lengkap */}
             <div>
-              <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">
-                Total Tagihan
-              </span>
-              <h3 className="text-2xl font-black text-emerald-600 sm:text-3xl">
-                Rp {finalTotal.toLocaleString("id-ID")}
-              </h3>
+              <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5 font-mono">
+                Alamat Lengkap &amp; Patokan Penerima <span className="text-rose-500">*</span>
+              </label>
+              <textarea
+                placeholder="Tuliskan nama jalan, nomor bangunan, RT/RW, kelurahan, kecamatan, dan patokan rumah..."
+                value={streetAddress}
+                onChange={(e) => setStreetAddress(e.target.value)}
+                rows="3"
+                className="w-full rounded-xl border border-[#162018]/15 bg-[#FAF8F4] p-3.5 text-sm text-slate-900 transition placeholder:text-slate-400 focus:border-[#162018] focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#162018] resize-none"
+                required
+              />
             </div>
 
-            <button
-              type="button"
-              onClick={handleCheckout}
-              disabled={loading}
-              className="flex items-center justify-center gap-2 rounded-2xl bg-emerald-600 px-8 py-3.5 text-sm font-bold text-white shadow-lg shadow-emerald-600/25 transition hover:-translate-y-0.5 hover:bg-emerald-700 hover:shadow-emerald-600/35 disabled:cursor-not-allowed disabled:translate-y-0 disabled:opacity-50 disabled:shadow-none cursor-pointer"
-            >
-              <CreditCard size={18} />
-              {loading ? "Memproses Order..." : "Bayar Sekarang"}
-            </button>
+            {/* Catatan untuk Kurir */}
+            <div>
+              <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5 font-mono flex items-center gap-1.5">
+                <FileText size={13} className="text-slate-400" />
+                Catatan Pengiriman Khusus (Opsional)
+              </label>
+              <input
+                type="text"
+                placeholder="Contoh: Hubungi via WA sebelum kirim, titip pos satpam jika tidak di rumah"
+                value={shippingNotes}
+                onChange={(e) => setShippingNotes(e.target.value)}
+                className="w-full rounded-xl border border-[#162018]/15 bg-[#FAF8F4] px-4 py-2 text-xs sm:text-sm text-slate-900 transition placeholder:text-slate-400 focus:border-[#162018] focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#162018]"
+              />
+            </div>
+          </div>
+
+          {validationError ? (
+            <div className="mt-4 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-xs sm:text-sm font-semibold text-rose-700 flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-rose-500 shrink-0" />
+              <span>{validationError}</span>
+            </div>
+          ) : null}
+
+          {/* Order Summary */}
+          <div className="mt-8 border-t border-[#162018]/10 pt-6 relative z-10">
+            <h2 className="flex items-center gap-2 text-sm sm:text-base font-bold text-[#162018] uppercase tracking-wider font-mono mb-4">
+              <Package size={16} className="text-emerald-600" />
+              Rincian Item yang Dipesan ({checkoutItems.length} Produk)
+            </h2>
+
+            <div className="space-y-3">
+              {checkoutItems.map((item, index) => {
+                const name = item.productName || item.products?.name || item.name;
+                const img =
+                  item.productImage ||
+                  item.products?.image_url ||
+                  item.imageUrl ||
+                  item.image_url ||
+                  "https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=400&q=80";
+                const price = Number(item.price || item.products?.price || 0);
+
+                return (
+                  <div
+                    key={item.id || index}
+                    className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-2xl border border-[#162018]/10 bg-[#FAF8F4] p-3.5 text-sm"
+                  >
+                    <div className="flex items-center gap-3 min-w-0">
+                      <img
+                        src={img}
+                        alt={name}
+                        className="h-12 w-12 shrink-0 rounded-xl object-cover bg-white border border-[#162018]/10"
+                        onError={(e) => {
+                          e.currentTarget.onerror = null;
+                          e.currentTarget.src = "https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=400&q=80";
+                        }}
+                      />
+                      <div className="min-w-0">
+                        <p className="font-condensed font-bold uppercase tracking-tight text-slate-900 truncate">
+                          {name}
+                        </p>
+                        <div className="flex flex-wrap items-center gap-2 mt-0.5">
+                          <span className="text-xs font-mono text-slate-500">Jumlah: {item.quantity} pcs</span>
+                          {item.size && (
+                            <span className="inline-flex items-center rounded-md bg-[#162018] px-1.5 py-0.5 text-[10px] font-black font-mono text-white">
+                              SIZE {item.size}
+                            </span>
+                          )}
+                        </div>
+                        {item.customName && (
+                          <p className="text-[11px] font-mono text-emerald-800 font-bold mt-1 bg-white px-2 py-0.5 rounded-md border border-emerald-200/60 w-fit">
+                            🎽 Sablon: {item.customName} #{item.customNumber || "-"} {item.customCollar && `(${item.customCollar})`}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+
+                    <span className="font-mono font-black text-[#B9382B] text-base self-end sm:self-center">
+                      Rp {(price * item.quantity).toLocaleString("id-ID")}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Promo Code / Voucher Box */}
+            <div className="mt-6 pt-5 border-t border-[#162018]/10">
+              <div className="flex items-center gap-2 text-xs font-mono font-bold uppercase tracking-wider text-slate-600 mb-2.5">
+                <Tag size={14} className="text-emerald-600" />
+                <span>Kupon Diskon Resmi RegarSport</span>
+              </div>
+
+              {appliedVoucher ? (
+                <div className="flex items-center justify-between p-3.5 rounded-2xl bg-emerald-50 border border-emerald-300">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-7 h-7 rounded-full bg-emerald-700 text-white flex items-center justify-center shadow-xs">
+                      <Check size={14} strokeWidth={3} />
+                    </div>
+                    <div>
+                      <div className="text-xs font-black text-emerald-950 font-mono">
+                        {appliedVoucher.code} (Diskon Aktif)
+                      </div>
+                      <div className="text-[11px] font-mono text-emerald-700">
+                        Potongan harga: -Rp {discount.toLocaleString("id-ID")}
+                      </div>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleRemoveVoucher}
+                    className="text-xs font-bold text-rose-600 hover:text-rose-800 px-2.5 py-1 rounded-lg hover:bg-rose-100 transition cursor-pointer font-mono"
+                  >
+                    Lepas
+                  </button>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <input
+                    type="text"
+                    value={voucherCodeInput}
+                    onChange={(e) => setVoucherCodeInput(e.target.value.toUpperCase())}
+                    placeholder="Masukkan kode voucher (contoh: REGARJUARA)"
+                    className="flex-1 px-4 py-2.5 rounded-xl bg-[#FAF8F4] border border-[#162018]/15 text-xs font-mono font-bold text-slate-900 uppercase focus:outline-none focus:border-[#162018] focus:bg-white"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleApplyVoucher}
+                    disabled={validatingVoucher || !voucherCodeInput.trim()}
+                    className="flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-[#162018] hover:bg-black text-white text-xs font-bold font-mono uppercase tracking-wider transition disabled:opacity-50 cursor-pointer shrink-0"
+                  >
+                    {validatingVoucher && <Loader2 size={13} className="animate-spin" />}
+                    <span>Terapkan</span>
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Rincian Tagihan & Tombol Bayar */}
+            <div className="mt-5 pt-4 border-t border-[#162018]/10 space-y-2 text-xs font-mono">
+              <div className="flex justify-between text-slate-600">
+                <span>Subtotal Produk</span>
+                <span className="font-bold text-slate-800">
+                  Rp {total.toLocaleString("id-ID")}
+                </span>
+              </div>
+              <div className="flex justify-between text-slate-600">
+                <span>Ongkos Kirim dari Bandung</span>
+                <span className="font-bold text-emerald-700">GRATIS (Promo Ekspedisi Atelier)</span>
+              </div>
+              {appliedVoucher && (
+                <div className="flex justify-between text-emerald-700 font-bold">
+                  <span>Potongan Voucher ({appliedVoucher.code})</span>
+                  <span>-Rp {discount.toLocaleString("id-ID")}</span>
+                </div>
+              )}
+            </div>
+
+            <div className="mt-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-t border-[#162018]/10 pt-5">
+              <div>
+                <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-400 block">
+                  Total Tagihan Pembayaran
+                </span>
+                <h3 className="font-condensed text-3xl font-black text-[#B9382B] tracking-tight">
+                  Rp {finalTotal.toLocaleString("id-ID")}
+                </h3>
+              </div>
+
+              <button
+                type="button"
+                onClick={handleCheckout}
+                disabled={loading}
+                className="flex items-center justify-center gap-2 rounded-2xl bg-[#B9382B] hover:bg-[#982D22] px-8 py-4 text-xs font-black font-condensed tracking-wider uppercase text-white shadow-lg shadow-[#B9382B]/25 transition hover:-translate-y-0.5 active:translate-y-0 disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
+              >
+                <CreditCard size={17} />
+                <span>{loading ? "Memproses Order..." : "Bayar Sekarang via Midtrans"}</span>
+              </button>
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Direct Midtrans Payment Modal on Checkout */}
-      {createdOrder && (
-        <MidtransModal
-          isOpen={showPaymentModal}
-          onClose={handlePaymentClose}
-          order={createdOrder}
-          onSuccess={handlePaymentSuccess}
-        />
-      )}
+        {/* Direct Midtrans Payment Modal on Checkout */}
+        {createdOrder && (
+          <MidtransModal
+            isOpen={showPaymentModal}
+            onClose={handlePaymentClose}
+            order={createdOrder}
+            onSuccess={handlePaymentSuccess}
+          />
+        )}
+      </div>
     </div>
   );
 }

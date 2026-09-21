@@ -347,153 +347,206 @@ export default function OrderDetail() {
   const totalAmount = Number(order.totalAmount || order.total_amount || 0);
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 sm:py-12">
-      {/* Back Button */}
-      <Link
-        to="/dashboard/my-orders"
-        className="inline-flex items-center gap-2 text-sm font-semibold text-slate-500 hover:text-slate-800 transition mb-6 group"
-      >
-        <ArrowLeft size={16} className="transition group-hover:-translate-x-1" />
-        Kembali ke Pesanan Saya
-      </Link>
+    <div className="bg-[#FAF8F4] min-h-screen py-8 sm:py-12 text-[#111613] font-sans-body animate-fade-in">
+      <div className="mx-auto max-w-5xl px-4 sm:px-6">
+        {/* Tactical Breadcrumb & Origin Pill */}
+        <div className="mb-6 flex flex-wrap items-center justify-between gap-3 text-xs font-mono">
+          <Link
+            to="/dashboard/my-orders"
+            className="inline-flex items-center gap-1.5 rounded-full bg-white px-3.5 py-1.5 text-xs font-mono font-bold text-slate-700 border border-[#162018]/15 hover:border-[#162018] hover:text-[#162018] transition shadow-2xs group"
+          >
+            <ArrowLeft size={14} className="transition group-hover:-translate-x-0.5" />
+            <span>Kembali ke Pesanan Saya</span>
+          </Link>
 
-      {/* Main Card */}
-      <div className="rounded-3xl bg-white p-6 shadow-sm ring-1 ring-slate-900/5 sm:p-8 space-y-8">
-        {/* Header */}
-        <div className="flex flex-wrap items-center justify-between gap-4 pb-6 border-b border-slate-100">
-          <div>
-            <div className="flex items-center gap-2">
-              <Package size={20} className="text-emerald-600" />
-              <h1 className="text-xl font-bold text-slate-900 sm:text-2xl">
-                {order.orderNumber || `Order #${order.id}`}
-              </h1>
-            </div>
-            {order.createdAt || order.created_at ? (
-              <p className="mt-1 flex items-center gap-1.5 text-xs text-slate-400">
-                <Calendar size={13} />
-                Dibuat pada:{" "}
-                {new Date(order.createdAt || order.created_at).toLocaleString(
-                  "id-ID"
-                )}
-              </p>
-            ) : null}
-          </div>
-
-          <div className="flex items-center gap-2.5">
-            {/* Tombol Cetak / Unduh Dokumen Resmi */}
-            <button
-              type="button"
-              onClick={() => setShowInvoiceModal(true)}
-              className={`flex items-center gap-1.5 rounded-2xl px-4 py-2 text-xs sm:text-sm font-bold shadow-xs transition active:scale-95 cursor-pointer ${
-                isPaid
-                  ? "bg-emerald-50 text-emerald-800 border border-emerald-200 hover:bg-emerald-100"
-                  : isPending
-                  ? "bg-amber-50 text-amber-800 border border-amber-200 hover:bg-amber-100"
-                  : "bg-slate-100 text-slate-600 border border-slate-200 hover:bg-slate-200"
-              }`}
-              title={isPaid ? "Cetak atau Unduh Invoice Resmi Lunas" : "Lihat / Cetak Tagihan Sementara (Proforma)"}
-            >
-              {isPaid ? <FileText size={15} className="text-emerald-600" /> : <Printer size={15} className="text-amber-600" />}
-              <span>{isPaid ? "Invoice Resmi (PDF)" : "Cetak Tagihan"}</span>
-            </button>
-
-            {isCancelled ? (
-              <div className="flex flex-col items-end gap-1">
-                <span className="rounded-full bg-rose-50 px-3.5 py-1.5 text-xs font-bold text-rose-600 ring-1 ring-rose-200">
-                  Dibatalkan
-                </span>
-                {order.cancellationReason && (
-                  <span className="text-[10px] text-slate-500 italic max-w-xs text-right">
-                    Alasan: {order.cancellationReason}
-                  </span>
-                )}
-              </div>
-            ) : isExpired ? (
-              <div className="flex items-center gap-2">
-                <span className="rounded-full bg-rose-50 px-3.5 py-1.5 text-xs font-bold text-rose-600 ring-1 ring-rose-200">
-                  Kedaluwarsa
-                </span>
-                <Link
-                  to="/dashboard"
-                  className="inline-flex items-center gap-1.5 rounded-2xl bg-slate-800 hover:bg-slate-900 px-4 py-2 text-xs font-bold text-white shadow-xs transition"
-                >
-                  <RotateCcw size={14} />
-                  Pesan Ulang
-                </Link>
-              </div>
-            ) : isPending ? (
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={() => setShowCancelModal(true)}
-                  className="flex items-center gap-1.5 rounded-2xl bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 px-4 py-2.5 text-xs font-bold transition active:scale-95 cursor-pointer"
-                >
-                  <Ban size={14} />
-                  <span>Batalkan Pesanan</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setShowModal(true)}
-                  className="flex items-center gap-2 rounded-2xl bg-emerald-600 px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-emerald-600/20 transition hover:-translate-y-0.5 hover:bg-emerald-700 active:scale-95 cursor-pointer"
-                >
-                  <CreditCard size={16} />
-                  Bayar Sekarang
-                </button>
-              </div>
-            ) : (
-              <span className="rounded-full bg-emerald-50 px-3.5 py-1.5 text-xs font-bold text-emerald-700 ring-1 ring-emerald-200 flex items-center gap-1.5">
-                <CheckCircle2 size={14} />
-                {order.status}
-              </span>
-            )}
-          </div>
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-[#162018] px-3.5 py-1 text-[11px] font-bold tracking-wider text-emerald-400 uppercase font-mono shadow-xs">
+            <Sparkles size={12} className="text-amber-400" />
+            Atelier Cicendo Bandung // Order Detail &amp; QC Passport
+          </span>
         </div>
 
-        {/* Stepper / Timeline Pelacakan Status Bergaris */}
-        {isCancelled ? (
-          <div className="rounded-2xl border border-rose-200 bg-rose-50 p-4 text-rose-800 flex items-center gap-3">
-            <AlertCircle size={20} className="text-rose-600 shrink-0" />
-            <p className="text-sm font-medium">
-              Pesanan ini telah dibatalkan dan tidak dapat diproses lebih lanjut.
-            </p>
-          </div>
-        ) : isExpired ? (
-          <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-amber-900 flex items-center gap-3">
-            <AlertCircle size={20} className="text-amber-600 shrink-0" />
+        {/* Main Card */}
+        <div className="rounded-3xl border border-[#162018]/10 bg-white p-6 shadow-sm ring-1 ring-black/5 sm:p-8 space-y-8 relative overflow-hidden">
+          {/* Header */}
+          <div className="flex flex-wrap items-center justify-between gap-4 pb-6 border-b border-[#162018]/10">
             <div>
-              <p className="text-sm font-bold">
-                Batas Waktu Pembayaran Telah Kedaluwarsa (Melebihi 24 Jam)
-              </p>
-              <p className="text-xs text-amber-700 mt-0.5">
-                Tagihan pembayaran untuk transaksi lama ini sudah kedaluwarsa di sistem Midtrans. Silakan pesan ulang produk yang Anda inginkan.
-              </p>
+              <div className="flex items-center gap-2">
+                <Package size={20} className="text-[#162018]" />
+                <h1 className="font-mono text-xl sm:text-2xl font-black text-[#162018]">
+                  {order.orderNumber || `Order #${order.id}`}
+                </h1>
+              </div>
+              {order.createdAt || order.created_at ? (
+                <p className="mt-1 flex items-center gap-1.5 text-xs text-slate-400 font-mono">
+                  <Calendar size={12} />
+                  Dibuat pada:{" "}
+                  {new Date(order.createdAt || order.created_at).toLocaleString("id-ID")}
+                </p>
+              ) : null}
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2.5">
+              {/* Tombol Cetak / Unduh Dokumen Resmi */}
+              <button
+                type="button"
+                onClick={() => setShowInvoiceModal(true)}
+                className={`flex items-center gap-1.5 rounded-xl px-4 py-2.5 text-xs font-mono font-bold uppercase tracking-wider shadow-2xs transition active:scale-95 cursor-pointer ${
+                  isPaid
+                    ? "bg-emerald-50 text-emerald-800 border border-emerald-300 hover:bg-emerald-100"
+                    : isPending
+                    ? "bg-amber-50 text-amber-800 border border-amber-300 hover:bg-amber-100"
+                    : "bg-[#FAF8F4] text-slate-700 border border-[#162018]/15 hover:bg-white"
+                }`}
+                title={isPaid ? "Cetak atau Unduh Invoice Resmi Lunas" : "Lihat / Cetak Tagihan Sementara"}
+              >
+                {isPaid ? <FileText size={14} className="text-emerald-700" /> : <Printer size={14} className="text-amber-700" />}
+                <span>{isPaid ? "Invoice Resmi (PDF)" : "Cetak Tagihan"}</span>
+              </button>
+
+              {isCancelled ? (
+                <div className="flex flex-col items-end gap-1">
+                  <span className="rounded-full bg-rose-50 px-3.5 py-1 text-xs font-mono font-bold uppercase tracking-wider text-rose-700 border border-rose-200">
+                    Dibatalkan
+                  </span>
+                  {order.cancellationReason && (
+                    <span className="text-[10px] text-slate-500 italic max-w-xs text-right font-mono">
+                      Alasan: {order.cancellationReason}
+                    </span>
+                  )}
+                </div>
+              ) : isExpired ? (
+                <div className="flex items-center gap-2">
+                  <span className="rounded-full bg-rose-50 px-3.5 py-1 text-xs font-mono font-bold uppercase tracking-wider text-rose-700 border border-rose-200">
+                    Kedaluwarsa
+                  </span>
+                  <Link
+                    to="/dashboard"
+                    className="inline-flex items-center gap-1.5 rounded-xl bg-[#162018] hover:bg-black px-4 py-2 text-xs font-mono font-bold text-white shadow-xs transition"
+                  >
+                    <RotateCcw size={13} />
+                    <span>Pesan Ulang</span>
+                  </Link>
+                </div>
+              ) : isPending ? (
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setShowCancelModal(true)}
+                    className="flex items-center gap-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 px-3.5 py-2 text-xs font-mono font-bold transition active:scale-95 cursor-pointer"
+                  >
+                    <Ban size={13} />
+                    <span>Batalkan</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setShowModal(true)}
+                    className="flex items-center gap-2 rounded-xl bg-[#B9382B] hover:bg-[#982D22] px-5 py-2.5 text-xs font-condensed font-black uppercase tracking-wider text-white shadow-md shadow-[#B9382B]/20 transition hover:-translate-y-0.5 active:scale-95 cursor-pointer"
+                  >
+                    <CreditCard size={15} />
+                    <span>Bayar Sekarang</span>
+                  </button>
+                </div>
+              ) : (
+                <span className="rounded-full bg-emerald-50 px-3.5 py-1 text-xs font-mono font-bold uppercase tracking-wider text-emerald-800 border border-emerald-300 flex items-center gap-1.5">
+                  <CheckCircle2 size={13} />
+                  {order.status}
+                </span>
+              )}
             </div>
           </div>
-        ) : (
-          <div className="py-2">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xs font-bold uppercase tracking-wider text-slate-400">
-                Status Progres Pelacakan Pesanan
-              </h2>
-              <span className="text-xs font-semibold text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200/60">
-                Tahap {Math.max(1, currentRank)} dari 5
-              </span>
+
+          {/* Stepper / Timeline Pelacakan Status Bergaris */}
+          {isCancelled ? (
+            <div className="rounded-2xl border border-rose-200 bg-rose-50 p-4 text-rose-800 flex items-center gap-3">
+              <AlertCircle size={20} className="text-rose-600 shrink-0" />
+              <p className="text-sm font-medium">
+                Pesanan ini telah dibatalkan dan proses produksi/pengiriman dihentikan.
+              </p>
             </div>
+          ) : isExpired ? (
+            <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-amber-900 flex items-center gap-3">
+              <AlertCircle size={20} className="text-amber-600 shrink-0" />
+              <div>
+                <p className="text-sm font-bold font-mono">
+                  Batas Waktu Pembayaran Telah Kedaluwarsa (Melebihi 24 Jam)
+                </p>
+                <p className="text-xs text-amber-700 mt-0.5">
+                  Tagihan pembayaran untuk transaksi lama ini sudah kedaluwarsa di sistem Midtrans. Silakan lakukan pemesanan ulang jersey pilihan Anda.
+                </p>
+              </div>
+            </div>
+          ) : (
+            <div className="py-2">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xs font-mono font-bold uppercase tracking-wider text-slate-500">
+                  Status Progres Pelacakan Pesanan
+                </h2>
+                <span className="text-xs font-mono font-bold text-emerald-800 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
+                  Tahap {Math.max(1, currentRank)} dari 5
+                </span>
+              </div>
 
-            {/* Desktop Stepper Bergaris Aktif */}
-            <div className="hidden sm:block relative mb-6 pt-2">
-              {/* Garis Dasar Abu-Abu */}
-              <div className="absolute top-7 left-12 right-12 h-1 bg-slate-100 rounded-full z-0" />
+              {/* Desktop Stepper Bergaris Aktif */}
+              <div className="hidden sm:block relative mb-6 pt-2">
+                {/* Garis Dasar Abu-Abu */}
+                <div className="absolute top-7 left-12 right-12 h-1 bg-slate-100 rounded-full z-0" />
 
-              {/* Garis Progres Hijau Berjalan */}
-              <div
-                className="absolute top-7 left-12 h-1 bg-emerald-500 rounded-full transition-all duration-500 z-0"
-                style={{
-                  width: `${Math.min(100, Math.max(0, ((currentRank - 1) / 4) * 85))}%`,
-                }}
-              />
+                {/* Garis Progres Hijau Berjalan */}
+                <div
+                  className="absolute top-7 left-12 h-1 bg-emerald-600 rounded-full transition-all duration-500 z-0"
+                  style={{
+                    width: `${Math.min(100, Math.max(0, ((currentRank - 1) / 4) * 85))}%`,
+                  }}
+                />
 
-              <div className="grid grid-cols-5 relative z-10">
+                <div className="grid grid-cols-5 relative z-10">
+                  {ORDER_STEPS.map((step, idx) => {
+                    const stepRank = STATUS_RANK[step.key];
+                    const isCompleted = currentRank > stepRank;
+                    const isCurrent = currentRank === stepRank;
+                    const IconComponent = step.icon;
+
+                    return (
+                      <div key={step.key} className="flex flex-col items-center text-center px-1">
+                        <div
+                          className={`w-11 h-11 rounded-2xl flex items-center justify-center transition-all duration-300 ${
+                            isCurrent
+                              ? "bg-[#162018] text-amber-300 shadow-md ring-4 ring-[#162018]/15 scale-110"
+                              : isCompleted
+                              ? "bg-emerald-600 text-white shadow-xs"
+                              : "bg-white border-2 border-slate-200 text-slate-400"
+                          }`}
+                        >
+                          {isCompleted ? <Check size={18} strokeWidth={2.5} /> : <IconComponent size={18} />}
+                        </div>
+
+                        <span
+                          className={`text-xs font-bold mt-3 leading-tight font-mono ${
+                            isCurrent
+                              ? "text-[#162018] font-black"
+                              : isCompleted
+                              ? "text-slate-800"
+                              : "text-slate-400"
+                          }`}
+                        >
+                          {step.label}
+                        </span>
+
+                        <span className="text-[10px] text-slate-400 mt-0.5 leading-tight font-mono">
+                          {isCurrent
+                            ? "Sedang berlangsung"
+                            : isCompleted
+                            ? "Selesai"
+                            : `Langkah ${idx + 1}`}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Mobile Vertical Stepper */}
+              <div className="sm:hidden space-y-4 relative pl-6 border-l-2 border-[#162018]/20 ml-3">
                 {ORDER_STEPS.map((step, idx) => {
                   const stepRank = STATUS_RANK[step.key];
                   const isCompleted = currentRank > stepRank;
@@ -501,204 +554,157 @@ export default function OrderDetail() {
                   const IconComponent = step.icon;
 
                   return (
-                    <div key={step.key} className="flex flex-col items-center text-center px-1">
+                    <div key={step.key} className="relative pb-2 last:pb-0">
                       <div
-                        className={`w-11 h-11 rounded-2xl flex items-center justify-center transition-all duration-300 ${
+                        className={`absolute -left-[31px] top-0 w-8 h-8 rounded-full flex items-center justify-center text-xs ${
                           isCurrent
-                            ? "bg-emerald-600 text-white shadow-lg shadow-emerald-600/30 ring-4 ring-emerald-100 scale-110"
+                            ? "bg-[#162018] text-amber-300 ring-4 ring-[#162018]/15 font-bold"
                             : isCompleted
-                            ? "bg-emerald-500 text-white shadow-sm"
-                            : "bg-white border-2 border-slate-200 text-slate-400"
+                            ? "bg-emerald-600 text-white"
+                            : "bg-white border-2 border-slate-300 text-slate-400"
                         }`}
                       >
-                        {isCompleted ? <Check size={18} strokeWidth={2.5} /> : <IconComponent size={18} />}
+                        {isCompleted ? <Check size={13} /> : <IconComponent size={13} />}
                       </div>
-
-                      <span
-                        className={`text-xs font-bold mt-3 leading-tight ${
-                          isCurrent
-                            ? "text-emerald-700 font-black"
-                            : isCompleted
-                            ? "text-slate-800"
-                            : "text-slate-400"
-                        }`}
-                      >
-                        {step.label}
-                      </span>
-
-                      <span className="text-[10px] text-slate-400 mt-0.5 leading-tight">
-                        {isCurrent
-                          ? "Sedang berlangsung"
-                          : isCompleted
-                          ? "Selesai"
-                          : `Langkah ${idx + 1}`}
-                      </span>
+                      <div className="ml-2 font-mono">
+                        <p
+                          className={`text-xs font-bold ${
+                            isCurrent
+                              ? "text-[#162018] font-black"
+                              : isCompleted
+                              ? "text-slate-900"
+                              : "text-slate-400"
+                          }`}
+                        >
+                          {step.label}
+                        </p>
+                        <p className="text-[10px] text-slate-400">
+                          {isCurrent ? "Sedang dalam tahap ini" : isCompleted ? "Tahap selesai" : `Menunggu antrean`}
+                        </p>
+                      </div>
                     </div>
                   );
                 })}
               </div>
             </div>
+          )}
 
-            {/* Mobile Vertical Stepper */}
-            <div className="sm:hidden space-y-4 relative pl-6 border-l-2 border-slate-200 ml-3">
-              {ORDER_STEPS.map((step, idx) => {
-                const stepRank = STATUS_RANK[step.key];
-                const isCompleted = currentRank > stepRank;
-                const isCurrent = currentRank === stepRank;
-                const IconComponent = step.icon;
-
-                return (
-                  <div key={step.key} className="relative pb-2 last:pb-0">
-                    <div
-                      className={`absolute -left-[31px] top-0 w-8 h-8 rounded-full flex items-center justify-center text-xs ${
-                        isCurrent
-                          ? "bg-emerald-600 text-white ring-4 ring-emerald-100 font-bold"
-                          : isCompleted
-                          ? "bg-emerald-500 text-white"
-                          : "bg-white border-2 border-slate-300 text-slate-400"
-                      }`}
-                    >
-                      {isCompleted ? <Check size={14} /> : <IconComponent size={14} />}
+          {/* Kartu Informasi Pengiriman & Pelacakan Ekspedisi Visual */}
+          {(order.shippingCourier || order.trackingNumber || (order.status || "").toUpperCase() === "SHIPPED") && (
+            <div className="rounded-3xl border border-[#162018]/15 bg-[#FAF8F4] p-6 shadow-2xs space-y-6">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div className="flex items-center gap-3.5">
+                  <div className="h-12 w-12 rounded-2xl bg-[#162018] text-emerald-400 flex items-center justify-center shrink-0 shadow-sm">
+                    <Truck size={22} />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] font-mono font-black uppercase tracking-wider bg-[#162018] text-amber-300 px-2.5 py-0.5 rounded">
+                        {order.shippingCourier || "Ekspedisi Partner"}
+                      </span>
+                      <span className="text-xs text-slate-500 font-mono">Nomor Resi:</span>
                     </div>
-                    <div className="ml-2">
-                      <p
-                        className={`text-sm font-bold ${
-                          isCurrent
-                            ? "text-emerald-700 font-black"
-                            : isCompleted
-                            ? "text-slate-900"
-                            : "text-slate-400"
+                    <div className="flex items-center gap-2 mt-1">
+                      <span className="font-mono text-base font-black text-slate-900 tracking-wider">
+                        {order.trackingNumber || "Menunggu penerbitan nomor resi"}
+                      </span>
+                      {order.trackingNumber && (
+                        <button
+                          type="button"
+                          onClick={() => handleCopyResi(order.trackingNumber)}
+                          className="p-1 text-slate-400 hover:text-[#162018] rounded-lg hover:bg-white transition cursor-pointer"
+                          title="Salin Nomor Resi"
+                        >
+                          {copiedResi ? <Check size={15} className="text-emerald-600" /> : <Copy size={15} />}
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-2">
+                  {order.trackingNumber && (
+                    <button
+                      type="button"
+                      onClick={() => window.open(getCourierTrackingUrl(order.shippingCourier, order.trackingNumber), "_blank")}
+                      className="inline-flex items-center gap-1.5 rounded-xl bg-white text-slate-800 border border-[#162018]/15 hover:border-[#162018] px-4 py-2 text-xs font-mono font-bold shadow-2xs transition active:scale-95 cursor-pointer"
+                    >
+                      <ExternalLink size={13} />
+                      <span>Lacak di Portal Kurir ↗</span>
+                    </button>
+                  )}
+
+                  {(order.status || "").toUpperCase() === "SHIPPED" && (
+                    <button
+                      type="button"
+                      onClick={handleCompleteOrder}
+                      disabled={completing}
+                      className="flex items-center gap-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-mono font-bold px-4 py-2 shadow-xs transition active:scale-95 disabled:opacity-50 shrink-0 cursor-pointer"
+                    >
+                      <PackageCheck size={16} />
+                      {completing ? "Menyelesaikan..." : "Konfirmasi Diterima"}
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* Visual Tracking Ekspedisi Stepper */}
+              <div className="p-4 rounded-2xl bg-white border border-[#162018]/10 shadow-2xs">
+                <div className="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-wider mb-4 flex items-center justify-between">
+                  <span>Tahapan Ekspedisi Pengiriman</span>
+                  <span className="text-emerald-700 font-semibold font-mono">Atelier Cicendo Bandung Hub</span>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+                  {[
+                    {
+                      step: "1",
+                      title: "QC & Packing Selesai",
+                      desc: "Inspeksi 3 lapis & label thermal dicetak di Atelier Bandung",
+                      active: true,
+                    },
+                    {
+                      step: "2",
+                      title: "Diserahkan ke Kurir",
+                      desc: `Paket diserahkan ke ${order.shippingCourier || "ekspedisi partner"}`,
+                      active: Boolean(order.trackingNumber),
+                    },
+                    {
+                      step: "3",
+                      title: "Dalam Perjalanan",
+                      desc: `Menuju kota tujuan (${order.shippingCity || "Tujuan"})`,
+                      active: (order.status || "").toUpperCase() === "SHIPPED" || (order.status || "").toUpperCase() === "COMPLETED",
+                    },
+                    {
+                      step: "4",
+                      title: "Pesanan Diterima",
+                      desc: `Kurir mengantar ke ${order.recipientName || "Penerima"}`,
+                      active: (order.status || "").toUpperCase() === "COMPLETED",
+                    },
+                  ].map((item, idx) => (
+                    <div key={idx} className="flex items-start gap-3">
+                      <div
+                        className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-mono font-bold shrink-0 ${
+                          item.active
+                            ? "bg-[#162018] text-amber-300 shadow-2xs"
+                            : "bg-slate-100 text-slate-400 border border-slate-200"
                         }`}
                       >
-                        {step.label}
-                      </p>
-                      <p className="text-xs text-slate-400">
-                        {isCurrent ? "Sedang dalam tahap ini" : isCompleted ? "Tahap selesai" : `Menunggu antrean`}
-                      </p>
+                        {item.active ? <Check size={13} strokeWidth={3} /> : item.step}
+                      </div>
+                      <div>
+                        <h5 className={`text-xs font-bold font-mono ${item.active ? "text-slate-900" : "text-slate-400"}`}>
+                          {item.title}
+                        </h5>
+                        <p className="text-[10px] text-slate-500 mt-0.5 leading-relaxed">
+                          {item.desc}
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        )}
-
-        {/* Kartu Informasi Pengiriman & Pelacakan Ekspedisi Visual */}
-        {(order.shippingCourier || order.trackingNumber || (order.status || "").toUpperCase() === "SHIPPED") && (
-          <div className="rounded-3xl border border-emerald-500/30 bg-emerald-50/40 p-6 shadow-xs space-y-6">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-              <div className="flex items-center gap-3.5">
-                <div className="h-12 w-12 rounded-2xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-md shadow-emerald-600/20">
-                  <Truck size={24} />
-                </div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs font-black uppercase tracking-wider bg-emerald-200/80 text-emerald-900 px-2.5 py-0.5 rounded-full">
-                      {order.shippingCourier || "Ekspedisi Partner"}
-                    </span>
-                    <span className="text-xs text-slate-500 font-medium">Nomor Resi Resmi:</span>
-                  </div>
-                  <div className="flex items-center gap-2 mt-1">
-                    <span className="font-mono text-base font-black text-slate-900 tracking-wider">
-                      {order.trackingNumber || "Menunggu penerbitan nomor resi"}
-                    </span>
-                    {order.trackingNumber && (
-                      <button
-                        type="button"
-                        onClick={() => handleCopyResi(order.trackingNumber)}
-                        className="p-1 text-slate-400 hover:text-emerald-700 rounded-lg hover:bg-emerald-100 transition cursor-pointer"
-                        title="Salin Nomor Resi"
-                      >
-                        {copiedResi ? <Check size={16} className="text-emerald-600" /> : <Copy size={16} />}
-                      </button>
-                    )}
-                  </div>
+                  ))}
                 </div>
               </div>
-
-              <div className="flex flex-wrap items-center gap-2">
-                {order.trackingNumber && (
-                  <button
-                    type="button"
-                    onClick={() => window.open(getCourierTrackingUrl(order.shippingCourier, order.trackingNumber), "_blank")}
-                    className="inline-flex items-center gap-1.5 rounded-2xl bg-white text-emerald-800 border border-emerald-200 hover:bg-emerald-100 px-4 py-2.5 text-xs font-bold shadow-xs transition active:scale-95 cursor-pointer"
-                  >
-                    <ExternalLink size={14} />
-                    <span>Lacak di Portal Kurir ↗</span>
-                  </button>
-                )}
-
-                {(order.status || "").toUpperCase() === "SHIPPED" && (
-                  <button
-                    type="button"
-                    onClick={handleCompleteOrder}
-                    disabled={completing}
-                    className="flex items-center gap-2 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-bold px-5 py-2.5 shadow-lg shadow-emerald-600/20 transition active:scale-95 disabled:opacity-50 shrink-0 cursor-pointer"
-                  >
-                    <PackageCheck size={18} />
-                    {completing ? "Menyelesaikan..." : "Konfirmasi Pesanan Diterima"}
-                  </button>
-                )}
-              </div>
             </div>
-
-            {/* Visual Tracking Ekspedisi Stepper */}
-            <div className="p-4 rounded-2xl bg-white border border-emerald-100 shadow-xs">
-              <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-4 flex items-center justify-between">
-                <span>Tahapan Pengiriman Ekspedisi</span>
-                <span className="text-emerald-700 font-semibold">RegarSport Wonogiri Hub</span>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
-                {[
-                  {
-                    step: "1",
-                    title: "Pengepakan Selesai",
-                    desc: "Paket dikemas & label resi thermal dicetak di Gudang Wonogiri",
-                    active: true,
-                  },
-                  {
-                    step: "2",
-                    title: "Diserahkan ke Kurir",
-                    desc: `Paket diserahkan ke ${order.shippingCourier || "ekspedisi"}`,
-                    active: Boolean(order.trackingNumber),
-                  },
-                  {
-                    step: "3",
-                    title: "Dalam Perjalanan",
-                    desc: `Menuju hub logistik kota tujuan (${order.shippingCity || "Tujuan"})`,
-                    active: (order.status || "").toUpperCase() === "SHIPPED" || (order.status || "").toUpperCase() === "COMPLETED",
-                  },
-                  {
-                    step: "4",
-                    title: "Pesanan Diterima",
-                    desc: `Kurir mengantar ke ${order.recipientName || "Penerima"}`,
-                    active: (order.status || "").toUpperCase() === "COMPLETED",
-                  },
-                ].map((item, idx) => (
-                  <div key={idx} className="flex items-start gap-3">
-                    <div
-                      className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${
-                        item.active
-                          ? "bg-emerald-600 text-white shadow-sm"
-                          : "bg-slate-100 text-slate-400 border border-slate-200"
-                      }`}
-                    >
-                      {item.active ? <Check size={13} strokeWidth={3} /> : item.step}
-                    </div>
-                    <div>
-                      <h5 className={`text-xs font-bold ${item.active ? "text-slate-900" : "text-slate-400"}`}>
-                        {item.title}
-                      </h5>
-                      <p className="text-[10px] text-slate-500 mt-0.5 leading-relaxed">
-                        {item.desc}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
+          )}
 
         {/* 3 Pilar Garansi Resmi RegarSport & Klaim Retur */}
         {(() => {
@@ -1333,6 +1339,7 @@ export default function OrderDetail() {
           setClaims((prev) => [newClaim, ...prev]);
         }}
       />
+      </div>
     </div>
   );
 }

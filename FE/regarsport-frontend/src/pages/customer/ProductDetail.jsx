@@ -150,6 +150,7 @@ export default function ProductDetail() {
   const [customNumber, setCustomNumber] = useState("");
   const [customCollar, setCustomCollar] = useState("O-Neck");
   const [customTeam, setCustomTeam] = useState("");
+  const [activeMediaTab, setActiveMediaTab] = useState("photo"); // photo | mockup
 
   // Otomatis matikan kustomisasi jika berpindah ke produk non-jersey
   useEffect(() => {
@@ -413,77 +414,255 @@ export default function ProductDetail() {
   }
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-12">
-      <div className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-900/5 sm:p-8">
-        <div className="grid gap-10 md:grid-cols-2">
-          <div className="group aspect-square overflow-hidden rounded-2xl bg-slate-100">
-            <img
-              src={product.imageUrl || product.image_url || "https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=800&q=80"}
-              onError={(e) => {
-                e.currentTarget.onerror = null;
-                e.currentTarget.src = "https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=800&q=80";
-              }}
-              alt={product.name}
-              className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
-            />
+    <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-10 animate-fade-in">
+      {/* Tactical Breadcrumb & Origin Pill */}
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-3 text-xs">
+        <Link
+          to="/dashboard"
+          className="inline-flex items-center gap-1.5 rounded-full bg-white px-4 py-2 font-mono font-bold text-slate-700 border border-[#162018]/15 hover:border-[#162018] hover:text-[#162018] transition shadow-2xs group"
+        >
+          <ChevronLeft size={14} className="transition-transform group-hover:-translate-x-0.5" />
+          <span>Kembali ke Katalog Toko</span>
+        </Link>
+
+        <div className="flex items-center gap-2">
+          <span className="hidden sm:inline-flex items-center gap-1.5 rounded-full bg-[#162018] px-3.5 py-1.5 text-[11px] font-bold tracking-wider text-emerald-400 uppercase font-mono shadow-xs">
+            <Sparkles size={12} className="text-amber-400" />
+            Atelier Cicendo Bandung // Pro Series
+          </span>
+          <span className="inline-flex items-center rounded-full bg-[#FAF8F4] px-3.5 py-1.5 text-[11px] font-bold uppercase tracking-wider text-slate-700 border border-[#162018]/15">
+            {product.categoryName || "Official Sportswear"}
+          </span>
+        </div>
+      </div>
+
+      <div className="rounded-3xl border border-[#162018]/10 bg-white p-6 shadow-sm ring-1 ring-black/5 sm:p-8 relative overflow-hidden">
+        {/* Subtle Topographic Accent */}
+        <div className="absolute top-0 right-0 w-96 h-96 bg-topography opacity-[0.03] pointer-events-none" />
+
+        <div className="grid gap-10 lg:grid-cols-12 relative z-10 items-start">
+          {/* Left Column: Gallery / Mockup Showcase (5 cols) */}
+          <div className="lg:col-span-5 space-y-4">
+            {/* Media Mode Tabs (For Jersey Categories) */}
+            {isJersey && (
+              <div className="flex items-center rounded-xl bg-[#FAF8F4] p-1 border border-[#162018]/10 text-xs font-bold">
+                <button
+                  type="button"
+                  onClick={() => setActiveMediaTab("photo")}
+                  className={`flex-1 py-2 rounded-lg flex items-center justify-center gap-1.5 transition cursor-pointer ${
+                    activeMediaTab === "photo"
+                      ? "bg-[#162018] text-white shadow-xs font-mono"
+                      : "text-slate-600 hover:text-black font-mono"
+                  }`}
+                >
+                  <Eye size={14} />
+                  <span>Foto Produk Real</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setActiveMediaTab("mockup")}
+                  className={`flex-1 py-2 rounded-lg flex items-center justify-center gap-1.5 transition cursor-pointer ${
+                    activeMediaTab === "mockup"
+                      ? "bg-[#162018] text-white shadow-xs font-mono"
+                      : "text-slate-600 hover:text-black font-mono"
+                  }`}
+                >
+                  <Shirt size={14} />
+                  <span>Simulasi 3D Custom</span>
+                </button>
+              </div>
+            )}
+
+            {/* Media Box */}
+            <div className="group relative aspect-square overflow-hidden rounded-2xl bg-[#F3EFE7] border border-[#162018]/10 shadow-inner">
+              {activeMediaTab === "photo" || !isJersey ? (
+                <>
+                  <img
+                    src={product.imageUrl || product.image_url || "https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=800&q=80"}
+                    onError={(e) => {
+                      e.currentTarget.onerror = null;
+                      e.currentTarget.src = "https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=800&q=80";
+                    }}
+                    alt={product.name}
+                    className="h-full w-full object-cover transition duration-700 group-hover:scale-105"
+                  />
+
+                  {/* Tactical Overlays */}
+                  <div className="absolute top-3.5 left-3.5 flex flex-col gap-1.5 pointer-events-none">
+                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-[#162018]/90 text-[10px] font-black uppercase tracking-wider text-amber-300 backdrop-blur-xs border border-white/10 shadow-xs font-mono">
+                      ORIGINAL ATELIER
+                    </span>
+                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-emerald-900/90 text-[10px] font-black uppercase tracking-wider text-emerald-300 backdrop-blur-xs border border-emerald-500/30 shadow-xs font-mono">
+                      OEKO-TEX INK
+                    </span>
+                  </div>
+
+                  <div className="absolute bottom-3.5 left-3.5 right-3.5 flex items-center justify-between">
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-white/95 text-[10px] font-bold text-slate-800 shadow-sm border border-slate-200/80">
+                      <ShieldCheck size={13} className="text-emerald-600" />
+                      100% Garansi Tukar Ukuran
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setLightbox({ open: true, index: 0, images: [product.imageUrl || product.image_url] })}
+                      className="p-2 rounded-lg bg-white/90 hover:bg-white text-slate-700 shadow-md transition cursor-pointer"
+                      title="Perbesar foto produk"
+                    >
+                      <Eye size={15} />
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <div className="p-4 h-full flex flex-col items-center justify-center bg-radial from-white to-[#F3EFE7]">
+                  <JerseyPreviewMockup
+                    productImage={product.imageUrl}
+                    productName={product.name}
+                    customName={customName}
+                    customNumber={customNumber}
+                    customCollar={customCollar}
+                    customTeam={customTeam}
+                    selectedSize={selectedSize}
+                  />
+                  <p className="text-[11px] font-mono text-slate-500 mt-2 text-center">
+                    Visualisasi rendering otomatis berdasarkan form kustomisasi tim
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {/* Quick Assurance Strip under Media */}
+            <div className="grid grid-cols-2 gap-2 text-center text-xs">
+              <div className="p-3 rounded-xl bg-[#FAF8F4] border border-[#162018]/10">
+                <span className="block text-[10px] font-mono uppercase tracking-wider text-slate-500">Kapasitas Produksi</span>
+                <span className="font-bold text-[#162018]">Order Satuan s/d Ribuan Pcs</span>
+              </div>
+              <div className="p-3 rounded-xl bg-[#FAF8F4] border border-[#162018]/10">
+                <span className="block text-[10px] font-mono uppercase tracking-wider text-slate-500">QC Standar Bandung</span>
+                <span className="font-bold text-[#162018]">Inspeksi Jahitan 3 Lapis</span>
+              </div>
+            </div>
+
+            {/* Share to WhatsApp Button */}
+            <button
+              type="button"
+              onClick={handleShareToWhatsApp}
+              className="w-full flex items-center justify-center gap-2 rounded-xl border border-emerald-600/30 bg-emerald-50/60 px-4 py-2.5 text-xs font-bold text-emerald-800 transition hover:bg-emerald-100/80 cursor-pointer"
+              title="Bagikan rincian dan rancangan produk ini ke WhatsApp tim Anda"
+            >
+              <Share2 size={15} className="text-emerald-600" />
+              <span>Diskusikan Rancangan dengan Tim via WhatsApp</span>
+            </button>
           </div>
 
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
-              {product.name}
-            </h1>
+          {/* Right Column: Tactical Product Detail Info (7 cols) */}
+          <div className="lg:col-span-7 space-y-6">
+            <div>
+              <div className="flex flex-wrap items-center gap-2 mb-2">
+                <span className="px-2.5 py-0.5 rounded-full bg-[#162018]/10 text-[10px] font-bold uppercase tracking-wider text-[#162018]">
+                  {product.categoryName || "Official Apparel"}
+                </span>
 
-            <div className="mt-3 flex items-center gap-2 text-sm text-slate-500">
-              <div className="flex items-center gap-1 text-amber-500">
-                <Star size={15} className="fill-current" />
-                <span className="font-semibold text-slate-700">{averageRating.toFixed(1)}</span>
+                {product.stock === 0 ? (
+                  <span className="rounded-full bg-rose-50 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-rose-600 border border-rose-200">
+                    Stok Habis
+                  </span>
+                ) : product.stock <= 5 ? (
+                  <span className="rounded-full bg-amber-50 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-amber-700 border border-amber-200">
+                    Sisa {product.stock} pcs (Segera Habis)
+                  </span>
+                ) : (
+                  <span className="rounded-full bg-emerald-50 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-emerald-700 border border-emerald-200">
+                    Tersedia ({product.stock} pcs)
+                  </span>
+                )}
               </div>
-              <span className="text-slate-300">•</span>
-              <span>{totalReviewsCount} ulasan</span>
-              {totalReviewsCount > 0 && (
-                <>
-                  <span className="text-slate-300">•</span>
-                  <span className="text-emerald-600 font-semibold">{satisfactionRate}% pembeli puas</span>
-                </>
-              )}
+
+              <h1 className="font-condensed text-3xl sm:text-4xl font-black uppercase tracking-tight text-[#162018] leading-tight">
+                {product.name}
+              </h1>
+
+              {/* Rating Summary Strip */}
+              <div className="mt-2.5 flex flex-wrap items-center gap-3 text-xs text-slate-500">
+                <div className="flex items-center gap-1 text-amber-500">
+                  <Star size={15} className="fill-current" />
+                  <span className="font-black text-slate-900">{averageRating.toFixed(1)}</span>
+                </div>
+                <span className="text-slate-300">•</span>
+                <span className="font-semibold text-slate-700">{totalReviewsCount} Ulasan Pembeli</span>
+                {totalReviewsCount > 0 && (
+                  <>
+                    <span className="text-slate-300">•</span>
+                    <span className="inline-flex items-center gap-1 text-emerald-700 font-bold bg-emerald-50 px-2 py-0.5 rounded-md">
+                      <ThumbsUp size={12} />
+                      {satisfactionRate}% Pembeli Puas
+                    </span>
+                  </>
+                )}
+              </div>
             </div>
 
-            <div className="mt-4 flex flex-wrap items-center gap-3">
-              <p className="text-3xl font-bold text-emerald-600">
-                Rp {Number(product.price).toLocaleString("id-ID")}
-              </p>
+            {/* Tactical Pricing Box */}
+            <div className="p-4 rounded-2xl bg-[#FAF8F4] border border-[#162018]/10 flex flex-wrap items-center justify-between gap-4">
+              <div>
+                <span className="block text-[10px] font-mono uppercase tracking-wider text-slate-400">Harga Resmi Atelier</span>
+                <div className="flex items-baseline gap-2.5">
+                  <p className="font-condensed text-3xl sm:text-4xl font-black text-[#B9382B] tracking-tight">
+                    Rp {Number(product.price).toLocaleString("id-ID")}
+                  </p>
+                  <span className="text-xs font-bold text-slate-400 line-through">
+                    Rp {Math.round(Number(product.price) * 1.15).toLocaleString("id-ID")}
+                  </span>
+                  <span className="px-2 py-0.5 rounded bg-[#B9382B]/10 text-[#B9382B] text-[11px] font-black uppercase">
+                    HEMAT 15%
+                  </span>
+                </div>
+              </div>
 
-              {product.stock === 0 ? (
-                <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-500">
-                  Stok Habis
+              <div className="text-right">
+                <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200/80">
+                  <CheckCircle2 size={13} className="text-emerald-600" />
+                  Bebas Biaya Tambahan
                 </span>
-              ) : product.stock <= 5 ? (
-                <span className="rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-600">
-                  Sisa {product.stock}
-                </span>
-              ) : (
-                <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-600">
-                  Stok Tersedia
-                </span>
-              )}
+              </div>
             </div>
 
-            <p className="mt-2 text-sm text-slate-400">Stok: {product.stock}</p>
+            {/* Product Description */}
+            <div>
+              <h2 className="text-xs font-mono font-bold uppercase tracking-wider text-slate-400 mb-1.5">
+                Deskripsi & Karakteristik Produk
+              </h2>
+              <p className="leading-relaxed text-sm text-slate-600">{product.description}</p>
+            </div>
 
-            <div className="mt-6">
-              <h2 className="text-lg font-semibold text-slate-900">Deskripsi</h2>
-              <p className="mt-2 leading-relaxed text-slate-600">{product.description}</p>
+            {/* Tactical 4-Cell Tech Specs Matrix */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+              <div className="p-3 rounded-xl bg-[#FAF8F4] border border-[#162018]/10">
+                <span className="block text-[10px] font-mono uppercase text-slate-400">Material</span>
+                <span className="font-bold text-xs text-[#162018]">Dri-Fit Jacquard</span>
+              </div>
+              <div className="p-3 rounded-xl bg-[#FAF8F4] border border-[#162018]/10">
+                <span className="block text-[10px] font-mono uppercase text-slate-400">Gramasi</span>
+                <span className="font-bold text-xs text-[#162018]">180 GSM Pro</span>
+              </div>
+              <div className="p-3 rounded-xl bg-[#FAF8F4] border border-[#162018]/10">
+                <span className="block text-[10px] font-mono uppercase text-slate-400">Teknik Cetak</span>
+                <span className="font-bold text-xs text-[#162018]">OEKO-TEX Sublim</span>
+              </div>
+              <div className="p-3 rounded-xl bg-[#FAF8F4] border border-[#162018]/10">
+                <span className="block text-[10px] font-mono uppercase text-slate-400">Atelier Asal</span>
+                <span className="font-bold text-xs text-[#162018]">Cicendo, Bandung</span>
+              </div>
             </div>
 
             {/* Size Selection Section */}
-            <div className="mt-6 rounded-2xl border border-slate-200/80 bg-slate-50/60 p-4">
+            <div className="rounded-2xl border border-[#162018]/10 bg-[#FAF8F4] p-4 sm:p-5">
               <div className="flex items-center justify-between gap-3 mb-3">
                 <div className="flex items-center gap-2">
-                  <span className="text-xs font-bold uppercase tracking-wider text-slate-600">
+                  <span className="text-xs font-bold uppercase tracking-wider text-slate-700">
                     Pilihan Ukuran:
                   </span>
                   <span className={`inline-flex items-center rounded-lg px-2.5 py-0.5 text-xs font-black shadow-xs ${
-                    isCurrentSizeSoldOut ? 'bg-rose-600 text-white' : 'bg-emerald-600 text-white'
+                    isCurrentSizeSoldOut ? 'bg-rose-600 text-white' : 'bg-[#162018] text-white'
                   }`}>
                     {selectedSize} {isCurrentSizeSoldOut && '(Habis)'}
                   </span>
@@ -493,10 +672,10 @@ export default function ProductDetail() {
                 <button
                   type="button"
                   onClick={() => setShowSizeChart(true)}
-                  className="inline-flex items-center gap-1.5 rounded-xl border border-emerald-200/90 bg-emerald-50 px-3 py-1.5 text-xs font-bold text-emerald-800 transition hover:bg-emerald-100/80 active:scale-95 shadow-2xs"
+                  className="inline-flex items-center gap-1.5 rounded-xl border border-[#162018]/20 bg-white px-3 py-1.5 text-xs font-bold text-[#162018] transition hover:bg-emerald-50/50 active:scale-95 cursor-pointer shadow-2xs"
                 >
-                  <Ruler size={14} className="text-emerald-600" />
-                  <span>Panduan Ukuran 📏</span>
+                  <Ruler size={14} className="text-[#162018]" />
+                  <span>Panduan Ukuran (Size Chart)</span>
                 </button>
               </div>
 
@@ -513,23 +692,23 @@ export default function ProductDetail() {
                       key={sz}
                       type="button"
                       onClick={() => setSelectedSize(sz)}
-                      className={`relative h-11 min-w-12 px-3 rounded-xl text-xs font-bold transition-all active:scale-95 flex flex-col items-center justify-center cursor-pointer ${
+                      className={`relative h-12 min-w-14 px-3 rounded-xl text-xs font-bold transition-all active:scale-95 flex flex-col items-center justify-center cursor-pointer ${
                         isSelected
                           ? isSzSoldOut
                             ? "bg-rose-600 text-white shadow-md shadow-rose-600/25 ring-2 ring-rose-500/20"
-                            : "bg-emerald-600 text-white shadow-md shadow-emerald-600/25 ring-2 ring-emerald-500/20"
+                            : "bg-[#162018] text-white shadow-md shadow-[#162018]/30 ring-2 ring-[#162018]/30"
                           : isSzSoldOut
                           ? "bg-slate-100 text-slate-400 border border-dashed border-slate-300 opacity-60"
-                          : "bg-white text-slate-700 border border-slate-200 hover:border-emerald-400 hover:bg-emerald-50/30"
+                          : "bg-white text-slate-700 border border-slate-200 hover:border-[#162018]/50 hover:bg-white"
                       }`}
                     >
-                      <span className={isSzSoldOut ? "line-through" : ""}>{sz}</span>
+                      <span className={`font-mono text-xs ${isSzSoldOut ? "line-through" : ""}`}>{sz}</span>
                       {isSzSoldOut ? (
-                        <span className="text-[9px] font-black text-rose-500 tracking-tighter uppercase leading-none mt-0.5">
+                        <span className="text-[8px] font-black text-rose-500 tracking-tighter uppercase leading-none mt-0.5">
                           Habis
                         </span>
                       ) : isSzLow ? (
-                        <span className={`text-[8px] font-bold tracking-tighter leading-none mt-0.5 ${isSelected ? 'text-amber-200' : 'text-amber-600'}`}>
+                        <span className={`text-[8px] font-bold tracking-tighter leading-none mt-0.5 ${isSelected ? 'text-amber-300' : 'text-amber-600'}`}>
                           Sisa {szStock}
                         </span>
                       ) : null}
@@ -545,10 +724,10 @@ export default function ProductDetail() {
                   <span>Ukuran <strong>{selectedSize}</strong> saat ini habis. Silakan pilih varian ukuran lain yang masih tersedia.</span>
                 </div>
               ) : (
-                <div className="mt-3 p-2.5 rounded-xl bg-emerald-50/80 border border-emerald-200/60 text-emerald-800 text-xs flex items-center justify-between">
+                <div className="mt-3 p-2.5 rounded-xl bg-white border border-[#162018]/10 text-slate-700 text-xs flex items-center justify-between">
                   <span className="flex items-center gap-1.5">
                     <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
-                    Stok varian <strong>{selectedSize}</strong>: <strong>{currentSizeStock} pcs</strong> tersedia
+                    Stok varian <strong>{selectedSize}</strong>: <strong>{currentSizeStock} pcs</strong> siap kirim dari Cicendo
                   </span>
                   {currentSizeStock < 5 && (
                     <span className="text-[10px] font-bold text-amber-700 bg-amber-100 px-2 py-0.5 rounded-md">
@@ -561,23 +740,23 @@ export default function ProductDetail() {
 
             {/* Kustomisasi Jersey Builder (HANYA MUNCUL PADA KATEGORI JERSEY) */}
             {isJersey && (
-              <div className="mt-6 rounded-2xl border border-emerald-200 bg-gradient-to-br from-emerald-50/70 via-teal-50/40 to-slate-50 p-4 sm:p-5 shadow-xs">
+              <div className="rounded-2xl border border-emerald-300/80 bg-gradient-to-br from-emerald-50/50 via-[#FAF8F4] to-white p-4 sm:p-5 shadow-xs">
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex items-center gap-2.5">
-                    <div className="w-9 h-9 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-sm shadow-emerald-600/30">
+                    <div className="w-9 h-9 rounded-xl bg-[#162018] text-emerald-400 flex items-center justify-center shrink-0 shadow-sm">
                       <Shirt size={18} />
                     </div>
                     <div>
                       <div className="flex items-center gap-2">
                         <h4 className="text-xs sm:text-sm font-black text-slate-900">
-                          Kustomisasi Sablon Jersey
+                          Kustomisasi Sablon Jersey Tim
                         </h4>
                         <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-600 text-white shadow-xs">
                           FREE SUBLIMASI
                         </span>
                       </div>
                       <p className="text-[11px] text-slate-500 mt-0.5">
-                        Cetak nama punggung, nomor punggung &amp; dada tengah, kerah, &amp; nama tim langsung dari pabrik Wonogiri.
+                        Cetak nama punggung, nomor, kerah, &amp; nama tim langsung dari Atelier Cicendo Bandung.
                       </p>
                     </div>
                   </div>
@@ -588,14 +767,17 @@ export default function ProductDetail() {
                       checked={isCustomJersey}
                       onChange={(e) => {
                         setIsCustomJersey(e.target.checked);
-                        if (e.target.checked && !customName && user?.fullName) {
-                          setCustomName(user.fullName.split(" ")[0].toUpperCase());
-                          setCustomNumber("10");
+                        if (e.target.checked) {
+                          setActiveMediaTab("mockup");
+                          if (!customName && user?.fullName) {
+                            setCustomName(user.fullName.split(" ")[0].toUpperCase());
+                            setCustomNumber("10");
+                          }
                         }
                       }}
                       className="sr-only peer"
                     />
-                    <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
+                    <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#162018]"></div>
                   </label>
                 </div>
 
@@ -614,7 +796,7 @@ export default function ProductDetail() {
                             value={customName}
                             onChange={(e) => setCustomName(e.target.value.toUpperCase())}
                             placeholder="CONTOH: DUJANAH"
-                            className="w-full px-3.5 py-2 rounded-xl bg-white border border-slate-200 text-xs font-mono font-bold text-slate-900 uppercase focus:outline-none focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600 shadow-2xs"
+                            className="w-full px-3.5 py-2 rounded-xl bg-white border border-slate-200 text-xs font-mono font-bold text-slate-900 uppercase focus:outline-none focus:border-[#162018] focus:ring-1 focus:ring-[#162018] shadow-2xs"
                           />
                           <span className="text-[10px] text-slate-400 mt-0.5 block">
                             Maksimal 14 karakter huruf kapital
@@ -635,10 +817,10 @@ export default function ProductDetail() {
                                 setCustomNumber(val);
                               }}
                               placeholder="10"
-                              className="w-full px-3.5 py-2 rounded-xl bg-white border border-slate-200 text-xs font-mono font-bold text-slate-900 focus:outline-none focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600 text-center shadow-2xs"
+                              className="w-full px-3.5 py-2 rounded-xl bg-white border border-slate-200 text-xs font-mono font-bold text-slate-900 focus:outline-none focus:border-[#162018] focus:ring-1 focus:ring-[#162018] text-center shadow-2xs"
                             />
-                            <span className="text-[10px] text-emerald-600 font-semibold mt-0.5 block">
-                              Punggung &amp; Tengah Dada (FIFA)
+                            <span className="text-[10px] text-emerald-700 font-semibold mt-0.5 block">
+                              Standar FIFA/PBVSI
                             </span>
                           </div>
 
@@ -649,7 +831,7 @@ export default function ProductDetail() {
                             <select
                               value={customCollar}
                               onChange={(e) => setCustomCollar(e.target.value)}
-                              className="w-full px-2.5 py-2 rounded-xl bg-white border border-slate-200 text-xs font-bold text-slate-800 focus:outline-none focus:border-emerald-600 shadow-2xs"
+                              className="w-full px-2.5 py-2 rounded-xl bg-white border border-slate-200 text-xs font-bold text-slate-800 focus:outline-none focus:border-[#162018] shadow-2xs"
                             >
                               <option value="O-Neck">O-Neck (Bulat)</option>
                               <option value="V-Neck">V-Neck (Lancip)</option>
@@ -667,14 +849,14 @@ export default function ProductDetail() {
                             maxLength={24}
                             value={customTeam}
                             onChange={(e) => setCustomTeam(e.target.value.toUpperCase())}
-                            placeholder="CONTOH: WONOGIRI UNITED"
-                            className="w-full px-3.5 py-2 rounded-xl bg-white border border-slate-200 text-xs font-mono font-bold text-slate-900 uppercase focus:outline-none focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600 shadow-2xs"
+                            placeholder="CONTOH: BANDUNG UNITED"
+                            className="w-full px-3.5 py-2 rounded-xl bg-white border border-slate-200 text-xs font-mono font-bold text-slate-900 uppercase focus:outline-none focus:border-[#162018] focus:ring-1 focus:ring-[#162018] shadow-2xs"
                           />
                         </div>
                       </div>
 
-                      {/* Kolom Live Photorealistic Jersey Mockup (Realistis Sesuai Produk) */}
-                      <div className="w-full">
+                      {/* Kolom Live Preview */}
+                      <div className="w-full flex flex-col items-center justify-center p-2 rounded-2xl bg-white/80 border border-emerald-100">
                         <JerseyPreviewMockup
                           productImage={product.imageUrl}
                           productName={product.name}
@@ -684,6 +866,9 @@ export default function ProductDetail() {
                           customTeam={customTeam}
                           selectedSize={selectedSize}
                         />
+                        <span className="text-[10px] font-mono text-emerald-800 mt-1 font-bold">
+                          ✓ Live Preview Aktual
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -691,44 +876,48 @@ export default function ProductDetail() {
               </div>
             )}
 
-            <div className="mt-6">
-              <span className="text-xs font-bold uppercase tracking-wider text-slate-600 block mb-2">
-                Jumlah:
+            {/* Quantity Selector */}
+            <div>
+              <span className="text-xs font-bold uppercase tracking-wider text-slate-600 block mb-2 font-mono">
+                Jumlah Pesanan:
               </span>
               <div className="flex items-center gap-4">
-                <div className="flex items-center rounded-full border border-slate-200">
+                <div className="flex items-center rounded-xl border border-[#162018]/20 bg-white p-1 shadow-2xs">
                   <button
                     type="button"
                     onClick={() => qty > 1 && setQty(qty - 1)}
                     disabled={qty <= 1 || isCurrentSizeSoldOut}
-                    className="flex h-11 w-11 items-center justify-center rounded-full text-slate-600 transition hover:bg-emerald-50 hover:text-emerald-700 disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-slate-600 cursor-pointer"
+                    className="flex h-10 w-10 items-center justify-center rounded-lg text-slate-700 transition hover:bg-slate-100 disabled:opacity-30 cursor-pointer"
                     aria-label="Kurangi jumlah"
                   >
-                    <Minus size={16} />
+                    <Minus size={15} />
                   </button>
 
-                  <span className="min-w-12 text-center text-lg font-bold text-slate-900">{isCurrentSizeSoldOut ? 0 : qty}</span>
+                  <span className="min-w-12 text-center text-base font-black font-mono text-slate-900">
+                    {isCurrentSizeSoldOut ? 0 : qty}
+                  </span>
 
                   <button
                     type="button"
                     onClick={() => qty < currentSizeStock && setQty(qty + 1)}
                     disabled={qty >= currentSizeStock || isCurrentSizeSoldOut}
-                    className="flex h-11 w-11 items-center justify-center rounded-full text-slate-600 transition hover:bg-emerald-50 hover:text-emerald-700 disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-slate-600 cursor-pointer"
+                    className="flex h-10 w-10 items-center justify-center rounded-lg text-slate-700 transition hover:bg-slate-100 disabled:opacity-30 cursor-pointer"
                     aria-label="Tambah jumlah"
                   >
-                    <Plus size={16} />
+                    <Plus size={15} />
                   </button>
                 </div>
 
                 {!isCurrentSizeSoldOut && currentSizeStock > 0 && (
-                  <span className="text-xs text-slate-500">
-                    Maks. {currentSizeStock} pcs
+                  <span className="text-xs text-slate-500 font-mono">
+                    Maks. {currentSizeStock} pcs per checkout
                   </span>
                 )}
               </div>
             </div>
 
-            <div className="mt-8 flex flex-wrap items-center gap-3">
+            {/* Tactical Action Buttons */}
+            <div className="flex flex-wrap items-center gap-3 pt-2">
               <button
                 type="button"
                 onClick={async () => {
@@ -738,12 +927,12 @@ export default function ProductDetail() {
                     await addToWishlist(product);
                   }
                 }}
-                className={`group flex items-center gap-2 rounded-2xl border px-4 py-3 text-sm font-semibold transition-all cursor-pointer ${
+                className={`group flex items-center gap-2 rounded-2xl border px-4 py-3.5 text-sm font-bold transition-all cursor-pointer ${
                   isWishlisted(product.id)
                     ? "border-rose-200 bg-rose-50/80 text-rose-700 hover:bg-rose-100/80 shadow-xs"
                     : "border-slate-200 bg-white text-slate-700 hover:border-rose-300 hover:bg-rose-50/50 hover:text-rose-600 shadow-xs"
                 }`}
-                title={isWishlisted(product.id) ? "Klik untuk menghapus dari wishlist" : "Simpan produk ini ke wishlist"}
+                title={isWishlisted(product.id) ? "Hapus dari wishlist" : "Simpan ke wishlist"}
               >
                 <Heart
                   size={18}
@@ -753,53 +942,43 @@ export default function ProductDetail() {
                       : "text-slate-400 group-hover:text-rose-500"
                   }`}
                 />
-                <span>{isWishlisted(product.id) ? "Tersimpan di Wishlist" : "Simpan ke Wishlist"}</span>
+                <span className="hidden sm:inline">{isWishlisted(product.id) ? "Tersimpan" : "Wishlist"}</span>
               </button>
 
               <button
                 type="button"
                 onClick={handleAddToCart}
                 disabled={product.stock <= 0 || isCurrentSizeSoldOut}
-                className={`flex items-center gap-2 rounded-2xl border-2 px-5 py-3 text-sm font-bold transition disabled:cursor-not-allowed disabled:opacity-40 ${
+                className={`flex-1 flex items-center justify-center gap-2 rounded-2xl border-2 px-5 py-3.5 text-sm font-bold transition disabled:cursor-not-allowed disabled:opacity-40 font-mono ${
                   isCurrentSizeSoldOut
                     ? 'border-slate-300 bg-slate-100 text-slate-400'
-                    : 'border-emerald-600 bg-emerald-50/60 text-emerald-700 hover:bg-emerald-100 cursor-pointer'
+                    : 'border-[#162018] bg-white text-[#162018] hover:bg-[#162018] hover:text-white cursor-pointer shadow-xs'
                 }`}
               >
                 <ShoppingCart size={18} />
-                {isCurrentSizeSoldOut ? `Ukuran ${selectedSize} Habis` : '+ Keranjang'}
+                {isCurrentSizeSoldOut ? `Ukuran ${selectedSize} Habis` : '+ KERANJANG'}
               </button>
 
               <button
                 type="button"
                 onClick={handleDirectBuy}
                 disabled={product.stock <= 0 || isCurrentSizeSoldOut}
-                className="flex items-center gap-2 rounded-2xl bg-emerald-600 px-6 py-3 text-sm font-bold text-white shadow-lg shadow-emerald-600/20 transition hover:-translate-y-0.5 hover:bg-emerald-700 hover:shadow-emerald-600/30 disabled:cursor-not-allowed disabled:translate-y-0 disabled:opacity-40 cursor-pointer"
+                className="flex-1 flex items-center justify-center gap-2 rounded-2xl bg-[#B9382B] hover:bg-[#982D22] px-6 py-3.5 text-sm font-black font-condensed tracking-wider uppercase text-white shadow-lg shadow-[#B9382B]/25 transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:translate-y-0 disabled:opacity-40 cursor-pointer"
               >
                 <Zap size={18} />
-                Beli Sekarang
-              </button>
-
-              <button
-                type="button"
-                onClick={handleShareToWhatsApp}
-                className="flex items-center gap-2 rounded-2xl border border-emerald-200 bg-emerald-50/70 px-4 py-3 text-sm font-bold text-emerald-800 transition hover:bg-emerald-100 hover:border-emerald-300 cursor-pointer shadow-xs active:scale-[0.98]"
-                title="Bagikan rincian dan rancangan produk ini ke WhatsApp tim Anda"
-              >
-                <Share2 size={17} className="text-emerald-600" />
-                <span>Bagikan ke Tim</span>
+                BELI SEKARANG
               </button>
             </div>
 
             {/* 3 Pilar Garansi Resmi RegarSport 100% Bebas Cemas */}
-            <div className="mt-8 rounded-3xl border border-emerald-200/90 bg-gradient-to-br from-emerald-50/70 via-teal-50/40 to-white p-5 shadow-xs">
-              <div className="flex items-center gap-2.5 text-xs font-black uppercase tracking-wider text-emerald-800">
+            <div className="rounded-3xl border border-[#162018]/10 bg-[#FAF8F4] p-5 shadow-2xs">
+              <div className="flex items-center gap-2.5 text-xs font-black uppercase tracking-wider text-[#162018] font-mono">
                 <ShieldCheck size={18} className="text-emerald-600" />
-                <span>Garansi Resmi RegarSport 100% Bebas Cemas</span>
+                <span>GARANSI RESMI ATELIER REGARSPORT CICENDO</span>
               </div>
 
-              <div className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <div className="flex items-start gap-2.5 rounded-2xl bg-white/90 border border-emerald-100/80 p-3 shadow-2xs">
+              <div className="mt-3.5 grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div className="flex items-start gap-2.5 rounded-2xl bg-white border border-[#162018]/10 p-3 shadow-2xs">
                   <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-xl bg-emerald-100/70 text-emerald-700">
                     <CheckCircle2 size={15} />
                   </div>
@@ -811,26 +990,26 @@ export default function ProductDetail() {
                   </div>
                 </div>
 
-                <div className="flex items-start gap-2.5 rounded-2xl bg-white/90 border border-emerald-100/80 p-3 shadow-2xs">
+                <div className="flex items-start gap-2.5 rounded-2xl bg-white border border-[#162018]/10 p-3 shadow-2xs">
                   <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-xl bg-emerald-100/70 text-emerald-700">
                     <Ruler size={15} />
                   </div>
                   <div>
                     <h4 className="text-xs font-bold text-slate-900">7 Hari Tukar Ukuran</h4>
                     <p className="text-[11px] text-slate-500 mt-0.5 leading-tight">
-                      Ukuran tidak pas? Fasilitas tukar ukuran mudah & cepat.
+                      Ukuran kurang pas? Garansi tukar baru tanpa ribet.
                     </p>
                   </div>
                 </div>
 
-                <div className="flex items-start gap-2.5 rounded-2xl bg-white/90 border border-emerald-100/80 p-3 shadow-2xs">
+                <div className="flex items-start gap-2.5 rounded-2xl bg-white border border-[#162018]/10 p-3 shadow-2xs">
                   <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-xl bg-emerald-100/70 text-emerald-700">
                     <Sparkles size={15} />
                   </div>
                   <div>
-                    <h4 className="text-xs font-bold text-slate-900">Kain & Jahitan Atletik</h4>
+                    <h4 className="text-xs font-bold text-slate-900">Anti-Luntur Seumur Hidup</h4>
                     <p className="text-[11px] text-slate-500 mt-0.5 leading-tight">
-                      Bahan Dry-Fit Jacquard anti luntur & jahitan kuat bergaransi.
+                      Sublimasi OEKO-TEX menyatu permanen pada serat kain.
                     </p>
                   </div>
                 </div>
