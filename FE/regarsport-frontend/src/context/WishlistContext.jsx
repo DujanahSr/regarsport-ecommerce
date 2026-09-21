@@ -281,6 +281,18 @@ export const WishlistProvider = ({ children }) => {
     [wishlistItems]
   );
 
+  const toggleWishlist = useCallback(
+    async (product) => {
+      const prodId = Number(product.id || product.productId || product.product_id);
+      if (isWishlisted(prodId)) {
+        await removeWishlist(prodId);
+      } else {
+        await addToWishlist(product);
+      }
+    },
+    [addToWishlist, isWishlisted, removeWishlist]
+  );
+
   useEffect(() => {
     if (authLoading) return;
     loadWishlist();
@@ -295,6 +307,8 @@ export const WishlistProvider = ({ children }) => {
       removeWishlist,
       clearWishlist,
       isWishlisted,
+      isInWishlist: isWishlisted,
+      toggleWishlist,
       getWishlistItemId,
     }),
     [
@@ -305,6 +319,7 @@ export const WishlistProvider = ({ children }) => {
       loadWishlist,
       loading,
       removeWishlist,
+      toggleWishlist,
       wishlistItems,
     ]
   );

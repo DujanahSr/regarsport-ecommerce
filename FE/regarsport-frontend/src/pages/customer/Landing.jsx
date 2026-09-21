@@ -29,8 +29,11 @@ import QuickSearchModal from "../../components/customer/QuickSearchModal";
 
 export default function Landing() {
   const { user } = useAuth();
-  const { cartItems, addToCart } = useCart();
-  const { wishlistItems, toggleWishlist, isInWishlist } = useWishlist();
+  const { cartItems = [], addToCart = () => {} } = useCart() || {};
+  const wishlist = useWishlist() || {};
+  const wishlistItems = wishlist.wishlistItems || [];
+  const toggleWishlist = wishlist.toggleWishlist || (() => {});
+  const isWishlisted = wishlist.isWishlisted || wishlist.isInWishlist || (() => false);
 
   // Drawer and Modal States
   const [isNavOpen, setIsNavOpen] = useState(false);
@@ -489,7 +492,7 @@ export default function Landing() {
               </div>
             ) : filteredProducts.length > 0 ? (
               filteredProducts.slice(0, 8).map((prod) => {
-                const isFav = isInWishlist(prod.id);
+                const isFav = isWishlisted(prod.id);
                 const discountPercent = 15;
                 const originalPrice = Math.round(Number(prod.price || 185000) * 1.18);
 
