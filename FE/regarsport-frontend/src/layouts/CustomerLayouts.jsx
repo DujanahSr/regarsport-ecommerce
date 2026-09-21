@@ -5,7 +5,7 @@ import Footer from "../components/customer/Footer";
 
 export default function CustomerLayouts() {
   return (
-    <div className="flex min-h-screen flex-col bg-slate-50">
+    <div className="flex min-h-screen flex-col bg-[#FAF8F4] text-[#111613] font-sans-body">
       <Header />
 
       <main className="flex-1">

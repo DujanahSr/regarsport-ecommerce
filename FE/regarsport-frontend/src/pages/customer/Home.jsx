@@ -1,79 +1,146 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-hooks/set-state-in-effect */
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { memo, useEffect, useMemo, useRef, useState } from "react";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import toast from "react-hot-toast";
 import {
   ArrowRight,
   ChevronLeft,
   ChevronRight,
-  CreditCard,
-  LayoutGrid,
-  Package,
+  Heart,
+  Plus,
+  Phone,
   RotateCcw,
   Search,
   ShieldCheck,
   SlidersHorizontal,
   Sparkles,
-  TrendingUp,
   Truck,
-  Users,
+  Award,
   X,
+  Tag,
 } from "lucide-react";
 
 import api from "../../services/api";
-import {
-  EmptyState,
-  SectionSkeletonGrid,
-} from "../../components/common/UiStates";
+import { useAuth } from "../../context/AuthContext";
+import { useCart } from "../../context/CartContext";
+import { useWishlist } from "../../context/WishlistContext";
+import { EmptyState, SectionSkeletonGrid } from "../../components/common/UiStates";
 
-const ProductCard = memo(function ProductCard({ product }) {
+// Tactical Athletic Product Card (Brigade Overland Aesthetic)
+const ProductCard = memo(function ProductCard({ product, user, isFav, onToggleFav, onQuickBuy }) {
+  const originalPrice = Math.round(Number(product.price || 185000) * 1.18);
+  const discountPercent = 15;
+
   return (
-    <div className="group relative flex flex-col overflow-hidden rounded-2xl bg-white ring-1 ring-slate-900/5 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl">
-      <div className="relative aspect-4/3 overflow-hidden bg-slate-100">
+    <div className="group rounded-3xl bg-white border border-black/5 overflow-hidden flex flex-col hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
+      {/* Image & Multi-Badge Container */}
+      <div className="relative aspect-square overflow-hidden bg-slate-100">
         <img
-          src={product.imageUrl || product.image_url || "https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=600&q=80"}
+          src={product.imageUrl || product.image_url || "/images/hero-athlete.jpg"}
+          alt={product.name}
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
           onError={(e) => {
             e.currentTarget.onerror = null;
-            e.currentTarget.src = "https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=600&q=80";
+            e.currentTarget.src = "/images/hero-athlete.jpg";
           }}
-          alt={product.name}
-          className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
         />
 
+        {/* Side-by-Side Multi-Badges */}
+        <div className="absolute top-3 left-3 flex flex-wrap gap-1.5 z-10">
+          <span className="bg-white/95 backdrop-blur-sm text-black text-[10px] font-black uppercase px-2.5 py-1 rounded-full shadow-xs">
+            DISKON {discountPercent}%
+          </span>
+          <span className="bg-[#FAF0ED] text-[#B9382B] border border-[#B9382B]/20 text-[10px] font-extrabold uppercase px-2 py-1 rounded-full">
+            GARANSI 100%
+          </span>
+        </div>
+
+        {/* Stock Status Badge */}
         {product.stock === 0 ? (
-          <span className="absolute bottom-3 left-3 rounded-full bg-slate-700 px-2.5 py-1 text-[11px] font-semibold text-white">
+          <span className="absolute bottom-3 left-3 rounded-full bg-slate-900/85 backdrop-blur-xs px-2.5 py-1 text-[10px] font-bold text-white uppercase tracking-wider">
             Stok Habis
           </span>
         ) : product.stock <= 5 ? (
-          <span className="absolute bottom-3 left-3 rounded-full bg-amber-500 px-2.5 py-1 text-[11px] font-semibold text-white">
-            Sisa {product.stock}
+          <span className="absolute bottom-3 left-3 rounded-full bg-amber-500/90 backdrop-blur-xs px-2.5 py-1 text-[10px] font-bold text-white uppercase tracking-wider">
+            Sisa {product.stock} pcs
           </span>
         ) : null}
+
+        {/* Wishlist Toggle Button */}
+        <button
+          type="button"
+          onClick={() => onToggleFav(product)}
+          className={`absolute top-3 right-3 w-8 h-8 rounded-full flex items-center justify-center transition-all cursor-pointer z-10 ${
+            isFav
+              ? "bg-[#B9382B] text-white shadow-md scale-105"
+              : "bg-white/85 hover:bg-white text-slate-700 hover:text-black shadow-xs hover:scale-105"
+          }`}
+          title={isFav ? "Hapus dari Favorit" : "Simpan ke Favorit"}
+        >
+          <Heart size={15} fill={isFav ? "currentColor" : "none"} />
+        </button>
       </div>
 
-      <div className="flex flex-1 flex-col p-4 sm:p-5">
-        <h2 className="line-clamp-2 font-semibold text-slate-900">{product.name}</h2>
+      {/* Card Body */}
+      <div className="p-5 flex-1 flex flex-col justify-between space-y-3">
+        <div>
+          <div className="text-[10px] font-mono font-bold uppercase tracking-widest text-slate-400">
+            {product.category?.name || "REGARSPORT APPAREL"}
+          </div>
+          <Link
+            to={`/dashboard/product/${product.id}`}
+            className="font-condensed text-xl font-bold text-slate-900 line-clamp-1 group-hover:text-emerald-800 transition-colors mt-0.5 block"
+          >
+            {product.name}
+          </Link>
+        </div>
 
-        <p className="mt-2 text-lg font-bold text-emerald-600">
-          Rp {Number(product.price).toLocaleString("id-ID")}
-        </p>
+        <div className="pt-2 border-t border-black/5 flex items-center justify-between">
+          <div>
+            <div className="text-[11px] text-slate-400 line-through">
+              Rp {originalPrice.toLocaleString("id-ID")}
+            </div>
+            <div className="font-condensed text-2xl font-black text-[#111613]">
+              Rp {Number(product.price || 0).toLocaleString("id-ID")}
+            </div>
+          </div>
 
-        <p className="mt-1 text-sm text-slate-400">Stok: {product.stock}</p>
+          <div className="flex items-center gap-2">
+            <Link
+              to={`/dashboard/product/${product.id}`}
+              className="px-3 py-2 rounded-full border border-black/10 hover:border-black/30 text-slate-700 hover:text-black text-xs font-bold uppercase tracking-wider transition-colors"
+            >
+              Detail
+            </Link>
 
-        <Link
-          to={`/dashboard/product/${product.id}`}
-          className="mt-4 flex items-center justify-center gap-1.5 rounded-xl bg-emerald-950 py-2.5 text-sm font-semibold text-white transition group-hover:gap-2.5 hover:bg-emerald-900"
-        >
-          Lihat Detail
-          <ArrowRight size={15} className="transition group-hover:translate-x-0.5" />
-        </Link>
+            <button
+              type="button"
+              onClick={() => onQuickBuy(product)}
+              disabled={product.stock === 0}
+              className="flex items-center gap-1 px-4 py-2 rounded-full bg-[#111613] hover:bg-black text-white font-bold text-xs uppercase tracking-wider transition-all hover:scale-105 cursor-pointer shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+              title="Pesan Jersey"
+            >
+              <Plus size={14} />
+              <span>BELI</span>
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );
 });
 
 export default function Home() {
-  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const { addToCart = () => {} } = useCart() || {};
+  const wishlist = useWishlist() || {};
+  const wishlistItems = wishlist.wishlistItems || [];
+  const toggleWishlist = wishlist.toggleWishlist || (() => {});
+  const isWishlisted = wishlist.isWishlisted || wishlist.isInWishlist || (() => false);
+
+  const [searchParams, setSearchParams] = useSearchParams();
   const initialCategory = searchParams.get("categoryId") || searchParams.get("category") || "";
   const initialSearch = searchParams.get("search") || "";
 
@@ -88,10 +155,11 @@ export default function Home() {
   const [error, setError] = useState("");
   const [sortBy, setSortBy] = useState("default");
   const [priceRange, setPriceRange] = useState("all");
+
   const searchTimerRef = useRef(null);
-  const shopSectionRef = useRef(null);
+  const catalogSectionRef = useRef(null);
 
-
+  // Fetch products from catalog microservice
   const getProducts = async () => {
     try {
       setLoading(true);
@@ -113,14 +181,15 @@ export default function Home() {
       setProducts(productList);
       setTotalPages(raw?.totalPages || res.data?.meta?.totalPages || 1);
     } catch (requestError) {
-      console.log(requestError);
-      setError("Gagal memuat produk. Silakan coba lagi.");
+      console.error("Gagal memuat katalog produk:", requestError);
+      setError("Gagal memuat data produk dari server. Silakan coba lagi.");
       setProducts([]);
     } finally {
       setLoading(false);
     }
   };
 
+  // Debounced search
   useEffect(() => {
     if (searchTimerRef.current) {
       clearTimeout(searchTimerRef.current);
@@ -138,10 +207,12 @@ export default function Home() {
     };
   }, [search]);
 
+  // Refetch when search, category, or page changes
   useEffect(() => {
     getProducts();
   }, [debouncedSearch, categoryId, page]);
 
+  // Sync URL searchParams
   useEffect(() => {
     const cat = searchParams.get("categoryId") || searchParams.get("category") || "";
     const q = searchParams.get("search") || "";
@@ -156,6 +227,7 @@ export default function Home() {
     }
   }, [searchParams]);
 
+  // Fetch categories
   useEffect(() => {
     const getCategories = async () => {
       try {
@@ -163,23 +235,24 @@ export default function Home() {
         const categoryList = Array.isArray(res.data) ? res.data : (res.data?.data || []);
         setCategories(categoryList);
       } catch (categoryError) {
-        console.log(categoryError);
+        console.error("Gagal memuat kategori:", categoryError);
       }
     };
 
     getCategories();
   }, []);
 
+  // Filter & sort locally
   const filteredProducts = useMemo(() => {
     let list = products.filter((product) =>
-      product.name.toLowerCase().includes(search.toLowerCase())
+      product.name?.toLowerCase().includes(search.toLowerCase())
     );
 
     // Filter Rentang Harga
-    if (priceRange === "under_100k") {
-      list = list.filter((p) => Number(p.price) < 100000);
-    } else if (priceRange === "100k_250k") {
-      list = list.filter((p) => Number(p.price) >= 100000 && Number(p.price) <= 250000);
+    if (priceRange === "under_150k") {
+      list = list.filter((p) => Number(p.price) < 150000);
+    } else if (priceRange === "150k_250k") {
+      list = list.filter((p) => Number(p.price) >= 150000 && Number(p.price) <= 250000);
     } else if (priceRange === "above_250k") {
       list = list.filter((p) => Number(p.price) > 250000);
     }
@@ -198,239 +271,217 @@ export default function Home() {
     return list;
   }, [products, search, priceRange, sortBy]);
 
+  // Wishlist handler with guest guard
+  const handleToggleFav = (product) => {
+    if (!user) {
+      toast.error("Silakan masuk terlebih dahulu untuk menyimpan jersey favorit!");
+      navigate("/login");
+      return;
+    }
+    toggleWishlist(product);
+  };
 
-  const scrollToShop = () => {
-    shopSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  // Quick Buy handler with guest guard
+  const handleQuickBuy = async (product) => {
+    if (!user) {
+      toast.error("Silakan masuk terlebih dahulu untuk memesan jersey ini!");
+      navigate("/login");
+      return;
+    }
+    try {
+      await addToCart(product, 1, "L");
+      toast.success(`Berhasil menambahkan 1x ${product.name} (Ukuran L) ke keranjang!`);
+    } catch {
+      toast.error("Gagal menambahkan ke keranjang.");
+    }
+  };
+
+  const handleCategorySelect = (id) => {
+    setPage(1);
+    setCategoryId(id ? String(id) : "");
+    if (id) {
+      setSearchParams({ categoryId: String(id) });
+    } else {
+      setSearchParams({});
+    }
+    setTimeout(() => {
+      catalogSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 100);
+  };
+
+  const handleWhatsAppConsultation = () => {
+    const msg = encodeURIComponent(
+      "Halo Tim Desainer RegarSport Atelier Cicendo Bandung, kami ingin konsultasi pembuatan custom jersey tim olahraga (nama, nomor punggung, & logo tim)."
+    );
+    window.open(`https://wa.me/6281234567890?text=${msg}`, "_blank");
   };
 
   return (
-    <div className="bg-slate-50">
-      {/* HERO */}
-      <section className="relative overflow-hidden bg-emerald-950">
-        <div className="pointer-events-none absolute inset-0 overflow-hidden">
-          <div className="absolute -top-32 -right-20 h-80 w-80 rounded-full bg-emerald-500/10 blur-3xl" />
-          <div className="absolute bottom-0 left-0 h-64 w-64 rounded-full bg-emerald-400/10 blur-3xl" />
-        </div>
+    <div className="min-h-screen bg-[#FAF8F4] text-[#111613] font-sans-body antialiased">
+      {/* 1. TACTICAL STORE HERO BANNER (TOPOGRAPHY THEME) */}
+      <section className="relative bg-[#18221B] text-white overflow-hidden border-b border-white/10">
+        {/* Topographic Texture Overlay */}
+        <div className="absolute inset-0 bg-topography opacity-20 pointer-events-none" />
 
-        <div className="relative mx-auto grid max-w-7xl items-center gap-12 px-4 pt-12 pb-24 sm:px-6 sm:pt-16 sm:pb-32 lg:grid-cols-[1.1fr_0.9fr]">
-          <div>
-            <div className="mb-6 flex flex-wrap items-center gap-3">
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/5 px-3.5 py-1.5 text-xs font-medium text-emerald-100">
-                <TrendingUp size={13} className="text-emerald-300" />
-                Belanja Online Terpercaya
-              </span>
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/5 px-3.5 py-1.5 text-xs font-medium text-emerald-100">
-                <Sparkles size={13} className="text-emerald-300" />
-                Produk Pilihan Berkualitas
-              </span>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16 relative z-10">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+            {/* Left Narrative */}
+            <div className="lg:col-span-8 space-y-4">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 border border-white/15 text-xs font-semibold text-emerald-400">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+                <span>KATALOG RESMI 2026 • ATELIER CICENDO BANDUNG</span>
+              </div>
+
+              <h1 className="font-condensed text-4xl sm:text-5xl lg:text-6xl font-black uppercase tracking-tight text-white leading-[0.95]">
+                JERSEY OLAHRAGA PROFESIONAL. <br />
+                <span className="text-[#FAF8F4] opacity-90">
+                  DIRANCANG UNTUK PERFORMA JUARA.
+                </span>
+              </h1>
+
+              <p className="text-sm sm:text-base text-slate-300 max-w-2xl leading-relaxed">
+                {user ? (
+                  <>
+                    Selamat datang kembali, <b>Kapten {user.fullName ? user.fullName.split(" ")[0] : "Member"}</b>!
+                    Jelajahi seluruh koleksi ready-stock Dry-Fit Microfiber berpori aktif atau pesan custom jersey dengan nama &amp; nomor tim langsung dari atelier Bandung.
+                  </>
+                ) : (
+                  <>
+                    Pusat apparel atletik &amp; custom jersey olahraga terlengkap di Indonesia. Dibuat langsung di atelier Cicendo Bandung dengan teknologi sublimasi permanen anti-luntur dan 100% garansi tukar ukuran.
+                  </>
+                )}
+              </p>
+
+              {/* Metric Assurance Strip */}
+              <div className="pt-3 flex flex-wrap items-center gap-3 sm:gap-6 text-xs text-slate-300">
+                <span className="flex items-center gap-1.5">
+                  <ShieldCheck size={16} className="text-emerald-400 shrink-0" />
+                  <span>100% Garansi Tukar Ukuran</span>
+                </span>
+                <span>•</span>
+                <span className="flex items-center gap-1.5">
+                  <Sparkles size={16} className="text-emerald-400 shrink-0" />
+                  <span>Sublimasi OEKO-TEX Permanen</span>
+                </span>
+                <span>•</span>
+                <span className="flex items-center gap-1.5">
+                  <Truck size={16} className="text-emerald-400 shrink-0" />
+                  <span>Bebas Ongkir Seluruh Indonesia</span>
+                </span>
+              </div>
             </div>
 
-            <h1 className="text-4xl font-bold leading-tight tracking-tight text-white sm:text-5xl">
-              Lengkapi Kebutuhan Olahraga Anda
-              <span className="block text-emerald-400">dengan Produk Pilihan Terbaik</span>
-            </h1>
-
-            <p className="mt-5 max-w-xl leading-relaxed text-emerald-50/70">
-              Temukan peralatan, pakaian, dan aksesori olahraga berkualitas tinggi untuk
-              menunjang performa terbaik Anda setiap hari.
-            </p>
-
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-8">
-              <div className="flex items-center gap-2.5 text-sm text-emerald-50/90">
-                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white/10">
-                  <Truck size={16} className="text-emerald-300" />
-                </span>
-                Pengiriman ke seluruh Indonesia
-              </div>
-
-              <div className="flex items-center gap-2.5 text-sm text-emerald-50/90">
-                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white/10">
-                  <ShieldCheck size={16} className="text-emerald-300" />
-                </span>
-                Garansi resmi setiap produk
-              </div>
-            </div>
-
-            <div className="mt-8 flex flex-wrap gap-3">
-              <button
-                type="button"
-                onClick={scrollToShop}
-                className="inline-flex items-center gap-2 rounded-xl bg-white px-6 py-3 text-sm font-semibold text-emerald-950 shadow-lg shadow-emerald-950/30 transition hover:bg-emerald-50"
-              >
-                Belanja Sekarang
-                <ArrowRight size={16} />
-              </button>
-
-              <button
-                type="button"
-                onClick={scrollToShop}
-                className="inline-flex items-center gap-2 rounded-xl border border-white/25 px-6 py-3 text-sm font-semibold text-white transition hover:bg-white/10"
-              >
-                Lihat Kategori
-              </button>
-            </div>
-          </div>
-
-          <div className="relative">
-            <div className="absolute -top-6 -right-6 h-32 w-32 rounded-full bg-emerald-500/20 blur-2xl" />
-
-            <div className="relative space-y-5 rounded-2xl border border-white/10 bg-white/4 p-6 backdrop-blur sm:p-8">
-              <div className="flex items-center gap-4">
-                <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-500/15">
-                  <Package size={22} className="text-emerald-300" />
-                </span>
-                <div>
-                  <p className="text-2xl font-bold text-white">500+</p>
-                  <p className="text-sm text-emerald-50/60">Produk tersedia</p>
+            {/* Right Custom Inquiry CTA Card */}
+            <div className="lg:col-span-4">
+              <div className="p-6 rounded-3xl bg-black/40 border border-white/15 backdrop-blur-md shadow-2xl space-y-4">
+                <div className="flex items-center gap-2 text-emerald-400 text-xs font-bold uppercase tracking-wider">
+                  <Award size={16} />
+                  <span>KONSULTASI JERSEY TIM</span>
                 </div>
-              </div>
-
-              <div className="h-px bg-white/10" />
-
-              <div className="flex items-center gap-4">
-                <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-500/15">
-                  <Users size={22} className="text-emerald-300" />
-                </span>
-                <div>
-                  <p className="text-2xl font-bold text-white">10rb+</p>
-                  <p className="text-sm text-emerald-50/60">Pelanggan puas</p>
-                </div>
-              </div>
-
-              <div className="h-px bg-white/10" />
-
-              <div className="flex items-center gap-4">
-                <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-500/15">
-                  <ShieldCheck size={22} className="text-emerald-300" />
-                </span>
-                <div>
-                  <p className="text-2xl font-bold text-white">100%</p>
-                  <p className="text-sm text-emerald-50/60">Produk original</p>
-                </div>
+                <h3 className="font-condensed text-xl font-bold uppercase text-white leading-snug">
+                  Ingin Buat Jersey Custom Khusus Tim Anda?
+                </h3>
+                <p className="text-xs text-slate-300 leading-relaxed">
+                  Desain gratis, bisa custom nama, nomor punggung pemain, serta logo sponsor tanpa batasan warna sublimasi.
+                </p>
+                <button
+                  type="button"
+                  onClick={handleWhatsAppConsultation}
+                  className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-[#0D130F] font-black text-xs uppercase tracking-wider transition-all cursor-pointer shadow-lg shadow-emerald-500/20"
+                >
+                  <Phone size={15} />
+                  <span>Hubungi Desainer (WhatsApp)</span>
+                </button>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      <div className="mx-auto max-w-7xl px-4 pb-16 sm:px-6 sm:pb-24">
-        {/* Floating search & filter card */}
-        <div
-          ref={shopSectionRef}
-          className="relative -mt-10 mb-10 scroll-mt-24 rounded-2xl bg-white p-5 shadow-xl shadow-emerald-950/10 ring-1 ring-slate-900/5 sm:-mt-14 sm:p-6"
-        >
+      {/* 2. MAIN CATALOG CONTAINER & FILTER CONTROLS */}
+      <div ref={catalogSectionRef} className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 space-y-8 scroll-mt-24">
+        {/* Elevated Filter Suite Card */}
+        <div className="p-6 sm:p-7 rounded-3xl bg-white border border-black/5 shadow-xl space-y-6">
+          {/* Top Search Bar */}
           <div className="relative">
             <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
             <input
               type="text"
-              placeholder="Cari produk olahraga..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full rounded-xl border border-slate-200 bg-slate-50 py-3 pl-11 pr-4 text-sm text-slate-700 transition focus:border-emerald-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+              placeholder="Cari nama jersey, nomor, spesifikasi bahan Dry-Fit..."
+              className="w-full pl-11 pr-10 py-3.5 rounded-2xl bg-slate-50 hover:bg-slate-100/80 focus:bg-white border border-black/10 focus:border-emerald-600 text-xs sm:text-sm font-medium focus:outline-none transition-all"
             />
+            {search && (
+              <button
+                type="button"
+                onClick={() => setSearch("")}
+                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-black p-1 cursor-pointer"
+              >
+                <X size={16} />
+              </button>
+            )}
           </div>
 
-          <div className="mt-4 flex gap-2 overflow-x-auto pb-1 scrollbar-none">
-            <button
-              type="button"
-              onClick={() => {
-                setPage(1);
-                setCategoryId("");
-              }}
-              className={`flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border px-4 py-2 text-sm font-medium transition ${
-                categoryId === ""
-                  ? "border-emerald-600 bg-emerald-600 text-white"
-                  : "border-slate-200 text-slate-600 hover:border-emerald-300 hover:text-emerald-700"
-              }`}
-            >
-              <LayoutGrid size={14} />
-              Semua Kategori
-            </button>
+          {/* Sport Category Pills (Barlow Condensed Athletic Style) */}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between text-[11px] font-bold uppercase tracking-widest text-slate-400">
+              <span>PILIH CABANG OLAHRAGA</span>
+              <span className="font-mono text-emerald-700">{categories.length} Kategori Resmi</span>
+            </div>
 
-            {categories.map((category) => (
+            <div className="flex flex-wrap gap-2 pt-1">
               <button
-                key={category.id}
                 type="button"
-                onClick={() => {
-                  setPage(1);
-                  setCategoryId(category.id);
-                }}
-                className={`shrink-0 whitespace-nowrap rounded-full border px-4 py-2 text-sm font-medium transition ${
-                  categoryId === category.id
-                    ? "border-emerald-600 bg-emerald-600 text-white"
-                    : "border-slate-200 text-slate-600 hover:border-emerald-300 hover:text-emerald-700"
+                onClick={() => handleCategorySelect("")}
+                className={`px-4 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all cursor-pointer ${
+                  categoryId === ""
+                    ? "bg-[#111613] text-white shadow-md scale-105"
+                    : "bg-slate-100 hover:bg-slate-200 text-slate-700 border border-black/5"
                 }`}
               >
-                {category.name}
+                SEMUA KOLEKSI
               </button>
-            ))}
-          </div>
-        </div>
 
-        {/* Trust strip */}
-        <div className="mb-12 grid grid-cols-1 gap-4 sm:grid-cols-3">
-          <div className="flex items-start gap-3 rounded-2xl border border-slate-100 bg-white p-4">
-            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-50">
-              <Truck size={18} className="text-emerald-600" />
-            </span>
-            <div>
-              <p className="font-semibold text-slate-900">Pengiriman Cepat</p>
-              <p className="mt-0.5 text-sm text-slate-500">Dikirim ke seluruh Indonesia tepat waktu.</p>
+              {categories.map((cat) => {
+                const isActive = String(categoryId) === String(cat.id);
+                return (
+                  <button
+                    key={cat.id}
+                    type="button"
+                    onClick={() => handleCategorySelect(cat.id)}
+                    className={`px-4 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all cursor-pointer flex items-center gap-1.5 ${
+                      isActive
+                        ? "bg-[#111613] text-white shadow-md scale-105"
+                        : "bg-slate-100 hover:bg-slate-200 text-slate-700 border border-black/5"
+                    }`}
+                  >
+                    <span>{cat.name}</span>
+                  </button>
+                );
+              })}
             </div>
           </div>
 
-          <div className="flex items-start gap-3 rounded-2xl border border-slate-100 bg-white p-4">
-            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-50">
-              <ShieldCheck size={18} className="text-emerald-600" />
-            </span>
-            <div>
-              <p className="font-semibold text-slate-900">Garansi Resmi</p>
-              <p className="mt-0.5 text-sm text-slate-500">Setiap produk bergaransi resmi.</p>
-            </div>
-          </div>
-
-          <div className="flex items-start gap-3 rounded-2xl border border-slate-100 bg-white p-4">
-            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-50">
-              <CreditCard size={18} className="text-emerald-600" />
-            </span>
-            <div>
-              <p className="font-semibold text-slate-900">Pembayaran Aman</p>
-              <p className="mt-0.5 text-sm text-slate-500">Berbagai metode pembayaran terpercaya.</p>
-            </div>
-          </div>
-        </div>
-
-        {/* Product section header & toolbar */}
-        <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-          <div>
-            <h2 className="text-2xl font-bold text-slate-900">Koleksi Produk</h2>
-            <p className="mt-1 text-sm text-slate-500">
-              {loading
-                ? "Memuat produk..."
-                : error
-                ? "Terjadi kendala saat memuat produk"
-                : `${filteredProducts.length} produk siap dipesan`}
-            </p>
-          </div>
-
-          {/* Filter & Sort Toolbar */}
-          <div className="flex flex-wrap items-center gap-2.5">
-            {/* Price Range Pills */}
-            <div className="flex items-center gap-1 rounded-xl bg-slate-100 p-1 text-xs">
+          {/* Controls Strip: Price Filter & Sorting */}
+          <div className="pt-4 border-t border-black/5 flex flex-col md:flex-row md:items-center justify-between gap-4">
+            {/* Price Filter Pills */}
+            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 pr-1">Harga:</span>
               {[
-                { id: "all", label: "Semua Harga" },
-                { id: "under_100k", label: "< 100rb" },
-                { id: "100k_250k", label: "100rb - 250rb" },
-                { id: "above_250k", label: "> 250rb" },
+                { id: "all", label: "Semua" },
+                { id: "under_150k", label: "< Rp 150rb" },
+                { id: "150k_250k", label: "Rp 150rb – 250rb" },
+                { id: "above_250k", label: "> Rp 250rb" },
               ].map((pill) => (
                 <button
                   key={pill.id}
                   type="button"
                   onClick={() => setPriceRange(pill.id)}
-                  className={`rounded-lg px-2.5 py-1.5 font-medium transition cursor-pointer ${
+                  className={`px-3 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-wider transition-colors cursor-pointer ${
                     priceRange === pill.id
-                      ? "bg-white text-emerald-700 shadow-xs font-bold"
-                      : "text-slate-600 hover:text-slate-900"
+                      ? "bg-emerald-950 text-white shadow-xs"
+                      : "bg-slate-100 text-slate-600 hover:bg-slate-200"
                   }`}
                 >
                   {pill.label}
@@ -438,106 +489,193 @@ export default function Home() {
               ))}
             </div>
 
-            {/* Sort Selector */}
-            <div className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs text-slate-700 shadow-xs">
-              <SlidersHorizontal size={13} className="text-slate-400" />
-              <span className="font-medium text-slate-500">Urut:</span>
-              <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
-                className="bg-transparent font-semibold text-slate-800 outline-none cursor-pointer"
-              >
-                <option value="default">Paling Sesuai</option>
-                <option value="price_asc">Harga: Termurah</option>
-                <option value="price_desc">Harga: Termahal</option>
-                <option value="name_asc">Nama: A - Z</option>
-                <option value="name_desc">Nama: Z - A</option>
-              </select>
-            </div>
+            {/* Sort Dropdown & Reset Action */}
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border border-black/10 bg-slate-50 text-xs">
+                <SlidersHorizontal size={13} className="text-slate-400" />
+                <span className="text-[11px] font-semibold text-slate-500">Urutkan:</span>
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value)}
+                  className="bg-transparent text-xs font-bold text-slate-900 outline-none cursor-pointer"
+                >
+                  <option value="default">Paling Sesuai</option>
+                  <option value="price_asc">Harga: Termurah</option>
+                  <option value="price_desc">Harga: Termahal</option>
+                  <option value="name_asc">Nama: A – Z</option>
+                  <option value="name_desc">Nama: Z – A</option>
+                </select>
+              </div>
 
-            {/* Reset Filter Button */}
-            {(priceRange !== "all" || sortBy !== "default" || search) && (
-              <button
-                type="button"
-                onClick={() => {
-                  setPriceRange("all");
-                  setSortBy("default");
-                  setSearch("");
-                }}
-                className="flex items-center gap-1 rounded-xl border border-rose-200 bg-rose-50 px-2.5 py-1.5 text-xs font-semibold text-rose-600 transition hover:bg-rose-100 cursor-pointer"
-                title="Reset Semua Filter"
-              >
-                <X size={12} />
-                <span>Reset</span>
-              </button>
-            )}
+              {(priceRange !== "all" || sortBy !== "default" || search || categoryId) && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setPriceRange("all");
+                    setSortBy("default");
+                    setSearch("");
+                    setCategoryId("");
+                    setSearchParams({});
+                  }}
+                  className="flex items-center gap-1 px-3 py-1.5 rounded-full border border-red-200 bg-red-50 text-[11px] font-bold text-red-600 hover:bg-red-100 transition-colors cursor-pointer"
+                  title="Reset Semua Filter"
+                >
+                  <X size={12} />
+                  <span>Reset Filter</span>
+                </button>
+              )}
+            </div>
           </div>
         </div>
 
-        {error ? (
-          <EmptyState
-            title="Data produk gagal dimuat"
-            description={error}
-            action={
+        {/* 3. PRODUCT CATALOG GRID SECTION */}
+        <div className="space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2 border-b border-black/5 pb-4">
+            <div>
+              <span className="text-xs font-extrabold uppercase tracking-widest text-emerald-800">
+                ETALASE RESMI ATELIER
+              </span>
+              <h2 className="font-condensed text-3xl font-extrabold uppercase tracking-tight text-[#111613]">
+                KOLEKSI JERSEY JUARA PEKAN INI
+              </h2>
+            </div>
+
+            <div className="text-xs text-slate-500 font-mono">
+              Menampilkan <b>{filteredProducts.length}</b> jersey siap dipesan
+            </div>
+          </div>
+
+          {/* Loading State */}
+          {loading ? (
+            <SectionSkeletonGrid />
+          ) : error ? (
+            <EmptyState
+              title="Data produk gagal dimuat"
+              description={error}
+              action={
+                <button
+                  type="button"
+                  onClick={getProducts}
+                  className="inline-flex items-center gap-2 rounded-full bg-[#111613] px-6 py-3 text-xs font-bold uppercase tracking-wider text-white transition hover:bg-black cursor-pointer shadow-lg"
+                >
+                  <RotateCcw size={15} />
+                  <span>Coba Muat Ulang</span>
+                </button>
+              }
+            />
+          ) : filteredProducts.length === 0 ? (
+            <div className="p-12 text-center rounded-3xl bg-white border border-black/5 space-y-4">
+              <div className="w-14 h-14 mx-auto rounded-2xl bg-slate-100 flex items-center justify-center text-slate-400">
+                <Tag size={24} />
+              </div>
+              <h3 className="font-condensed text-2xl font-bold uppercase text-slate-900">
+                Tidak Ada Produk yang Sesuai
+              </h3>
+              <p className="text-xs text-slate-500 max-w-md mx-auto">
+                {search
+                  ? `Tidak ada jersey yang cocok dengan kata kunci "${search}". Silakan coba kata kunci lain atau reset filter.`
+                  : "Belum ada produk untuk kategori atau rentang harga yang dipilih."}
+              </p>
               <button
                 type="button"
-                onClick={getProducts}
-                className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-700"
+                onClick={() => {
+                  setSearch("");
+                  setPriceRange("all");
+                  setCategoryId("");
+                  setSearchParams({});
+                }}
+                className="px-6 py-2.5 rounded-full bg-[#111613] hover:bg-black text-white text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer shadow"
               >
-                <RotateCcw size={16} />
-                Coba Lagi
+                Tampilkan Seluruh Produk
               </button>
-            }
-          />
-        ) : loading ? (
-          <SectionSkeletonGrid />
-        ) : filteredProducts.length === 0 ? (
-          <EmptyState
-            title="Produk tidak ditemukan"
-            description={
-              search
-                ? "Coba ubah kata kunci pencarian Anda."
-                : "Belum ada produk yang tersedia saat ini."
-            }
-          />
-        ) : (
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3 xl:grid-cols-4">
-            {filteredProducts.map((product) => (
-              <ProductCard
-                key={product.id}
-                product={product}
-              />
-            ))}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {filteredProducts.map((product) => (
+                <ProductCard
+                  key={product.id}
+                  product={product}
+                  user={user}
+                  isFav={isWishlisted(product.id)}
+                  onToggleFav={handleToggleFav}
+                  onQuickBuy={handleQuickBuy}
+                />
+              ))}
+            </div>
+          )}
+
+          {/* Pagination Controls */}
+          {!loading && !error && totalPages > 1 && (
+            <div className="pt-8 flex items-center justify-center gap-3">
+              <button
+                type="button"
+                disabled={page === 1}
+                onClick={() => {
+                  setPage((p) => Math.max(p - 1, 1));
+                  catalogSectionRef.current?.scrollIntoView({ behavior: "smooth" });
+                }}
+                className="flex h-11 w-11 items-center justify-center rounded-full border border-black/10 bg-white text-slate-700 hover:bg-black hover:text-white transition-all disabled:opacity-40 disabled:hover:bg-white disabled:hover:text-slate-700 cursor-pointer shadow-xs"
+                title="Halaman Sebelumnya"
+              >
+                <ChevronLeft size={18} />
+              </button>
+
+              <span className="px-6 py-2.5 rounded-full bg-[#111613] text-white font-mono text-xs font-bold tracking-wider shadow-md">
+                HALAMAN {page} / {totalPages}
+              </span>
+
+              <button
+                type="button"
+                disabled={page === totalPages}
+                onClick={() => {
+                  setPage((p) => Math.min(p + 1, totalPages));
+                  catalogSectionRef.current?.scrollIntoView({ behavior: "smooth" });
+                }}
+                className="flex h-11 w-11 items-center justify-center rounded-full border border-black/10 bg-white text-slate-700 hover:bg-black hover:text-white transition-all disabled:opacity-40 disabled:hover:bg-white disabled:hover:text-slate-700 cursor-pointer shadow-xs"
+                title="Halaman Berikutnya"
+              >
+                <ChevronRight size={18} />
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* 4. BREAKOUT BANNER: ATELIER BANDUNG CUSTOM PRODUCTION */}
+        <section className="p-8 sm:p-12 rounded-3xl bg-[#18221B] text-white relative overflow-hidden shadow-2xl border border-white/10">
+          <div className="absolute inset-0 bg-topography opacity-15 pointer-events-none" />
+
+          <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+            <div className="lg:col-span-8 space-y-3">
+              <span className="text-[10px] font-extrabold uppercase tracking-widest text-emerald-400">
+                LAYANAN CUSTOM ATELIER CICENDO
+              </span>
+              <h3 className="font-condensed text-3xl sm:text-4xl font-black uppercase text-white leading-tight">
+                PRODUKSI JERSEY SATU TIM LENGKAP TANPA RIBET
+              </h3>
+              <p className="text-xs sm:text-sm text-slate-300 leading-relaxed max-w-2xl">
+                Bebas kustom logo klub, nomor punggung, nama pemain, hingga sponsor dengan teknologi sublimasi digital presisi tinggi. Bergaransi 100% tukar ukuran jika tidak pas di badan.
+              </p>
+            </div>
+
+            <div className="lg:col-span-4 flex flex-col sm:flex-row lg:flex-col gap-3">
+              <button
+                type="button"
+                onClick={handleWhatsAppConsultation}
+                className="flex items-center justify-center gap-2 py-3.5 px-6 rounded-full bg-[#FAF8F4] hover:bg-white text-[#111613] font-black text-xs uppercase tracking-wider transition-all hover:scale-105 shadow-xl cursor-pointer"
+              >
+                <Phone size={15} className="text-emerald-700" />
+                <span>KONSULTASI DESAIN GRATIS</span>
+              </button>
+              <Link
+                to="/dashboard/about"
+                className="flex items-center justify-center gap-2 py-3.5 px-6 rounded-full bg-white/10 hover:bg-white/20 text-white font-bold text-xs uppercase tracking-wider transition-all border border-white/20 text-center"
+              >
+                <span>LIHAT WORKSHOP BANDUNG</span>
+                <ArrowRight size={14} />
+              </Link>
+            </div>
           </div>
-        )}
-
-        {!loading && !error && totalPages > 1 ? (
-          <div className="mt-12 flex items-center justify-center gap-3 sm:mt-16">
-            <button
-              type="button"
-              disabled={page === 1}
-              onClick={() => setPage((currentPage) => Math.max(currentPage - 1, 1))}
-              className="flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 transition hover:border-emerald-300 hover:text-emerald-700 disabled:opacity-40 disabled:hover:border-slate-200 disabled:hover:text-slate-600"
-              aria-label="Halaman sebelumnya"
-            >
-              <ChevronLeft size={18} />
-            </button>
-
-            <span className="rounded-full bg-emerald-950 px-5 py-2 text-sm font-semibold text-white">
-              {page} / {totalPages}
-            </span>
-
-            <button
-              type="button"
-              disabled={page === totalPages}
-              onClick={() => setPage((currentPage) => Math.min(currentPage + 1, totalPages))}
-              className="flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 transition hover:border-emerald-300 hover:text-emerald-700 disabled:opacity-40 disabled:hover:border-slate-200 disabled:hover:text-slate-600"
-              aria-label="Halaman berikutnya"
-            >
-              <ChevronRight size={18} />
-            </button>
-          </div>
-        ) : null}
+        </section>
       </div>
     </div>
   );

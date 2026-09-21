@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import {
@@ -26,6 +26,9 @@ import {
   CreditCard,
   Tag,
   ExternalLink,
+  ChevronDown,
+  LogOut,
+  Package,
 } from "lucide-react";
 
 import api from "../../services/api";
@@ -39,12 +42,26 @@ import QuickSearchModal from "../../components/customer/QuickSearchModal";
 
 export default function Landing() {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const { cartItems = [], addToCart = () => {} } = useCart() || {};
   const wishlist = useWishlist() || {};
   const wishlistItems = wishlist.wishlistItems || [];
   const toggleWishlist = wishlist.toggleWishlist || (() => {});
   const isWishlisted = wishlist.isWishlisted || wishlist.isInWishlist || (() => false);
+
+  // User Dropdown State & Click-outside listener
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const userMenuRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (userMenuRef.current && !userMenuRef.current.contains(e.target)) {
+        setIsUserMenuOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   // Drawer and Modal States
   const [isNavOpen, setIsNavOpen] = useState(false);
@@ -225,19 +242,156 @@ export default function Landing() {
 
             {/* User Auth Buttons */}
             {user ? (
-              <Link
-                to={
-                  user.role === "admin"
-                    ? "/admin"
-                    : user.role === "logistics"
-                    ? "/admin/warehouse"
-                    : "/dashboard"
-                }
-                className="flex items-center gap-2 py-2 px-3.5 rounded-full bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500/30 text-xs font-bold uppercase tracking-wider transition-colors border border-emerald-500/40"
-              >
-                <User size={15} />
-                <span>{user.fullName ? user.fullName.split(" ")[0] : "Akun"}</span>
-              </Link>
+              <div className="relative" ref={userMenuRef}>
+                <button
+                  type="button"
+                  onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                  className="flex items-center gap-2 py-1.5 pl-1.5 pr-3 rounded-full bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500/30 text-xs font-bold uppercase tracking-wider transition-all border border-emerald-500/40 cursor-pointer"
+                >
+                  {user.avatarUrl ? (
+                    <img
+                      src={user.avatarUrl}
+                      alt={user.fullName}
+                      className="w-7 h-7 rounded-full object-cover ring-1 ring-emerald-400 shrink-0"
+                      onError={(e) => {
+                        e.currentTarget.style.display = "none";
+                        e.currentTarget.nextElementSibling?.classList.remove("hidden");
+                      }}
+                    />
+                  ) : null}
+                  <span
+                    className={`w-7 h-7 rounded-full bg-linear-to-br from-emerald-600 to-emerald-800 text-white font-black text-xs flex items-center justify-center ring-1 ring-emerald-400/50 shrink-0 ${
+                      user.avatarUrl ? "hidden" : ""
+                    }`}
+                  >
+                    {user.fullName?.charAt(0).toUpperCase() || "U"}
+                  </span>
+                  <span>{user.fullName ? user.fullName.split(" ")[0] : "Akun"}</span>
+                  <ChevronDown
+                    size={13}
+                    className={`transition-transform duration-200 ${
+                      isUserMenuOpen ? "rotate-180" : ""
+                    }`}
+                  />
+                </button>
+
+                {/* Tactical Profile Dropdown Menu */}
+                {isUserMenuOpen && (
+                  <div className="absolute right-0 mt-2 w-64 rounded-2xl bg-[#162018] border border-emerald-500/30 shadow-2xl overflow-hidden z-50 animate-fade-in text-white divide-y divide-white/10">
+                    {/* User Identity Header */}
+                    <div className="p-4 bg-black/40 space-y-1.5">
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-10 h-10 rounded-full bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center font-black text-emerald-300 text-sm overflow-hidden shrink-0">
+                          {user.avatarUrl ? (
+                            <img
+                              src={user.avatarUrl}
+                              alt={user.fullName}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            user.fullName?.charAt(0).toUpperCase() || "U"
+                          )}
+                        </div>
+                        <div className="overflow-hidden">
+                          <div className="text-xs font-bold text-white truncate">
+                            {user.fullName || "Pengguna"}
+                          </div>
+                          <div className="text-[10px] text-slate-400 truncate">
+                            {user.email}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="pt-1 flex items-center gap-1.5">
+                        <span className="px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 text-[9px] font-black uppercase tracking-wider border border-emerald-500/30">
+                          {user.role === "admin"
+                            ? "ADMINISTRATOR"
+                            : user.role === "logistics"
+                            ? "LOGISTIK GUDANG"
+                            : "KAPTEN TIM MEMBER"}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Navigation Links */}
+                    <div className="p-2 space-y-0.5 text-xs">
+                      <Link
+                        to="/dashboard/profile"
+                        onClick={() => setIsUserMenuOpen(false)}
+                        className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-200 hover:text-white hover:bg-white/10 transition-colors font-medium"
+                      >
+                        <User size={15} className="text-emerald-400" />
+                        <span>Profil &amp; Pengaturan Akun</span>
+                      </Link>
+
+                      <Link
+                        to="/dashboard/my-orders"
+                        onClick={() => setIsUserMenuOpen(false)}
+                        className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-200 hover:text-white hover:bg-white/10 transition-colors font-medium"
+                      >
+                        <Package size={15} className="text-emerald-400" />
+                        <span>Pesanan Saya &amp; Lacak Resi</span>
+                      </Link>
+
+                      <Link
+                        to="/dashboard/favorites"
+                        onClick={() => setIsUserMenuOpen(false)}
+                        className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-200 hover:text-white hover:bg-white/10 transition-colors font-medium"
+                      >
+                        <Heart size={15} className="text-emerald-400" />
+                        <span>Wishlist Jersey Favorit</span>
+                      </Link>
+
+                      <Link
+                        to="/dashboard/cart"
+                        onClick={() => setIsUserMenuOpen(false)}
+                        className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-200 hover:text-white hover:bg-white/10 transition-colors font-medium"
+                      >
+                        <ShoppingBag size={15} className="text-emerald-400" />
+                        <span>Keranjang Belanja</span>
+                      </Link>
+
+                      {user.role === "admin" && (
+                        <Link
+                          to="/admin"
+                          onClick={() => setIsUserMenuOpen(false)}
+                          className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-amber-300 hover:bg-amber-500/20 transition-colors font-bold"
+                        >
+                          <ShieldCheck size={15} className="text-amber-400" />
+                          <span>Panel Administrator</span>
+                        </Link>
+                      )}
+
+                      {user.role === "logistics" && (
+                        <Link
+                          to="/admin/warehouse"
+                          onClick={() => setIsUserMenuOpen(false)}
+                          className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-purple-300 hover:bg-purple-500/20 transition-colors font-bold"
+                        >
+                          <Truck size={15} className="text-purple-400" />
+                          <span>Panel Gudang &amp; Ekspedisi</span>
+                        </Link>
+                      )}
+                    </div>
+
+                    {/* Logout Button */}
+                    <div className="p-2">
+                      <button
+                        type="button"
+                        onClick={async () => {
+                          setIsUserMenuOpen(false);
+                          await logout();
+                          toast.success("Berhasil keluar akun.");
+                          navigate("/");
+                        }}
+                        className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-red-400 hover:text-red-300 hover:bg-red-500/15 transition-colors font-bold text-xs cursor-pointer"
+                      >
+                        <LogOut size={15} />
+                        <span>Keluar Akun (Logout)</span>
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
             ) : (
               <div className="flex items-center gap-1.5 sm:gap-2">
                 <Link
