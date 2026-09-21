@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   X,
   ChevronRight,
@@ -8,10 +8,13 @@ import {
   Sparkles,
   User,
   LogOut,
+  Building2,
+  Award,
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 
-export default function NavDrawer({ isOpen, onClose, onOpenSearch, onSelectCategory }) {
+export default function NavDrawer({ isOpen, onClose, onOpenSearch }) {
+  const navigate = useNavigate();
   const { user, logout } = useAuth();
 
   // Close on ESC key
@@ -40,34 +43,31 @@ export default function NavDrawer({ isOpen, onClose, onOpenSearch, onSelectCateg
   if (!isOpen) return null;
 
   const categories = [
-    { name: "JERSEY SEPAKBOLA & FUTSAL", tag: "POPULER", key: "SEPAKBOLA", categoryId: 1 },
-    { name: "JERSEY BOLA VOLI (PRO LIGA)", tag: "HOT", key: "BOLA VOLI", categoryId: 2 },
-    { name: "JERSEY BADMINTON & TENIS", key: "BADMINTON", categoryId: 3 },
-    { name: "JERSEY BASKET & STREETBALL", key: "BASKET", categoryId: 5 },
-    { name: "CUSTOM TIM & ESPORTS", tag: "CUSTOM", key: "ESPORTS", categoryId: 4 },
+    { name: "JERSEY SEPAKBOLA & FUTSAL", tag: "POPULER", categoryId: 1, desc: "Dry-Fit Microfiber" },
+    { name: "JERSEY BOLA VOLI (PRO LIGA)", tag: "HOT", categoryId: 2, desc: "V-Neck Elastis Tinggi" },
+    { name: "JERSEY BADMINTON & TENIS", tag: "ELITE", categoryId: 3, desc: "Ventilasi Aktif" },
+    { name: "CUSTOM TIM & ESPORTS", tag: "CUSTOM", categoryId: 4, desc: "Sublimasi Full-Print" },
+    { name: "JERSEY BASKET & STREETBALL", tag: "PRO", categoryId: 5, desc: "Sleeveless Athletic" },
   ];
 
-  const handleCategoryClick = (cat) => {
+  const handleScrollTo = (sectionId) => {
     onClose();
-    if (onSelectCategory) {
-      onSelectCategory(cat.key);
+    if (window.location.pathname !== "/") {
+      navigate(`/#${sectionId}`);
       setTimeout(() => {
-        const el = document.getElementById("produk");
+        const el = document.getElementById(sectionId);
+        if (el) {
+          el.scrollIntoView({ behavior: "smooth" });
+        }
+      }, 250);
+    } else {
+      setTimeout(() => {
+        const el = document.getElementById(sectionId);
         if (el) {
           el.scrollIntoView({ behavior: "smooth" });
         }
       }, 100);
     }
-  };
-
-  const handleScrollTo = (id) => {
-    onClose();
-    setTimeout(() => {
-      const el = document.getElementById(id);
-      if (el) {
-        el.scrollIntoView({ behavior: "smooth" });
-      }
-    }, 100);
   };
 
   return (
@@ -117,31 +117,40 @@ export default function NavDrawer({ isOpen, onClose, onOpenSearch, onSelectCateg
           </button>
 
           {/* Navigation Links */}
-          <div className="space-y-1">
-            <p className="text-[11px] font-bold uppercase tracking-widest text-emerald-400/80 mb-2">
-              KATEGORI OLAHRAGA
-            </p>
+          {/* Navigation Links */}
+          <div className="space-y-1.5">
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-[11px] font-bold uppercase tracking-widest text-emerald-400">
+                KATEGORI OLAHRAGA
+              </p>
+              <span className="text-[10px] font-mono text-slate-400">5 Cabang Resmi</span>
+            </div>
             {categories.map((cat, idx) => (
-              <button
+              <Link
                 key={idx}
-                type="button"
-                onClick={() => handleCategoryClick(cat)}
-                className="w-full group flex items-center justify-between py-3 px-3 rounded-xl hover:bg-white/5 transition-all text-slate-200 hover:text-white cursor-pointer text-left"
+                to={`/dashboard?categoryId=${cat.categoryId}`}
+                onClick={onClose}
+                className="w-full group flex items-center justify-between py-2.5 px-3 rounded-xl hover:bg-white/10 transition-all text-slate-200 hover:text-white cursor-pointer text-left border border-transparent hover:border-white/10"
               >
-                <div className="flex items-center gap-2.5">
-                  <span className="font-condensed text-lg font-bold tracking-wide group-hover:translate-x-1 transition-transform">
-                    {cat.name}
-                  </span>
-                  {cat.tag && (
-                    <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-red-600/30 text-red-400 border border-red-500/40">
-                      {cat.tag}
+                <div className="space-y-0.5">
+                  <div className="flex items-center gap-2">
+                    <span className="font-condensed text-base font-bold tracking-wide group-hover:translate-x-1 transition-transform text-white">
+                      {cat.name}
                     </span>
-                  )}
+                    {cat.tag && (
+                      <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.2 rounded bg-red-600/30 text-red-400 border border-red-500/40">
+                        {cat.tag}
+                      </span>
+                    )}
+                  </div>
+                  <div className="text-[10px] text-slate-400 font-mono">
+                    {cat.desc}
+                  </div>
                 </div>
-                <div className="w-7 h-7 rounded-full bg-white/5 group-hover:bg-white/20 flex items-center justify-center text-slate-400 group-hover:text-white transition-colors">
+                <div className="w-7 h-7 rounded-full bg-white/5 group-hover:bg-emerald-500 group-hover:text-black flex items-center justify-center text-slate-400 transition-all shrink-0">
                   <ChevronRight size={14} />
                 </div>
-              </button>
+              </Link>
             ))}
 
             {/* Direct Full Store Catalog Link */}
@@ -149,50 +158,58 @@ export default function NavDrawer({ isOpen, onClose, onOpenSearch, onSelectCateg
               <Link
                 to="/dashboard"
                 onClick={onClose}
-                className="w-full py-3 px-4 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-between text-xs font-mono uppercase tracking-wider text-emerald-300 hover:text-white transition-all group"
+                className="w-full py-3 px-4 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/40 flex items-center justify-between text-xs font-mono uppercase tracking-wider text-emerald-300 hover:text-white transition-all group shadow-lg shadow-emerald-950/40"
               >
-                <span>Buka Katalog Toko Lengkap (50+ Produk)</span>
-                <span className="group-hover:translate-x-1 transition-transform">→</span>
+                <span className="font-bold">Buka Katalog Toko Lengkap (50+ Produk)</span>
+                <span className="group-hover:translate-x-1.5 transition-transform text-emerald-400">→</span>
               </Link>
             </div>
           </div>
 
           {/* Info & Section Navigation */}
-          <div className="pt-4 border-t border-white/10 space-y-2">
+          <div className="pt-4 border-t border-white/10 space-y-1.5">
             <p className="text-[11px] font-bold uppercase tracking-widest text-slate-400 mb-2">
               NAVIGASI HALAMAN
             </p>
             <button
               type="button"
               onClick={() => handleScrollTo("produk")}
-              className="w-full flex items-center gap-3 py-2 px-3 text-xs font-semibold text-slate-300 hover:text-white hover:bg-white/5 rounded-lg transition-colors text-left cursor-pointer"
+              className="w-full flex items-center gap-3 py-2.5 px-3 text-xs font-semibold text-slate-300 hover:text-white hover:bg-white/5 rounded-lg transition-colors text-left cursor-pointer group"
             >
-              <Sparkles size={16} className="text-emerald-400 shrink-0" />
+              <Sparkles size={16} className="text-emerald-400 shrink-0 group-hover:scale-110 transition-transform" />
               <span>Koleksi Rekomendasi Jersey</span>
             </button>
+            <Link
+              to="/dashboard/about"
+              onClick={onClose}
+              className="w-full flex items-center gap-3 py-2.5 px-3 text-xs font-semibold text-slate-300 hover:text-white hover:bg-white/5 rounded-lg transition-colors text-left cursor-pointer group"
+            >
+              <Building2 size={16} className="text-emerald-400 shrink-0 group-hover:scale-110 transition-transform" />
+              <span>Atelier &amp; Workshop Cicendo Bandung</span>
+            </Link>
             <button
               type="button"
-              onClick={() => handleScrollTo("tentang")}
-              className="w-full flex items-center gap-3 py-2 px-3 text-xs font-semibold text-slate-300 hover:text-white hover:bg-white/5 rounded-lg transition-colors text-left cursor-pointer"
+              onClick={() => handleScrollTo("keunggulan")}
+              className="w-full flex items-center gap-3 py-2.5 px-3 text-xs font-semibold text-slate-300 hover:text-white hover:bg-white/5 rounded-lg transition-colors text-left cursor-pointer group"
             >
-              <ShieldCheck size={16} className="text-emerald-400 shrink-0" />
-              <span>Atelier &amp; Workshop Cicendo Bandung</span>
+              <ShieldCheck size={16} className="text-emerald-400 shrink-0 group-hover:scale-110 transition-transform" />
+              <span>Garansi Tukar Ukuran 100% &amp; Standar Mutu</span>
             </button>
             <button
               type="button"
               onClick={() => handleScrollTo("testimoni")}
-              className="w-full flex items-center gap-3 py-2 px-3 text-xs font-semibold text-slate-300 hover:text-white hover:bg-white/5 rounded-lg transition-colors text-left cursor-pointer"
+              className="w-full flex items-center gap-3 py-2.5 px-3 text-xs font-semibold text-slate-300 hover:text-white hover:bg-white/5 rounded-lg transition-colors text-left cursor-pointer group"
             >
-              <Sparkles size={16} className="text-emerald-400 shrink-0" />
+              <Award size={16} className="text-emerald-400 shrink-0 group-hover:scale-110 transition-transform" />
               <span>Testimoni Kapten Tim Se-Indonesia</span>
             </button>
             <a
-              href="https://wa.me/6281234567890?text=Halo%20RegarSport,%20saya%20ingin%20konsultasi%20desain%20jersey"
+              href="https://wa.me/6281234567890?text=Halo%20Tim%20RegarSport%20Cicendo%20Bandung,%20saya%20ingin%20konsultasi%20desain%20jersey%20tim"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-3 py-2 px-3 text-xs font-semibold text-slate-300 hover:text-white hover:bg-white/5 rounded-lg transition-colors"
+              className="flex items-center gap-3 py-2.5 px-3 text-xs font-semibold text-slate-300 hover:text-white hover:bg-white/5 rounded-lg transition-colors group"
             >
-              <Phone size={16} className="text-emerald-400 shrink-0" />
+              <Phone size={16} className="text-emerald-400 shrink-0 group-hover:scale-110 transition-transform" />
               <span>Konsultasi Desain Gratis (WhatsApp)</span>
             </a>
           </div>

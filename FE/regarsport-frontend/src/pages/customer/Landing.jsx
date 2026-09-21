@@ -17,6 +17,15 @@ import {
   Layers,
   Award,
   Plus,
+  Copy,
+  Check,
+  Ruler,
+  X,
+  Building2,
+  Clock,
+  CreditCard,
+  Tag,
+  ExternalLink,
 } from "lucide-react";
 
 import api from "../../services/api";
@@ -42,14 +51,22 @@ export default function Landing() {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
 
+  // Interactive Modals State (Size Chart, Warranty Policy, Coupon)
+  const [showCouponModal, setShowCouponModal] = useState(false);
+  const [showSizeModal, setShowSizeModal] = useState(false);
+  const [showWarrantyModal, setShowWarrantyModal] = useState(false);
+
+  // Coupon / Newsletter state
+  const [newsletterEmail, setNewsletterEmail] = useState("");
+  const [couponClaimed, setCouponClaimed] = useState(() => {
+    return localStorage.getItem("regarsport_coupon_claimed") === "true";
+  });
+  const [couponCopied, setCouponCopied] = useState(false);
+
   // Products and Categories Data
   const [products, setProducts] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("ALL");
   const [loading, setLoading] = useState(true);
-
-  // Newsletter state
-  const [newsletterEmail, setNewsletterEmail] = useState("");
-  const [newsletterSent, setNewsletterSent] = useState(false);
 
   // Total cart count
   const cartCount = useMemo(
@@ -89,11 +106,22 @@ export default function Landing() {
 
   const handleNewsletterSubmit = (e) => {
     e.preventDefault();
-    if (newsletterEmail) {
-      setNewsletterSent(true);
-      setTimeout(() => setNewsletterSent(false), 4000);
-      setNewsletterEmail("");
+    if (!newsletterEmail || !newsletterEmail.includes("@")) {
+      toast.error("Mohon masukkan format email yang valid!");
+      return;
     }
+    localStorage.setItem("regarsport_subscriber", newsletterEmail);
+    localStorage.setItem("regarsport_coupon_claimed", "true");
+    setCouponClaimed(true);
+    setShowCouponModal(true);
+    toast.success("Kupon eksklusif REGARJUARA berhasil diaktifkan!");
+  };
+
+  const handleCopyCoupon = () => {
+    navigator.clipboard.writeText("REGARJUARA");
+    setCouponCopied(true);
+    toast.success("Kode kupon 'REGARJUARA' berhasil disalin ke clipboard!");
+    setTimeout(() => setCouponCopied(false), 3000);
   };
 
   // Filtered products for showcase section
@@ -260,13 +288,19 @@ export default function Landing() {
 
               {/* Action Buttons (Pill CTAs) */}
               <div className="pt-2 flex flex-wrap items-center justify-center lg:justify-start gap-4">
-                <a
-                  href="#produk"
+                <button
+                  type="button"
+                  onClick={() => {
+                    const el = document.getElementById("produk");
+                    if (el) {
+                      el.scrollIntoView({ behavior: "smooth" });
+                    }
+                  }}
                   className="flex items-center gap-2.5 px-8 py-4 rounded-full bg-[#FAF8F4] hover:bg-white text-[#111613] font-black text-xs uppercase tracking-wider transition-all hover:scale-105 shadow-xl cursor-pointer"
                 >
                   <span>JELAJAHI KOLEKSI JERSEY</span>
                   <ArrowRight size={16} />
-                </a>
+                </button>
 
                 <button
                   type="button"
@@ -449,7 +483,7 @@ export default function Landing() {
       </section>
 
       {/* 5. KOLEKSI UNGGULAN & MULTI-BADGE PRODUCTS GRID */}
-      <section id="koleksi" className="py-16 sm:py-24 bg-[#FAF8F4] border-t border-black/5">
+      <section id="produk" className="py-16 sm:py-24 bg-[#FAF8F4] border-t border-black/5 scroll-mt-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-4">
             <div>
@@ -613,7 +647,7 @@ export default function Landing() {
       </section>
 
       {/* 6. EDITORIAL STORY BANNER ("DIPRODUKSI SENDIRI & TERUJI DI LAPANGAN") */}
-      <section className="py-20 bg-[#18221B] text-white relative overflow-hidden border-y border-white/10">
+      <section id="atelier" className="py-20 bg-[#18221B] text-white relative overflow-hidden border-y border-white/10 scroll-mt-20">
         {/* Topographic Background Texture */}
         <div className="absolute inset-0 bg-topography opacity-15 pointer-events-none" />
 
@@ -673,7 +707,7 @@ export default function Landing() {
       </section>
 
       {/* 7. 4 PILAR KEUNGGULAN BRAND */}
-      <section id="keunggulan" className="py-16 sm:py-20 bg-[#F3EFE7] border-b border-black/5">
+      <section id="keunggulan" className="py-16 sm:py-20 bg-[#F3EFE7] border-b border-black/5 scroll-mt-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-2xl mx-auto mb-12">
             <span className="text-xs font-extrabold uppercase tracking-widest text-emerald-800">
@@ -727,7 +761,7 @@ export default function Landing() {
       </section>
 
       {/* 8. TESTIMONI ATLET & KAPTEN TIM */}
-      <section id="testimoni" className="py-20 bg-[#FAF8F4]">
+      <section id="testimoni" className="py-20 bg-[#FAF8F4] scroll-mt-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-2xl mx-auto mb-14">
             <span className="text-xs font-extrabold uppercase tracking-widest text-emerald-800">
@@ -796,106 +830,280 @@ export default function Landing() {
         <div className="absolute inset-0 bg-topography opacity-15 pointer-events-none" />
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 space-y-12">
-          {/* Newsletter Section with Embedded Pill Input */}
-          <div className="p-8 sm:p-10 rounded-3xl bg-[#18221B] border border-white/10 flex flex-col lg:flex-row items-center justify-between gap-6 shadow-2xl">
-            <div className="space-y-1 text-center lg:text-left">
-              <span className="text-[10px] font-extrabold uppercase tracking-widest text-emerald-400">
-                KUPON EKSKLUSIF & RILIS SERI BARU
-              </span>
-              <h3 className="font-condensed text-2xl sm:text-3xl font-bold uppercase tracking-tight text-white">
-                GABUNG DENGAN KOMUNITAS ATLET REGARSPORT
-              </h3>
-              <p className="text-xs text-slate-400 max-w-lg">
-                Dapatkan promo awal musim, undangan turnamen, dan diskon grosir jersey tim langsung ke email Anda.
-              </p>
+          {/* Newsletter Section with Embedded Pill Input & Instant Coupon Claim */}
+          {couponClaimed ? (
+            <div className="p-8 sm:p-10 rounded-3xl bg-linear-to-r from-[#18221B] via-[#1F2F23] to-[#18221B] border border-emerald-500/40 flex flex-col lg:flex-row items-center justify-between gap-6 shadow-2xl relative overflow-hidden">
+              <div className="space-y-1.5 text-center lg:text-left z-10">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px] font-black uppercase tracking-wider">
+                  <Sparkles size={12} />
+                  <span>KUPON AKTIF ANDA</span>
+                </div>
+                <h3 className="font-condensed text-2xl sm:text-3xl font-bold uppercase tracking-tight text-white">
+                  KUPON DISKON 15% TIM SIAP DIGUNAKAN
+                </h3>
+                <p className="text-xs text-slate-300 max-w-lg">
+                  Gunakan kode kupon di bawah ini saat memesan jersey di katalog untuk potongan harga 15% + bebas biaya sablon nama & nomor punggung tim.
+                </p>
+              </div>
+
+              <div className="flex flex-wrap items-center justify-center lg:justify-end gap-3 z-10 w-full lg:w-auto">
+                <div className="flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-black/60 border border-emerald-400/50 text-white font-mono text-sm tracking-widest font-bold">
+                  <Tag size={15} className="text-emerald-400" />
+                  <span>REGARJUARA</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleCopyCoupon}
+                  className="px-5 py-2.5 rounded-full bg-emerald-500 hover:bg-emerald-400 text-[#0F1712] font-black text-xs uppercase tracking-wider flex items-center gap-1.5 transition-transform hover:scale-105 cursor-pointer shadow-lg shadow-emerald-500/20"
+                >
+                  {couponCopied ? <Check size={14} /> : <Copy size={14} />}
+                  <span>{couponCopied ? "TERSALIN!" : "SALIN KODE"}</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowCouponModal(true)}
+                  className="px-4 py-2.5 rounded-full bg-white/10 hover:bg-white/20 text-white font-bold text-xs uppercase tracking-wider transition-colors cursor-pointer border border-white/15"
+                >
+                  Rincian
+                </button>
+                <Link
+                  to="/dashboard"
+                  className="px-5 py-2.5 rounded-full bg-[#FAF8F4] hover:bg-white text-[#111613] font-bold text-xs uppercase tracking-wider flex items-center gap-1.5 transition-transform hover:scale-105 shadow"
+                >
+                  <span>Buka Toko</span>
+                  <ArrowRight size={14} />
+                </Link>
+              </div>
             </div>
+          ) : (
+            <div className="p-8 sm:p-10 rounded-3xl bg-[#18221B] border border-white/10 flex flex-col lg:flex-row items-center justify-between gap-6 shadow-2xl">
+              <div className="space-y-1 text-center lg:text-left">
+                <span className="text-[10px] font-extrabold uppercase tracking-widest text-emerald-400">
+                  KUPON EKSKLUSIF & RILIS SERI BARU
+                </span>
+                <h3 className="font-condensed text-2xl sm:text-3xl font-bold uppercase tracking-tight text-white">
+                  GABUNG DENGAN KOMUNITAS ATLET REGARSPORT
+                </h3>
+                <p className="text-xs text-slate-400 max-w-lg">
+                  Daftarkan email kapten atau manajer tim Anda untuk langsung mengklaim kupon diskon 15% serta info rilis jersey terbaru.
+                </p>
+              </div>
 
-            <form
-              onSubmit={handleNewsletterSubmit}
-              className="w-full lg:w-auto flex-1 max-w-md flex items-center bg-white/10 rounded-full p-1.5 border border-white/15 focus-within:border-emerald-400 transition-colors"
-            >
-              <input
-                type="email"
-                required
-                value={newsletterEmail}
-                onChange={(e) => setNewsletterEmail(e.target.value)}
-                placeholder="Masukkan email kapten / manajer..."
-                className="w-full bg-transparent px-4 py-2 text-xs text-white placeholder:text-slate-400 focus:outline-none"
-              />
-              <button
-                type="submit"
-                className="px-5 py-2.5 rounded-full bg-[#FAF8F4] hover:bg-white text-[#111613] font-bold text-xs uppercase tracking-wider flex items-center gap-1.5 shrink-0 transition-transform hover:scale-105 cursor-pointer shadow"
+              <form
+                onSubmit={handleNewsletterSubmit}
+                className="w-full lg:w-auto flex-1 max-w-md flex items-center bg-white/10 rounded-full p-1.5 border border-white/15 focus-within:border-emerald-400 transition-colors"
               >
-                <span>GABUNG</span>
-                <ArrowRight size={14} />
-              </button>
-            </form>
-          </div>
-
-          {newsletterSent && (
-            <div className="p-4 rounded-2xl bg-emerald-900/60 border border-emerald-500/40 text-emerald-200 text-xs text-center animate-fade-in">
-              Terima kasih! Email Anda telah terdaftar untuk voucher eksklusif RegarSport.
+                <input
+                  type="email"
+                  required
+                  value={newsletterEmail}
+                  onChange={(e) => setNewsletterEmail(e.target.value)}
+                  placeholder="Masukkan email kapten / manajer..."
+                  className="w-full bg-transparent px-4 py-2 text-xs text-white placeholder:text-slate-400 focus:outline-none"
+                />
+                <button
+                  type="submit"
+                  className="px-5 py-2.5 rounded-full bg-[#FAF8F4] hover:bg-white text-[#111613] font-bold text-xs uppercase tracking-wider flex items-center gap-1.5 shrink-0 transition-transform hover:scale-105 cursor-pointer shadow"
+                >
+                  <span>KLAIM 15%</span>
+                  <ArrowRight size={14} />
+                </button>
+              </form>
             </div>
           )}
 
           {/* 4 Multi-Column Links */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 text-xs text-slate-400">
-            {/* Brand column */}
-            <div className="space-y-3">
+            {/* Brand & Atelier Info Column */}
+            <div className="space-y-3.5">
               <div className="flex items-center gap-2">
-                <div className="w-7 h-8 bg-[#B9382B] rounded-b-lg flex items-center justify-center">
+                <div className="w-7 h-8 bg-[#B9382B] rounded-b-lg flex items-center justify-center shadow">
                   <span className="text-[10px] font-black text-white">R</span>
                 </div>
                 <span className="font-condensed text-xl font-bold uppercase tracking-wider text-white">
                   PT REGARSPORT INDONESIA
                 </span>
               </div>
-              <p className="text-[11px] leading-relaxed">
-                Pabrik manufaktur apparel olahraga digital modern pertama di Indonesia dengan jaminan garansi tukar ukuran resmi.
+              <p className="text-[11px] leading-relaxed text-slate-300">
+                Pusat manufaktur apparel dan jersey olahraga profesional berteknologi digital sublimasi modern terintegrasi di Cicendo, Kota Bandung.
               </p>
-              <div className="text-[10px] text-slate-500 font-mono">
-                NPWP: 01.345.678.9-521.000 • Cicendo, Kota Bandung
+              <div className="space-y-1 text-[10px] text-slate-400 font-mono">
+                <div className="flex items-center gap-1.5 text-slate-300">
+                  <Building2 size={12} className="text-emerald-400 shrink-0" />
+                  <span>Jl. Cicendo No. 18, Pasir Kaliki, Bandung 40171</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <Clock size={12} className="text-emerald-400 shrink-0" />
+                  <span>Senin – Sabtu: 08.00 – 21.00 WIB</span>
+                </div>
+                <div>NPWP: 01.345.678.9-521.000</div>
+              </div>
+
+              {/* Social Media Channels */}
+              <div className="pt-1 flex items-center gap-2">
+                <a
+                  href="https://instagram.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-2.5 py-1 rounded-full bg-white/5 hover:bg-white/15 text-slate-300 hover:text-white border border-white/10 text-[10px] font-bold uppercase tracking-wider transition-colors"
+                >
+                  Instagram
+                </a>
+                <a
+                  href="https://tiktok.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-2.5 py-1 rounded-full bg-white/5 hover:bg-white/15 text-slate-300 hover:text-white border border-white/10 text-[10px] font-bold uppercase tracking-wider transition-colors"
+                >
+                  TikTok
+                </a>
+                <a
+                  href="https://wa.me/6281234567890"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-2.5 py-1 rounded-full bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 hover:text-white border border-emerald-500/30 text-[10px] font-bold uppercase tracking-wider transition-colors"
+                >
+                  WhatsApp
+                </a>
               </div>
             </div>
 
-            {/* Column 2: Katalog */}
+            {/* Column 2: Katalog Olahraga */}
             <div>
-              <h5 className="font-condensed text-sm font-bold uppercase tracking-wider text-white mb-3">
-                KATALOG OLAHRAGA
+              <h5 className="font-condensed text-sm font-bold uppercase tracking-wider text-white mb-3 flex items-center gap-2">
+                <span>KATALOG OLAHRAGA</span>
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
               </h5>
-              <ul className="space-y-2 text-[11px]">
-                <li><Link to="/dashboard?categoryId=1" className="hover:text-white transition-colors">Jersey Sepakbola & Futsal</Link></li>
-                <li><Link to="/dashboard?categoryId=2" className="hover:text-white transition-colors">Jersey Bola Voli Pro Liga</Link></li>
-                <li><Link to="/dashboard?categoryId=3" className="hover:text-white transition-colors">Jersey Badminton Elite</Link></li>
-                <li><Link to="/dashboard?categoryId=4" className="hover:text-white transition-colors">Custom Jersey Komunitas & Esport</Link></li>
-                <li><Link to="/dashboard?categoryId=5" className="hover:text-white transition-colors">Jersey Basket & Streetball</Link></li>
+              <ul className="space-y-2.5 text-[11px]">
+                <li>
+                  <Link to="/dashboard?categoryId=1" className="hover:text-emerald-300 transition-colors flex items-center justify-between group">
+                    <span>Jersey Sepakbola &amp; Futsal</span>
+                    <span className="text-[10px] text-slate-500 group-hover:text-emerald-400 font-mono">10+</span>
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/dashboard?categoryId=2" className="hover:text-emerald-300 transition-colors flex items-center justify-between group">
+                    <span>Jersey Bola Voli Pro Liga</span>
+                    <span className="text-[10px] text-slate-500 group-hover:text-emerald-400 font-mono">10+</span>
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/dashboard?categoryId=3" className="hover:text-emerald-300 transition-colors flex items-center justify-between group">
+                    <span>Jersey Badminton Elite</span>
+                    <span className="text-[10px] text-slate-500 group-hover:text-emerald-400 font-mono">10+</span>
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/dashboard?categoryId=4" className="hover:text-emerald-300 transition-colors flex items-center justify-between group">
+                    <span>Custom Jersey Komunitas &amp; Esport</span>
+                    <span className="text-[10px] text-slate-500 group-hover:text-emerald-400 font-mono">10+</span>
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/dashboard?categoryId=5" className="hover:text-emerald-300 transition-colors flex items-center justify-between group">
+                    <span>Jersey Basket &amp; Streetball</span>
+                    <span className="text-[10px] text-slate-500 group-hover:text-emerald-400 font-mono">10+</span>
+                  </Link>
+                </li>
+                <li className="pt-1">
+                  <Link to="/dashboard" className="text-emerald-400 font-bold hover:underline flex items-center gap-1">
+                    <span>Buka Katalog Lengkap (50+ Produk)</span>
+                    <ArrowRight size={12} />
+                  </Link>
+                </li>
               </ul>
             </div>
 
-            {/* Column 3: Garansi & CS */}
+            {/* Column 3: Garansi & Layanan Pelanggan */}
             <div>
-              <h5 className="font-condensed text-sm font-bold uppercase tracking-wider text-white mb-3">
-                GARANSI & LAYANAN
+              <h5 className="font-condensed text-sm font-bold uppercase tracking-wider text-white mb-3 flex items-center gap-2">
+                <span>GARANSI &amp; LAYANAN</span>
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
               </h5>
-              <ul className="space-y-2 text-[11px]">
-                <li><a href="#keunggulan" className="hover:text-white transition-colors">Ketentuan Garansi Tukar Ukuran</a></li>
-                <li><Link to="/dashboard/cart" className="hover:text-white transition-colors">Status Keranjang Belanja</Link></li>
-                <li><Link to="/dashboard/my-orders" className="hover:text-white transition-colors">Lacak Pesanan & Resi</Link></li>
-                <li><a href="https://wa.me/6281234567890" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">WhatsApp Customer Service</a></li>
-                <li><Link to="/dashboard/about" className="hover:text-white transition-colors">Tentang Atelier Cicendo</Link></li>
+              <ul className="space-y-2.5 text-[11px]">
+                <li>
+                  <button
+                    type="button"
+                    onClick={() => setShowWarrantyModal(true)}
+                    className="hover:text-emerald-300 transition-colors text-left flex items-center gap-1.5 cursor-pointer"
+                  >
+                    <ShieldCheck size={13} className="text-emerald-400" />
+                    <span>Ketentuan Garansi Tukar Ukuran 100%</span>
+                  </button>
+                </li>
+                <li>
+                  <button
+                    type="button"
+                    onClick={() => setShowSizeModal(true)}
+                    className="hover:text-emerald-300 transition-colors text-left flex items-center gap-1.5 cursor-pointer"
+                  >
+                    <Ruler size={13} className="text-emerald-400" />
+                    <span>Panduan Ukuran (Size Chart S - 3XL)</span>
+                  </button>
+                </li>
+                <li>
+                  <Link to="/dashboard/cart" className="hover:text-emerald-300 transition-colors block">
+                    Status Keranjang Belanja
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/dashboard/my-orders" className="hover:text-emerald-300 transition-colors block">
+                    Lacak Pesanan &amp; Status Resi
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/dashboard/about" className="hover:text-emerald-300 transition-colors block">
+                    Profil Atelier Cicendo Bandung
+                  </Link>
+                </li>
+                <li>
+                  <a
+                    href="https://wa.me/6281234567890?text=Halo%20RegarSport,%20saya%20ingin%20konsultasi%20layanan%20dan%20garansi"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-emerald-400 font-semibold hover:underline flex items-center gap-1"
+                  >
+                    <Phone size={12} />
+                    <span>Konsultasi WhatsApp Customer Care</span>
+                  </a>
+                </li>
               </ul>
             </div>
 
-            {/* Column 4: Keamanan & Pembayaran */}
-            <div className="space-y-3">
-              <h5 className="font-condensed text-sm font-bold uppercase tracking-wider text-white">
-                PEMBAYARAN & EKSPEDISI
+            {/* Column 4: Keamanan, Pembayaran & Ekspedisi */}
+            <div className="space-y-3.5">
+              <h5 className="font-condensed text-sm font-bold uppercase tracking-wider text-white flex items-center gap-2">
+                <span>PEMBAYARAN &amp; EKSPEDISI</span>
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
               </h5>
-              <p className="text-[11px] leading-relaxed">
-                Didukung Midtrans Payment Gateway (QRIS, BCA, Mandiri, BRI, GoPay) serta kurir J&T Express, JNE, SiCepat dengan nomor resi terverifikasi.
+              <p className="text-[11px] leading-relaxed text-slate-300">
+                Didukung gerbang pembayaran otomatis Midtrans dan kurir express resmi dengan nomor resi terverifikasi ke seluruh Indonesia.
               </p>
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 text-[10px] font-semibold text-emerald-400">
-                <CheckCircle2 size={13} />
+
+              {/* Payment Methods Pills */}
+              <div>
+                <div className="text-[10px] uppercase font-bold text-slate-400 mb-1.5">Metode Pembayaran</div>
+                <div className="flex flex-wrap gap-1.5 text-[9px] font-black uppercase text-slate-200">
+                  <span className="px-2 py-0.5 rounded bg-white/10 border border-white/15">QRIS</span>
+                  <span className="px-2 py-0.5 rounded bg-white/10 border border-white/15">BCA</span>
+                  <span className="px-2 py-0.5 rounded bg-white/10 border border-white/15">MANDIRI</span>
+                  <span className="px-2 py-0.5 rounded bg-white/10 border border-white/15">BRI</span>
+                  <span className="px-2 py-0.5 rounded bg-white/10 border border-white/15">GOPAY</span>
+                </div>
+              </div>
+
+              {/* Courier Partners Pills */}
+              <div>
+                <div className="text-[10px] uppercase font-bold text-slate-400 mb-1.5">Kurir Pengiriman</div>
+                <div className="flex flex-wrap gap-1.5 text-[9px] font-black uppercase text-slate-200">
+                  <span className="px-2 py-0.5 rounded bg-white/10 border border-white/15">J&amp;T Express</span>
+                  <span className="px-2 py-0.5 rounded bg-white/10 border border-white/15">JNE</span>
+                  <span className="px-2 py-0.5 rounded bg-white/10 border border-white/15">SiCepat</span>
+                </div>
+              </div>
+
+              <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-[10px] font-semibold text-emerald-300">
+                <CheckCircle2 size={13} className="text-emerald-400 shrink-0" />
                 <span>Verified SSL 256-bit Secure Checkout</span>
               </div>
             </div>
@@ -906,24 +1114,288 @@ export default function Landing() {
             <div>
               © {new Date().getFullYear()} PT RegarSport Indonesia. Hak Cipta Dilindungi Undang-Undang.
             </div>
-            <div className="flex gap-4">
+            <div className="flex flex-wrap items-center gap-4">
               <Link to="/dashboard/about" className="hover:text-white transition-colors">Tentang Perusahaan</Link>
               <span>•</span>
-              <a href="#keunggulan" className="hover:text-white transition-colors">Kebijakan Retur & Garansi</a>
+              <button
+                type="button"
+                onClick={() => setShowWarrantyModal(true)}
+                className="hover:text-white transition-colors cursor-pointer"
+              >
+                Kebijakan Retur &amp; Garansi
+              </button>
               <span>•</span>
-              <span className="text-slate-600">Cicendo, Kota Bandung • Indonesia</span>
+              <button
+                type="button"
+                onClick={() => setShowSizeModal(true)}
+                className="hover:text-white transition-colors cursor-pointer"
+              >
+                Panduan Ukuran
+              </button>
+              <span>•</span>
+              <span className="text-slate-400 font-medium">Cicendo, Kota Bandung • Indonesia</span>
             </div>
           </div>
         </div>
       </footer>
 
+      {/* ------------------------------------------------------------- */}
+      {/* INTERACTIVE MODALS */}
+      {/* ------------------------------------------------------------- */}
+
+      {/* 1. Modal Kupon Eksklusif REGARJUARA */}
+      {showCouponModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="fixed inset-0 bg-black/75 backdrop-blur-sm animate-fade-in" onClick={() => setShowCouponModal(false)} />
+          <div className="relative z-10 w-full max-w-md bg-[#162018] border border-emerald-500/40 rounded-3xl p-6 sm:p-8 text-white shadow-2xl animate-scale-up space-y-5">
+            <div className="flex items-center justify-between border-b border-white/10 pb-4">
+              <div className="flex items-center gap-2">
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping" />
+                <span className="font-condensed text-lg font-bold tracking-wider uppercase text-emerald-300">
+                  VOUCHER EKSKLUSIF REGARSPORT
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowCouponModal(false)}
+                className="p-1 rounded-full text-slate-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <div className="text-center space-y-2">
+              <div className="w-14 h-14 mx-auto rounded-2xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 flex items-center justify-center">
+                <Sparkles size={28} />
+              </div>
+              <h4 className="font-condensed text-2xl font-black uppercase text-white">
+                DISKON 15% PEMESANAN TIM
+              </h4>
+              <p className="text-xs text-slate-300 leading-relaxed">
+                Kupon ini berlaku untuk seluruh koleksi jersey ready stock &amp; custom di RegarSport Cicendo Bandung. Sudah termasuk gratis kustom nama dan nomor punggung pemain!
+              </p>
+            </div>
+
+            {/* Voucher Code Box */}
+            <div className="p-4 rounded-2xl bg-black/50 border-2 border-dashed border-emerald-500/50 text-center space-y-2">
+              <div className="text-[10px] font-bold uppercase tracking-widest text-slate-400">
+                Kode Kupon Resmi
+              </div>
+              <div className="font-mono text-2xl sm:text-3xl font-black tracking-widest text-emerald-300">
+                REGARJUARA
+              </div>
+              <button
+                type="button"
+                onClick={handleCopyCoupon}
+                className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-emerald-500 hover:bg-emerald-400 text-black font-extrabold text-xs uppercase tracking-wider transition-all cursor-pointer shadow-md"
+              >
+                {couponCopied ? <Check size={14} /> : <Copy size={14} />}
+                <span>{couponCopied ? "Kode Kupon Berhasil Disalin!" : "Salin Kode Kupon"}</span>
+              </button>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3 pt-2">
+              <button
+                type="button"
+                onClick={() => setShowCouponModal(false)}
+                className="py-3 rounded-xl bg-white/10 hover:bg-white/15 text-white font-bold text-xs uppercase tracking-wider transition-colors cursor-pointer"
+              >
+                Tutup
+              </button>
+              <Link
+                to="/dashboard"
+                onClick={() => setShowCouponModal(false)}
+                className="py-3 text-center rounded-xl bg-emerald-500 hover:bg-emerald-400 text-[#0F1712] font-black text-xs uppercase tracking-wider transition-all shadow-lg shadow-emerald-500/20"
+              >
+                Gunakan di Toko →
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 2. Modal Panduan Ukuran (Size Chart) */}
+      {showSizeModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="fixed inset-0 bg-black/75 backdrop-blur-sm animate-fade-in" onClick={() => setShowSizeModal(false)} />
+          <div className="relative z-10 w-full max-w-xl bg-[#162018] border border-white/15 rounded-3xl p-6 sm:p-8 text-white shadow-2xl animate-scale-up space-y-5 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between border-b border-white/10 pb-4">
+              <div className="flex items-center gap-2">
+                <Ruler size={18} className="text-emerald-400" />
+                <span className="font-condensed text-lg font-bold tracking-wider uppercase text-white">
+                  PANDUAN UKURAN JERSEY ATLETIK
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowSizeModal(false)}
+                className="p-1 rounded-full text-slate-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <p className="text-xs text-slate-300 leading-relaxed">
+              Standar ukuran jersey RegarSport dirancang pas di badan atlet (Athletic Slim-Fit) dengan bahan Dry-Fit Microfiber berpori aktif yang memiliki kelenturan 4-way stretch.
+            </p>
+
+            <div className="overflow-x-auto rounded-2xl border border-white/10 bg-black/40">
+              <table className="w-full text-xs text-left">
+                <thead className="bg-white/10 text-emerald-400 uppercase font-bold text-[10px] tracking-wider">
+                  <tr>
+                    <th className="px-3.5 py-3">Ukuran</th>
+                    <th className="px-3.5 py-3">Lebar Dada (cm)</th>
+                    <th className="px-3.5 py-3">Panjang Badan (cm)</th>
+                    <th className="px-3.5 py-3">Rekomendasi BB / TB</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-white/5 font-mono text-slate-200">
+                  <tr>
+                    <td className="px-3.5 py-2.5 font-bold text-white">S</td>
+                    <td className="px-3.5 py-2.5">48 cm</td>
+                    <td className="px-3.5 py-2.5">68 cm</td>
+                    <td className="px-3.5 py-2.5 text-[11px] text-slate-400 font-sans">50–60 kg • 160–168 cm</td>
+                  </tr>
+                  <tr className="bg-white/5">
+                    <td className="px-3.5 py-2.5 font-bold text-white">M</td>
+                    <td className="px-3.5 py-2.5">50 cm</td>
+                    <td className="px-3.5 py-2.5">70 cm</td>
+                    <td className="px-3.5 py-2.5 text-[11px] text-slate-400 font-sans">60–70 kg • 168–175 cm</td>
+                  </tr>
+                  <tr>
+                    <td className="px-3.5 py-2.5 font-bold text-emerald-400">L (Populer)</td>
+                    <td className="px-3.5 py-2.5">52 cm</td>
+                    <td className="px-3.5 py-2.5">72 cm</td>
+                    <td className="px-3.5 py-2.5 text-[11px] text-slate-400 font-sans">70–80 kg • 173–180 cm</td>
+                  </tr>
+                  <tr className="bg-white/5">
+                    <td className="px-3.5 py-2.5 font-bold text-white">XL</td>
+                    <td className="px-3.5 py-2.5">54 cm</td>
+                    <td className="px-3.5 py-2.5">74 cm</td>
+                    <td className="px-3.5 py-2.5 text-[11px] text-slate-400 font-sans">80–90 kg • 178–185 cm</td>
+                  </tr>
+                  <tr>
+                    <td className="px-3.5 py-2.5 font-bold text-white">XXL</td>
+                    <td className="px-3.5 py-2.5">56 cm</td>
+                    <td className="px-3.5 py-2.5">76 cm</td>
+                    <td className="px-3.5 py-2.5 text-[11px] text-slate-400 font-sans">90–100 kg • 182–190 cm</td>
+                  </tr>
+                  <tr className="bg-white/5">
+                    <td className="px-3.5 py-2.5 font-bold text-white">3XL</td>
+                    <td className="px-3.5 py-2.5">58 cm</td>
+                    <td className="px-3.5 py-2.5">78 cm</td>
+                    <td className="px-3.5 py-2.5 text-[11px] text-slate-400 font-sans">100+ kg • 185+ cm</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div className="p-3.5 rounded-2xl bg-emerald-950/50 border border-emerald-500/30 flex items-start gap-2.5 text-xs text-emerald-200">
+              <ShieldCheck size={18} className="text-emerald-400 shrink-0 mt-0.5" />
+              <span><b>Jaminan Pas 100%:</b> Jika setelah pesanan sampai ukurannya kurang nyaman, Anda berhak melakukan penukaran ukuran gratis dalam masa garansi 7 hari!</span>
+            </div>
+
+            <div className="flex justify-end pt-2">
+              <button
+                type="button"
+                onClick={() => setShowSizeModal(false)}
+                className="px-6 py-2.5 rounded-full bg-[#FAF8F4] hover:bg-white text-black font-extrabold text-xs uppercase tracking-wider transition-colors cursor-pointer"
+              >
+                Mengerti &amp; Tutup
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 3. Modal Ketentuan 100% Garansi Tukar Ukuran */}
+      {showWarrantyModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="fixed inset-0 bg-black/75 backdrop-blur-sm animate-fade-in" onClick={() => setShowWarrantyModal(false)} />
+          <div className="relative z-10 w-full max-w-lg bg-[#162018] border border-white/15 rounded-3xl p-6 sm:p-8 text-white shadow-2xl animate-scale-up space-y-5 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between border-b border-white/10 pb-4">
+              <div className="flex items-center gap-2">
+                <ShieldCheck size={20} className="text-emerald-400" />
+                <span className="font-condensed text-lg font-bold tracking-wider uppercase text-white">
+                  KEBIJAKAN 100% GARANSI TUKAR UKURAN
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowWarrantyModal(false)}
+                className="p-1 rounded-full text-slate-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <div className="space-y-3 text-xs text-slate-300 leading-relaxed">
+              <p>
+                RegarSport Atelier Cicendo Bandung menjamin setiap kapten tim mendapatkan jersey dengan ukuran yang benar-benar pas untuk bertanding.
+              </p>
+
+              <div className="space-y-2.5 pt-1">
+                <div className="p-3.5 rounded-2xl bg-white/5 border border-white/10 space-y-1">
+                  <div className="font-bold text-white flex items-center gap-1.5">
+                    <span className="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-[10px]">1</span>
+                    <span>Masa Berlaku Klaim 7 Hari</span>
+                  </div>
+                  <p className="text-[11px] text-slate-400 pl-6.5">
+                    Klaim tukar ukuran atau kendala jahitan dapat dilaporkan dalam 7 hari kalender sejak status resi kurir terkonfirmasi diterima.
+                  </p>
+                </div>
+
+                <div className="p-3.5 rounded-2xl bg-white/5 border border-white/10 space-y-1">
+                  <div className="font-bold text-white flex items-center gap-1.5">
+                    <span className="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-[10px]">2</span>
+                    <span>Syarat Kondisi Jersey</span>
+                  </div>
+                  <p className="text-[11px] text-slate-400 pl-6.5">
+                    Jersey belum dicuci, tidak terkena noda permanen pemakaian lapangan, dan hangtag produk masih ada.
+                  </p>
+                </div>
+
+                <div className="p-3.5 rounded-2xl bg-white/5 border border-white/10 space-y-1">
+                  <div className="font-bold text-white flex items-center gap-1.5">
+                    <span className="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-[10px]">3</span>
+                    <span>Proses Cepat di Atelier Bandung</span>
+                  </div>
+                  <p className="text-[11px] text-slate-400 pl-6.5">
+                    Tim produksi kami di Cicendo akan menyiapkan ukuran pengganti dalam 2-3 hari kerja dan dikirimkan kembali ke alamat tim Anda.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3 pt-2">
+              <button
+                type="button"
+                onClick={() => setShowWarrantyModal(false)}
+                className="py-3 rounded-xl bg-white/10 hover:bg-white/15 text-white font-bold text-xs uppercase tracking-wider transition-colors cursor-pointer"
+              >
+                Tutup
+              </button>
+              <a
+                href="https://wa.me/6281234567890?text=Halo%20Admin%20RegarSport,%20saya%20ingin%20klaim%20garansi%20tukar%20ukuran%20jersey%20tim"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="py-3 text-center rounded-xl bg-emerald-500 hover:bg-emerald-400 text-[#0F1712] font-black text-xs uppercase tracking-wider transition-all shadow-lg shadow-emerald-500/20"
+              >
+                Hubungi Admin CS →
+              </a>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ------------------------------------------------------------- */}
       {/* INTERACTIVE DRAWERS & MODALS */}
+      {/* ------------------------------------------------------------- */}
       {/* 1. Left Nav Drawer with Topographic Backdrop */}
       <NavDrawer
         isOpen={isNavOpen}
         onClose={() => setIsNavOpen(false)}
         onOpenSearch={() => setIsSearchOpen(true)}
-        onSelectCategory={(catKey) => setSelectedCategory(catKey)}
       />
 
       {/* 2. Right Cart Slide-Over Drawer */}
