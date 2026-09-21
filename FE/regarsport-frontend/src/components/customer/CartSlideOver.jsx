@@ -137,9 +137,9 @@ export default function CartSlideOver({ isOpen, onClose }) {
                 <div className="p-4 rounded-2xl bg-white border border-black/5 flex items-start gap-3 shadow-sm">
                   <Truck size={20} className="text-emerald-700 shrink-0 mt-0.5" />
                   <div>
-                    <div className="text-xs font-bold uppercase text-slate-800">Langsung Dari Pabrik Wonogiri</div>
+                    <div className="text-xs font-bold uppercase text-slate-800">Langsung Dari Atelier Cicendo Bandung</div>
                     <div className="text-[11px] text-slate-500 mt-0.5 leading-relaxed">
-                      Produksi terpusat berstandar atlet profesional dengan tinta sublimasi permanen OEKO-TEX.
+                      Produksi terpusat berstandar atlet profesional dengan tinta sublimasi permanen OEKO-TEX di Cicendo, Bandung.
                     </div>
                   </div>
                 </div>

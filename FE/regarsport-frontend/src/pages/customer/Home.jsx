@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-hooks/set-state-in-effect */
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import {
   ArrowRight,
   ChevronLeft,
@@ -73,11 +73,15 @@ const ProductCard = memo(function ProductCard({ product }) {
 });
 
 export default function Home() {
+  const [searchParams] = useSearchParams();
+  const initialCategory = searchParams.get("categoryId") || searchParams.get("category") || "";
+  const initialSearch = searchParams.get("search") || "";
+
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
-  const [search, setSearch] = useState("");
-  const [debouncedSearch, setDebouncedSearch] = useState("");
-  const [categoryId, setCategoryId] = useState("");
+  const [search, setSearch] = useState(initialSearch);
+  const [debouncedSearch, setDebouncedSearch] = useState(initialSearch);
+  const [categoryId, setCategoryId] = useState(initialCategory);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(true);
@@ -137,6 +141,20 @@ export default function Home() {
   useEffect(() => {
     getProducts();
   }, [debouncedSearch, categoryId, page]);
+
+  useEffect(() => {
+    const cat = searchParams.get("categoryId") || searchParams.get("category") || "";
+    const q = searchParams.get("search") || "";
+    if (cat !== categoryId) {
+      setCategoryId(cat);
+      setPage(1);
+    }
+    if (q !== search) {
+      setSearch(q);
+      setDebouncedSearch(q);
+      setPage(1);
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     const getCategories = async () => {

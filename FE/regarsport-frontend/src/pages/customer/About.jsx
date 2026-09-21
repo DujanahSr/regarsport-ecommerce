@@ -1,4 +1,4 @@
-import { Users, Package, Award, Zap, Heart, Shield, ShoppingBag } from "lucide-react";
+import { Users, Package, Award, Zap, Heart, Shield, ShoppingBag, MapPin } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const teamValues = [
@@ -100,6 +100,37 @@ export default function About() {
                 <p className="text-slate-500 text-sm mt-2 leading-relaxed">{desc}</p>
               </div>
             ))}
+          </div>
+        </section>
+
+        {/* Flagship Atelier & Workshop Location */}
+        <section className="bg-emerald-950 text-white rounded-3xl p-8 md:p-12 relative overflow-hidden shadow-2xl border border-emerald-900/40">
+          <div className="absolute top-0 right-0 -mr-16 -mt-16 w-80 h-80 rounded-full bg-emerald-500/10 blur-3xl pointer-events-none" />
+          <div className="relative z-10 max-w-3xl">
+            <div className="inline-flex items-center gap-2 bg-emerald-500/20 text-emerald-400 text-xs font-mono tracking-widest uppercase px-3.5 py-1.5 rounded-full mb-4 border border-emerald-500/30">
+              <MapPin size={13} />
+              Flagship Atelier & Workshop
+            </div>
+            <h2 className="text-3xl md:text-4xl font-black tracking-tight text-white mb-4">
+              Cicendo, Kota Bandung
+            </h2>
+            <p className="text-emerald-100/70 text-sm md:text-base leading-relaxed mb-6">
+              Studio riset tekstil, rancang bangun pola aerodinamis, dan pusat sublimasi berstandar atlet profesional kami kini beroperasi penuh di jantung Cicendo, Bandung. Seluruh pesanan custom jersey dan kit apparel diproduksi langsung dengan pengawasan mutu ketat.
+            </p>
+            <div className="grid sm:grid-cols-3 gap-4 pt-4 border-t border-emerald-900/60 text-xs text-emerald-200/80">
+              <div>
+                <span className="font-bold text-white block mb-1">Alamat Studio:</span>
+                Jl. Pasir Kaliki No. 123, Kec. Cicendo, Kota Bandung, Jawa Barat 40171
+              </div>
+              <div>
+                <span className="font-bold text-white block mb-1">Jam Operasional:</span>
+                Senin – Sabtu: 08.00 – 20.00 WIB
+              </div>
+              <div>
+                <span className="font-bold text-white block mb-1">Layanan Konsultasi:</span>
+                Tersedia fitting offline & digital via WhatsApp Official
+              </div>
+            </div>
           </div>
         </section>
 

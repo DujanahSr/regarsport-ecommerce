@@ -75,14 +75,10 @@ export default function App() {
                   element={<Register />}
                 />
 
-                {/* CUSTOMER */}
+                {/* CUSTOMER SHOP & BROWSING (PUBLIC ACCESS) */}
                 <Route
                   path="/dashboard"
-                  element={
-                    <ProtectedRoute>
-                      <CustomerLayouts />
-                    </ProtectedRoute>
-                  }
+                  element={<CustomerLayouts />}
                 >
                   <Route
                     index
@@ -106,22 +102,39 @@ export default function App() {
                     element={<Favorites />}
                   />
 
+                  {/* PROTECTED CUSTOMER ACTIONS */}
                   <Route
                     path="checkout"
-                    element={<Checkout />}
+                    element={
+                      <ProtectedRoute>
+                        <Checkout />
+                      </ProtectedRoute>
+                    }
                   />
                   <Route
                     path="my-orders"
-                    element={<MyOrders />}
+                    element={
+                      <ProtectedRoute>
+                        <MyOrders />
+                      </ProtectedRoute>
+                    }
                   />
                   <Route
                     path="orders/:id"
-                    element={<OrderDetail />}
+                    element={
+                      <ProtectedRoute>
+                        <OrderDetail />
+                      </ProtectedRoute>
+                    }
                   />
 
                   <Route
                     path="profile"
-                    element={<Profile />}
+                    element={
+                      <ProtectedRoute>
+                        <Profile />
+                      </ProtectedRoute>
+                    }
                   />
                 </Route>
 

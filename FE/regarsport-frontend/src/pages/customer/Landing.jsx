@@ -80,7 +80,7 @@ export default function Landing() {
 
   const handleCustomWhatsApp = () => {
     const msg = encodeURIComponent(
-      "Halo Tim Desain RegarSport Wonogiri, saya ingin konsultasi pembuatan custom jersey tim olahraga kami. Mohon info katalog bahan dry-fit dan pricelist."
+      "Halo Tim Desain RegarSport Cicendo Bandung, saya ingin konsultasi pembuatan custom jersey tim olahraga kami. Mohon info katalog bahan dry-fit dan pricelist."
     );
     window.open(`https://wa.me/6281234567890?text=${msg}`, "_blank");
   };
@@ -99,7 +99,8 @@ export default function Landing() {
     if (selectedCategory === "ALL") return products;
     return products.filter((p) => {
       const catName = p.category?.name?.toUpperCase() || "";
-      return catName.includes(selectedCategory);
+      const prodName = p.name?.toUpperCase() || "";
+      return catName.includes(selectedCategory) || prodName.includes(selectedCategory);
     });
   }, [products, selectedCategory]);
 
@@ -175,7 +176,7 @@ export default function Landing() {
                 REGARSPORT
               </span>
               <span className="text-[9px] font-bold uppercase tracking-[2px] text-emerald-400/90 block">
-                APPAREL • WONOGIRI
+                APPAREL • CICENDO BANDUNG
               </span>
             </div>
           </Link>
@@ -245,7 +246,7 @@ export default function Landing() {
             <div className="lg:col-span-7 space-y-6 text-center lg:text-left">
               <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 border border-white/15 text-xs font-semibold text-emerald-400">
                 <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-                <span>KOLEKSI ATLETIK 2026 • DIRECT FROM WONOGIRI</span>
+                <span>KOLEKSI ATLETIK 2026 • ATELIER CICENDO BANDUNG</span>
               </div>
 
               <h1 className="font-condensed text-5xl sm:text-6xl lg:text-7xl font-black uppercase tracking-tight text-white leading-[0.95]">
@@ -257,7 +258,7 @@ export default function Landing() {
 
               <p className="text-sm sm:text-base text-slate-300 max-w-xl mx-auto lg:mx-0 leading-relaxed font-normal">
                 Pusat apparel & jersey olahraga custom berstandar profesional.
-                Dibuat langsung di pabrik PT RegarSport Indonesia (Wonogiri) dengan
+                Dibuat langsung di atelier PT RegarSport Indonesia (Cicendo, Kota Bandung) dengan
                 bahan Dry-Fit Microfiber berpori aktif, sublimasi permanen anti-luntur,
                 dan komitmen garansi tukar ukuran 100%.
               </p>
@@ -340,7 +341,7 @@ export default function Landing() {
                       <div>
                         <div className="text-[10px] text-slate-400 uppercase">Mulai Dari</div>
                         <div className="font-condensed text-xl font-bold text-white">
-                          Rp 185.000
+                          Rp 175.000
                         </div>
                       </div>
                       <Link
@@ -382,34 +383,38 @@ export default function Landing() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
             {[
               {
+                id: 1,
                 name: "SEPAKBOLA & FUTSAL",
                 image: "/images/cat-football.jpg",
                 tag: "TERLARIS",
                 subtitle: "Dry-Fit Microfiber • Anti-UV",
               },
               {
+                id: 2,
                 name: "BOLA VOLI PRO",
                 image: "/images/cat-volleyball.jpg",
                 tag: "PRO LIGA",
                 subtitle: "Kerah V-Neck • Elastis Tinggi",
               },
               {
+                id: 3,
                 name: "BADMINTON ELITE",
                 image: "/images/cat-badminton.jpg",
                 tag: "RINGAN",
                 subtitle: "Ventilasi Aktif • Cepat Kering",
               },
               {
+                id: 4,
                 name: "KOMUNITAS & ESPORTS",
                 image: "/images/cat-esports.jpg",
                 tag: "CUSTOM",
                 subtitle: "Full-Print Sublimasi Tanpa Batas",
               },
-            ].map((cat, idx) => (
+            ].map((cat) => (
               <Link
-                key={idx}
-                to="/dashboard"
-                className="group relative aspect-4/5 rounded-3xl overflow-hidden bg-black/5 shadow-md border border-black/5 flex flex-col justify-between p-5 transition-all duration-500 hover:-translate-y-1.5 hover:shadow-2xl"
+                key={cat.id}
+                to={`/dashboard?categoryId=${cat.id}`}
+                className="group relative aspect-4/5 rounded-3xl overflow-hidden bg-black/5 shadow-md border border-black/5 flex flex-col justify-between p-5 transition-all duration-500 hover:-translate-y-1.5 hover:shadow-2xl cursor-pointer"
               >
                 <img
                   src={cat.image}
@@ -464,10 +469,11 @@ export default function Landing() {
             <div className="flex flex-wrap gap-2">
               {[
                 { label: "SEMUA", value: "ALL" },
-                { label: "SEPAKBOLA", value: "BOLA" },
+                { label: "SEPAKBOLA", value: "SEPAKBOLA" },
                 { label: "BOLA VOLI", value: "VOLI" },
                 { label: "BADMINTON", value: "BADMINTON" },
-                { label: "CUSTOM", value: "JERSEY" },
+                { label: "ESPORTS & KOMUNITAS", value: "ESPORT" },
+                { label: "BASKET", value: "BASKET" },
               ].map((pill) => (
                 <button
                   key={pill.value}
@@ -488,7 +494,7 @@ export default function Landing() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {loading ? (
               <div className="col-span-4 text-center py-16 text-slate-500 text-sm">
-                Sedang memuat katalog jersey dari pabrik Wonogiri...
+                Sedang memuat katalog jersey dari atelier Cicendo Bandung...
               </div>
             ) : filteredProducts.length > 0 ? (
               filteredProducts.slice(0, 8).map((prod) => {
@@ -581,7 +587,7 @@ export default function Landing() {
               })
             ) : (
               <div className="col-span-4 text-center py-16 text-slate-500 text-sm">
-                Sedang memuat katalog jersey dari pabrik Wonogiri...
+                Tidak ada produk dalam kategori ini saat ini.
               </div>
             )}
           </div>
@@ -610,11 +616,11 @@ export default function Landing() {
               <div className="relative rounded-3xl overflow-hidden shadow-2xl border border-white/15 aspect-16/10">
                 <img
                   src="/images/story-factory.jpg"
-                  alt="Pabrik RegarSport Wonogiri"
+                  alt="Atelier RegarSport Cicendo Bandung"
                   className="w-full h-full object-cover"
                 />
                 <div className="absolute bottom-4 left-4 bg-black/70 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-white/15 text-[10px] font-bold text-white uppercase tracking-wider">
-                  WONOGIRI APPAREL FACTORY • JAWA TENGAH
+                  CICENDO APPAREL STUDIO • KOTA BANDUNG
                 </div>
               </div>
             </div>
@@ -632,7 +638,7 @@ export default function Landing() {
 
               <p className="text-sm text-slate-300 leading-relaxed">
                 Di RegarSport, kami tidak sekadar menjual jersey. Kami mengoperasikan
-                fasilitas manufaktur tekstil terpadu di Wonogiri, Jawa Tengah. Mulai
+                fasilitas manufaktur & atelier tekstil terpadu di Cicendo, Kota Bandung. Mulai
                 dari riset kain Dry-Fit berpori aktif, pencetakan tinta sublimasi
                 standar OEKO-TEX ramah lingkungan, hingga penjahitan presisi tinggi
                 yang dirancang untuk tahan bergesekan dalam kompetisi terberat.
@@ -730,7 +736,7 @@ export default function Landing() {
                 quote:
                   "Jersey tim kami sudah dipakai lebih dari 30 pertandingan regional. Warna sublimasi dan sablon nomor punggung tetap tajam tanpa retak. Bahan sangat adem!",
                 name: "Rian Saputra",
-                role: "Kapten Garuda FC Wonogiri",
+                role: "Kapten Bandung Juara FC",
                 team: "Turnamen Liga 3 Regional",
               },
               {
@@ -840,7 +846,7 @@ export default function Landing() {
                 Pabrik manufaktur apparel olahraga digital modern pertama di Indonesia dengan jaminan garansi tukar ukuran resmi.
               </p>
               <div className="text-[10px] text-slate-500 font-mono">
-                NPWP: 01.345.678.9-521.000 • Wonogiri, Jawa Tengah
+                NPWP: 01.345.678.9-521.000 • Cicendo, Kota Bandung
               </div>
             </div>
 
@@ -850,11 +856,11 @@ export default function Landing() {
                 KATALOG OLAHRAGA
               </h5>
               <ul className="space-y-2 text-[11px]">
-                <li><Link to="/dashboard" className="hover:text-white transition-colors">Jersey Sepakbola & Futsal</Link></li>
-                <li><Link to="/dashboard" className="hover:text-white transition-colors">Jersey Bola Voli Pro Liga</Link></li>
-                <li><Link to="/dashboard" className="hover:text-white transition-colors">Jersey Badminton Elite</Link></li>
-                <li><Link to="/dashboard" className="hover:text-white transition-colors">Custom Jersey Komunitas & Esport</Link></li>
-                <li><Link to="/dashboard" className="hover:text-white transition-colors">Semua Koleksi Ready Stock</Link></li>
+                <li><Link to="/dashboard?categoryId=1" className="hover:text-white transition-colors">Jersey Sepakbola & Futsal</Link></li>
+                <li><Link to="/dashboard?categoryId=2" className="hover:text-white transition-colors">Jersey Bola Voli Pro Liga</Link></li>
+                <li><Link to="/dashboard?categoryId=3" className="hover:text-white transition-colors">Jersey Badminton Elite</Link></li>
+                <li><Link to="/dashboard?categoryId=4" className="hover:text-white transition-colors">Custom Jersey Komunitas & Esport</Link></li>
+                <li><Link to="/dashboard?categoryId=5" className="hover:text-white transition-colors">Jersey Basket & Streetball</Link></li>
               </ul>
             </div>
 
@@ -868,7 +874,7 @@ export default function Landing() {
                 <li><Link to="/dashboard/cart" className="hover:text-white transition-colors">Status Keranjang Belanja</Link></li>
                 <li><Link to="/dashboard/my-orders" className="hover:text-white transition-colors">Lacak Pesanan & Resi</Link></li>
                 <li><a href="https://wa.me/6281234567890" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">WhatsApp Customer Service</a></li>
-                <li><Link to="/dashboard/about" className="hover:text-white transition-colors">Tentang Fasilitas Pabrik</Link></li>
+                <li><Link to="/dashboard/about" className="hover:text-white transition-colors">Tentang Atelier Cicendo</Link></li>
               </ul>
             </div>
 
@@ -897,7 +903,7 @@ export default function Landing() {
               <span>•</span>
               <a href="#keunggulan" className="hover:text-white transition-colors">Kebijakan Retur & Garansi</a>
               <span>•</span>
-              <span className="text-slate-600">Wonogiri • Indonesia</span>
+              <span className="text-slate-600">Cicendo, Kota Bandung • Indonesia</span>
             </div>
           </div>
         </div>

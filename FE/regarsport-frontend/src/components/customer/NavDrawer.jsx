@@ -134,7 +134,7 @@ export default function NavDrawer({ isOpen, onClose, onOpenSearch }) {
               className="flex items-center gap-3 py-2 px-3 text-xs font-semibold text-slate-300 hover:text-white hover:bg-white/5 rounded-lg transition-colors"
             >
               <Sparkles size={16} className="text-emerald-400" />
-              <span>Tentang Pabrik & Teknologi Wonogiri</span>
+              <span>Tentang Atelier &amp; Workshop Cicendo Bandung</span>
             </Link>
             <a
               href="#keunggulan"

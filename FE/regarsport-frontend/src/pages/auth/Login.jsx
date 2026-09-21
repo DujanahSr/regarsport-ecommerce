@@ -4,52 +4,27 @@ import {
   LogIn,
   Mail,
   Lock,
-  Zap,
   ArrowRight,
+  ArrowLeft,
   Eye,
   EyeOff,
-  Shield,
-  BadgeCheck,
+  ShieldCheck,
+  CheckCircle2,
   Sparkles,
+  Compass,
 } from "lucide-react";
 import api from "../../services/api";
 import { useAuth } from "../../context/AuthContext";
 import toast from "react-hot-toast";
 
-// Produk cards: basketball, badminton, running shoes
-const PRODUCT_CARDS = [
-  {
-    img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRmMUacwvLmpSVq9GG61nYjlF-LO2au53UMOA&s",
-    label: "Basketball Pro",
-    price: "Rp 1.499.000",
-    tag: "BESTSELLER",
-    rotate: "-rotate-3",
-    top: "top-8",
-    left: "left-6",
-  },
-  {
-    img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSZn5GNR9h3C2yUjg_vg03m1LZRigR3HsSpKw&s",
-    label: "Badminton Elite",
-    price: "Rp 899.000",
-    tag: "NEW",
-    rotate: "rotate-2",
-    top: "top-[200px]",
-    left: "left-[160px]",
-  },
-  {
-    img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR5zpxaSnsbo3gxSJy7tYhSnlSok4oon8n6Rg&s",
-    label: "Running Shoes X1",
-    price: "Rp 1.299.000",
-    tag: "SALE",
-    rotate: "-rotate-1",
-    top: "top-[380px]",
-    left: "left-10",
-  },
-];
-
 const TICKER_ITEMS = [
-  "GEAR UP", "PERFORM", "DOMINATE", "LEVEL UP", "STAY FAST",
-  "GEAR UP", "PERFORM", "DOMINATE", "LEVEL UP", "STAY FAST",
+  "TACTICAL ATHLETICS",
+  "PRO-LEVEL PERFORMANCE",
+  "CICENDO ATELIER",
+  "AERODYNAMIC KNIT",
+  "SUBLIMATION SYSTEM",
+  "ZERO DISTRACTION",
+  "ENDURANCE GRADE",
 ];
 
 export default function Login() {
@@ -75,7 +50,10 @@ export default function Login() {
   const handleLogin = async (e) => {
     e.preventDefault();
     const validationError = validateForm();
-    if (validationError) { setError(validationError); return; }
+    if (validationError) {
+      setError(validationError);
+      return;
+    }
     setLoading(true);
     setError("");
     try {
@@ -101,7 +79,7 @@ export default function Login() {
         navigate("/dashboard");
       }
     } catch (err) {
-      const message = err.response?.data?.message || err.message || "Login gagal";
+      const message = err.response?.data?.message || err.message || "Email atau password salah";
       setError(message);
       toast.error(message);
     } finally {
@@ -110,308 +88,293 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0D0D0D] flex flex-col lg:flex-row overflow-hidden relative">
-
-      {/* ═══════════════════════════════════════
-          MOBILE HEADER (visible only < lg)
-      ═══════════════════════════════════════ */}
-      <div className="lg:hidden flex items-center justify-between px-6 pt-8 pb-4 z-20 relative">
-        <div className="flex items-center gap-2">
-          <div className="bg-[#00BFA5] p-1.5 rounded-md">
-            <Zap size={15} className="text-black" strokeWidth={3} />
-          </div>
-          <span className="text-white font-black tracking-[3px] text-sm uppercase">RegarSport</span>
-        </div>
+    <div className="min-h-screen bg-[#0F1712] text-[#FAF8F4] flex flex-col lg:flex-row relative selection:bg-emerald-500 selection:text-black">
+      {/* ── Top Bar Mobile Navigation ── */}
+      <div className="lg:hidden flex items-center justify-between px-6 py-4 border-b border-white/10 bg-[#18221B]/90 backdrop-blur-md sticky top-0 z-30">
+        <Link
+          to="/"
+          className="inline-flex items-center gap-2 text-xs font-mono tracking-widest text-[#FAF8F4]/80 hover:text-emerald-400 transition-colors uppercase"
+        >
+          <ArrowLeft size={14} />
+          <span>Beranda</span>
+        </Link>
+        <span className="font-['Barlow_Condensed'] font-black tracking-widest text-base text-emerald-400 uppercase">
+          REGARSPORT
+        </span>
         <Link
           to="/register"
-          className="text-[11px] font-bold text-[#00BFA5] border border-[#00BFA5]/30 px-3 py-1.5 rounded-full hover:bg-[#00BFA5]/10 transition-colors"
+          className="text-xs font-bold text-emerald-400 hover:underline"
         >
-          Daftar Gratis →
+          Daftar
         </Link>
       </div>
 
-      {/* ═══════════════════════════════════════
-          LEFT PANEL — Editorial + Products
-      ═══════════════════════════════════════ */}
-      <div className="hidden lg:flex w-[52%] xl:w-[55%] flex-col relative overflow-hidden bg-[#0C0C16]">
-
-        {/* Background */}
-        <div className="absolute inset-0">
-          <img
-            src="https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=900&q=80"
-            alt="Sport"
-            className="w-full h-full object-cover opacity-20"
-          />
-          <div className="absolute inset-0 bg-linear-to-r from-[#0C0C16] via-[#0C0C16]/70 to-transparent" />
-          <div className="absolute inset-0 bg-linear-to-t from-[#0C0C16] via-transparent to-transparent" />
-        </div>
-
-        {/* Grid overlay */}
+      {/* ══════════════════════════════════════════════
+          LEFT PANEL — Tactical Brand Editorial & Showcase
+      ══════════════════════════════════════════════ */}
+      <div className="hidden lg:flex w-[48%] xl:w-[50%] flex-col justify-between relative overflow-hidden bg-[#18221B] border-r border-white/10 p-12">
+        {/* Subtle Topographic / Crosshair Texture */}
         <div
-          className="absolute inset-0 opacity-[0.04]"
-          style={{ backgroundImage: "linear-gradient(#00BFA5 1px, transparent 1px), linear-gradient(90deg, #00BFA5 1px, transparent 1px)", backgroundSize: "60px 60px" }}
+          className="absolute inset-0 opacity-10 pointer-events-none"
+          style={{
+            backgroundImage: "radial-gradient(#10B981 1px, transparent 1px)",
+            backgroundSize: "28px 28px",
+          }}
         />
 
-        {/* Ticker tape */}
-        <div className="relative z-10 bg-[#00BFA5] py-2 overflow-hidden shrink-0">
-          <div className="flex gap-0 animate-[ticker_18s_linear_infinite] whitespace-nowrap w-max">
-            {TICKER_ITEMS.map((item, i) => (
-              <span key={i} className="text-[#0D0D0D] font-black text-xs tracking-[3px] uppercase px-6">
-                {item} <span className="text-black/30 mx-1">✦</span>
+        {/* Ambient Gradient Glow */}
+        <div className="absolute -top-32 -left-32 w-96 h-96 rounded-full bg-emerald-600/15 blur-[120px] pointer-events-none" />
+        <div className="absolute -bottom-32 -right-32 w-96 h-96 rounded-full bg-emerald-400/10 blur-[120px] pointer-events-none" />
+
+        {/* Top Header inside Left Panel */}
+        <div className="relative z-10 space-y-6">
+          <div className="flex items-center justify-between">
+            <Link
+              to="/"
+              className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-xs font-mono uppercase tracking-widest text-[#FAF8F4]/80 hover:text-white hover:bg-white/10 hover:border-emerald-500/40 transition-all duration-200 group"
+            >
+              <ArrowLeft size={14} className="group-hover:-translate-x-1 transition-transform" />
+              <span>Kembali Ke Beranda</span>
+            </Link>
+
+            <div className="flex items-center gap-2 text-[10px] font-mono uppercase tracking-widest text-emerald-400/80 bg-emerald-950/60 border border-emerald-500/30 px-3 py-1 rounded-full">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              ATELIER // CICENDO BANDUNG
+            </div>
+          </div>
+
+          <div className="pt-6">
+            <div className="inline-block text-[11px] font-mono tracking-[0.25em] text-emerald-400 uppercase bg-emerald-950/40 border border-emerald-800/40 px-3 py-1 rounded mb-4">
+              SECURE ACCESS // PORTAL ATLET
+            </div>
+            <h1 className="font-['Barlow_Condensed'] font-black text-5xl xl:text-6xl uppercase tracking-tight text-white leading-[0.92]">
+              PERSATUKAN <br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-[#FAF8F4] to-emerald-200">
+                ENERGI & IDENTITAS.
               </span>
-            ))}
+            </h1>
+            <p className="text-sm text-[#FAF8F4]/70 max-w-md mt-4 leading-relaxed font-sans">
+              Akses akun RegarSport untuk memantau status pesanan custom jersey tim, riwayat invoice, serta katalog edisi terbatas berstandar atelier Cicendo Bandung.
+            </p>
           </div>
         </div>
 
-        {/* Logo */}
-        <div className="relative z-10 px-10 pt-8">
-          <div className="flex items-center gap-2">
-            <div className="bg-[#00BFA5] p-1.5 rounded-md">
-              <Zap size={16} className="text-black" strokeWidth={3} />
-            </div>
-            <span className="text-white font-black tracking-[4px] text-base uppercase">RegarSport</span>
-          </div>
-        </div>
+        {/* Mid Showcase: Athletic Imagery & Tactical Specifications */}
+        <div className="relative z-10 my-8">
+          <div className="relative rounded-2xl overflow-hidden border border-white/15 bg-black/40 shadow-2xl group">
+            <img
+              src="https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=900&q=80"
+              alt="Athletic Performance"
+              className="w-full h-64 object-cover object-top opacity-60 group-hover:scale-105 transition-transform duration-700"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#18221B] via-[#18221B]/40 to-transparent" />
 
-        {/* Headline + Cards */}
-        <div className="relative z-10 px-10 mt-10 flex-1">
-          <div className="inline-block bg-[#0097A7] text-white text-[10px] font-black tracking-[3px] px-3 py-1.5 rounded-sm mb-5 uppercase">
-            Sport Store #1 Indonesia
-          </div>
-          <h1 className="text-[64px] xl:text-[76px] font-black text-white uppercase leading-[0.9] tracking-[-2px] mb-4">
-            KEMBALI<br />
-            KE{" "}
-            <span className="text-transparent" style={{ WebkitTextStroke: "2px #00BFA5" }}>
-              ARENA.
-            </span>
-          </h1>
-          <p className="text-[#2e4545] text-sm leading-relaxed max-w-70 mb-10">
-            Login dan lanjutkan perjalanan sportimu. Ribuan produk terbaik menunggumu.
-          </p>
-
-          {/* Product Cards dengan hover animasi */}
-          <div className="relative h-105 xl:h-115">
-            {PRODUCT_CARDS.map((card, i) => (
-              <div
-                key={i}
-                className={`absolute ${card.top} ${card.left} ${card.rotate} group cursor-pointer`}
-                style={{ zIndex: 10 - i }}
-              >
-                <div className="w-38.75 bg-[#0A1515]/80 backdrop-blur-md border border-white/10 rounded-2xl overflow-hidden shadow-[0_8px_32px_rgba(0,0,0,0.6)] transition-all duration-300 hover:scale-105 hover:border-[#00BFA5]/60 hover:shadow-[0_12px_48px_rgba(0,191,165,0.2)]">
-                  {/* Tag */}
-                  <div className="absolute top-2.5 left-2.5 z-10">
-                    <span className={`text-[9px] font-black tracking-[1.5px] px-2 py-1 rounded-sm ${
-                      card.tag === "BESTSELLER" ? "bg-[#00BFA5] text-black" :
-                      card.tag === "NEW" ? "bg-[#00E5FF] text-black" :
-                      "bg-[#0097A7] text-white"
-                    }`}>
-                      {card.tag}
-                    </span>
-                  </div>
-                  {/* Image */}
-                  <div className="h-27.5 bg-[#161622] overflow-hidden">
-                    <img
-                      src={card.img}
-                      alt={card.label}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                    />
-                  </div>
-                  {/* Info */}
-                  <div className="p-3">
-                    <p className="text-white text-[11px] font-bold leading-tight mb-1 line-clamp-1">{card.label}</p>
-                    <p className="text-[#00BFA5] text-[11px] font-black">{card.price}</p>
-                  </div>
-                </div>
+            <div className="absolute bottom-4 left-4 right-4 flex items-end justify-between">
+              <div>
+                <span className="text-[10px] font-mono uppercase tracking-widest text-emerald-400 block">
+                  CRAFTED FOR CHAMPIONS
+                </span>
+                <p className="font-['Barlow_Condensed'] font-bold text-lg text-white uppercase tracking-wide">
+                  OEKO-TEX High-Tensile Fabric
+                </p>
               </div>
-            ))}
+              <div className="text-right font-mono text-[10px] text-[#FAF8F4]/60">
+                <span>EST. 2014 // BDO</span>
+              </div>
+            </div>
+          </div>
 
-            {/* Stat badges */}
-            <div className="absolute bottom-0 right-0 flex flex-col gap-2">
-              {[
-                ["1M+", "Pelanggan Aktif"],
-                ["10K+", "Produk Sport"],
-                ["500+", "Brand Ternama"],
-              ].map(([num, label]) => (
-                <div
-                  key={label}
-                  className="flex items-center gap-3 bg-white/5 border border-white/8 backdrop-blur-sm rounded-xl px-4 py-2.5"
-                >
-                  <span className="text-[#00BFA5] font-black text-lg leading-none">{num}</span>
-                  <span className="text-[#2a3a3a] text-[10px] uppercase tracking-wide">{label}</span>
-                </div>
-              ))}
+          {/* Quick Pillars */}
+          <div className="grid grid-cols-3 gap-3 mt-4 text-center">
+            <div className="bg-white/5 border border-white/8 rounded-xl p-3">
+              <span className="block font-['Barlow_Condensed'] font-black text-xl text-emerald-400">100%</span>
+              <span className="text-[10px] font-mono uppercase tracking-wider text-[#FAF8F4]/60">Garansi Ukuran</span>
+            </div>
+            <div className="bg-white/5 border border-white/8 rounded-xl p-3">
+              <span className="block font-['Barlow_Condensed'] font-black text-xl text-emerald-400">1 PCS</span>
+              <span className="text-[10px] font-mono uppercase tracking-wider text-[#FAF8F4]/60">Bisa Custom Tim</span>
+            </div>
+            <div className="bg-white/5 border border-white/8 rounded-xl p-3">
+              <span className="block font-['Barlow_Condensed'] font-black text-xl text-emerald-400">0 RUPIAH</span>
+              <span className="text-[10px] font-mono uppercase tracking-wider text-[#FAF8F4]/60">Desain 3D Gratis</span>
             </div>
           </div>
         </div>
 
-        {/* Bottom ticker */}
-        <div className="relative z-10 border-t border-white/5 py-3 overflow-hidden shrink-0">
-          <div className="flex gap-0 animate-[ticker_25s_linear_infinite_reverse] whitespace-nowrap w-max">
-            {["ADIDAS", "NIKE", "PUMA", "REEBOK", "UNDER ARMOUR", "NEW BALANCE", "ASICS"].map((brand, i) => (
-              <span key={i} className="text-[#0d1e1e] font-black text-xs tracking-[3px] uppercase px-6">
-                {brand} <span className="text-[#0f1a1a] mx-1">◆</span>
+        {/* Bottom Continuous Ticker */}
+        <div className="relative z-10 border-t border-white/10 pt-4 overflow-hidden">
+          <div className="flex gap-6 whitespace-nowrap animate-[marquee_20s_linear_infinite] text-xs font-mono uppercase tracking-widest text-[#FAF8F4]/40">
+            {TICKER_ITEMS.concat(TICKER_ITEMS).map((item, idx) => (
+              <span key={idx} className="flex items-center gap-3">
+                <span className="text-emerald-400">◆</span>
+                {item}
               </span>
             ))}
           </div>
         </div>
       </div>
 
-      {/* ═══════════════════════════════════════
-          RIGHT PANEL — Form
-      ═══════════════════════════════════════ */}
-      <div className="flex-1 flex flex-col justify-center items-center px-6 sm:px-10 py-8 lg:py-0 relative z-10">
+      {/* ══════════════════════════════════════════════
+          RIGHT PANEL — Clean Tactical Login Form
+      ══════════════════════════════════════════════ */}
+      <div className="flex-1 flex flex-col justify-center items-center px-6 sm:px-12 py-12 lg:py-16 relative z-10">
+        {/* Subtle Ambient Light */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full bg-emerald-500/5 blur-[100px] pointer-events-none" />
 
-        {/* Ambient glow */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-125 h-125 rounded-full bg-[#00BFA5]/5 blur-[100px] pointer-events-none" />
-
-        <div className="w-full max-w-95 relative">
-
-          {/* Desktop indicator */}
-          <div className="hidden lg:flex items-center gap-2 mb-12">
-            <span className="text-xs uppercase tracking-[3px] text-white leading-none " >Sudah punya akun?</span>
+        <div className="w-full max-w-md">
+          {/* Top back button for mobile/desktop fallback */}
+          <div className="flex items-center justify-between mb-8">
+            <Link
+              to="/"
+              className="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-wider text-[#FAF8F4]/60 hover:text-emerald-400 transition-colors group"
+            >
+              <ArrowLeft size={14} className="group-hover:-translate-x-1 transition-transform" />
+              <span>← Kembali ke Beranda</span>
+            </Link>
+            <div className="flex items-center gap-1.5 text-xs font-mono text-emerald-400/80">
+              <Compass size={14} />
+              <span>REGARSPORT HUB</span>
+            </div>
           </div>
 
-          {/* Form header */}
+          {/* Form Header */}
           <div className="mb-8">
-            <div className="flex items-center gap-3 mb-3">
-              <div className="relative">
-                <div className="absolute inset-0 bg-[#00BFA5]/20 blur-lg rounded-xl" />
-                <div className="relative bg-[#00BFA5]/10 border border-[#00BFA5]/30 p-2.5 rounded-xl">
-                  <LogIn size={22} className="text-[#00BFA5]" strokeWidth={2} />
-                </div>
-              </div>
-              <div>
-                <p className="text-[9px] font-black tracking-[3px] text-[#00BFA5] uppercase mb-0.5">
-                  Welcome back
-                </p>
-                <h2 className="text-[34px] font-black text-white tracking-tight leading-none">LOGIN</h2>
-              </div>
+            <div className="inline-flex items-center gap-2 text-[10px] font-mono uppercase tracking-[0.2em] text-emerald-400 bg-emerald-950/80 border border-emerald-500/30 px-3 py-1 rounded mb-3">
+              <LogIn size={12} />
+              AUTHENTICATION
             </div>
-            <p className="text-[#2a3a3a] text-sm leading-relaxed">
-              Masuk dan temukan gear terbaikmu hari ini.
+            <h2 className="font-['Barlow_Condensed'] font-black text-4xl sm:text-5xl uppercase tracking-tight text-white leading-none">
+              MASUK KE AKUN
+            </h2>
+            <p className="text-xs sm:text-sm text-[#FAF8F4]/60 mt-2 font-sans">
+              Kelola pesanan jersey tim, simpan wishlist, atau lanjutkan checkout.
             </p>
           </div>
 
-          {/* Error */}
+          {/* Error Notice */}
           {error && (
-            <div className="mb-5 flex items-start gap-2.5 rounded-xl border border-[#0097A7]/30 bg-[#0097A7]/8 px-4 py-3">
-              <span className="text-[#0097A7] text-lg leading-none mt-0.5">!</span>
-              <p className="text-[#0097A7]/90 text-sm leading-snug">{error}</p>
+            <div className="mb-6 p-4 rounded-xl bg-red-950/50 border border-red-500/40 text-red-200 text-xs flex items-start gap-3">
+              <span className="font-bold text-red-400 text-sm leading-none mt-0.5">!</span>
+              <p className="leading-relaxed">{error}</p>
             </div>
           )}
 
-          {/* Form */}
+          {/* Login Form */}
           <form onSubmit={handleLogin} className="space-y-4">
-            {/* Email */}
             <div>
-              <label className="block text-[10px] font-black uppercase tracking-[2px] text-[#3a3a4a] mb-2">
-                Email
+              <label
+                htmlFor="login-email"
+                className="block text-[11px] font-mono uppercase tracking-wider text-[#FAF8F4]/70 mb-2"
+              >
+                Alamat Email
               </label>
-              <div className="group flex items-center bg-[#14141E] border border-[#1a1a2a] rounded-xl px-4 focus-within:border-[#00BFA5]/60 focus-within:bg-[#00BFA5]/4 focus-within:shadow-[0_0_0_3px_rgba(0,191,165,0.08)] transition-all duration-200">
-                <Mail size={15} className="text-[#4a5a5a] group-focus-within:text-[#00BFA5]/60 mr-3 shrink-0 transition-colors duration-200" />
+              <div className="relative flex items-center bg-[#18221B] border border-white/10 rounded-xl focus-within:border-emerald-400 focus-within:ring-2 focus-within:ring-emerald-400/20 transition-all">
+                <Mail size={16} className="text-[#FAF8F4]/40 ml-4 pointer-events-none" />
                 <input
                   ref={emailRef}
-                  type="email"
                   id="login-email"
-                  placeholder="john@email.com"
+                  type="email"
+                  placeholder="kapten@timanda.com"
                   autoComplete="email"
-                  className="flex-1 bg-transparent text-white text-sm py-3.5 outline-none placeholder-[#4a6a6a]"
                   value={form.email}
-                  onChange={(e) => { setForm({ ...form, email: e.target.value }); if (error) setError(""); }}
+                  onChange={(e) => {
+                    setForm({ ...form, email: e.target.value });
+                    if (error) setError("");
+                  }}
+                  className="w-full bg-transparent px-3 py-3.5 text-sm text-white placeholder:text-[#FAF8F4]/30 focus:outline-none"
                 />
               </div>
             </div>
 
-            {/* Password */}
             <div>
               <div className="flex items-center justify-between mb-2">
-                <label className="block text-[10px] font-black uppercase tracking-[2px] text-[#3a3a4a]">
-                  Password
+                <label
+                  htmlFor="login-password"
+                  className="block text-[11px] font-mono uppercase tracking-wider text-[#FAF8F4]/70"
+                >
+                  Kata Sandi
                 </label>
               </div>
-              <div className="group flex items-center bg-[#14141E] border border-[#1a1a2a] rounded-xl px-4 focus-within:border-[#00BFA5]/60 focus-within:bg-[#00BFA5]/4 focus-within:shadow-[0_0_0_3px_rgba(0,191,165,0.08)] transition-all duration-200">
-                <Lock size={15} className="text-[#4a5a5a] group-focus-within:text-[#00BFA5]/60 mr-3 shrink-0 transition-colors duration-200" />
+              <div className="relative flex items-center bg-[#18221B] border border-white/10 rounded-xl focus-within:border-emerald-400 focus-within:ring-2 focus-within:ring-emerald-400/20 transition-all">
+                <Lock size={16} className="text-[#FAF8F4]/40 ml-4 pointer-events-none" />
                 <input
-                  type={showPassword ? "text" : "password"}
                   id="login-password"
+                  type={showPassword ? "text" : "password"}
                   placeholder="••••••••"
                   autoComplete="current-password"
-                  className="flex-1 bg-transparent text-white text-sm py-3.5 outline-none placeholder-[#4a6a6a]"
                   value={form.password}
-                  onChange={(e) => { setForm({ ...form, password: e.target.value }); if (error) setError(""); }}
+                  onChange={(e) => {
+                    setForm({ ...form, password: e.target.value });
+                    if (error) setError("");
+                  }}
+                  className="w-full bg-transparent px-3 py-3.5 text-sm text-white placeholder:text-[#FAF8F4]/30 focus:outline-none"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="text-[#4a5a5a] hover:text-[#00BFA5]/60 transition-colors ml-2 shrink-0"
+                  className="p-3 text-[#FAF8F4]/40 hover:text-white transition-colors"
                   tabIndex={-1}
                 >
-                  {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
+                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
               </div>
             </div>
 
-            {/* Submit */}
             <button
               type="submit"
               disabled={loading}
-              className="relative w-full overflow-hidden flex items-center justify-center gap-2.5 bg-[#00BFA5] hover:bg-[#00BFA5]/90 disabled:opacity-50 disabled:cursor-not-allowed text-black font-black text-sm tracking-[2px] uppercase rounded-xl py-4 mt-2 transition-all duration-200 shadow-[0_4px_32px_rgba(0,191,165,0.3)] hover:shadow-[0_6px_40px_rgba(0,191,165,0.45)] active:scale-[0.98] group"
+              className="w-full mt-2 py-4 px-6 rounded-xl bg-emerald-500 hover:bg-emerald-400 active:scale-[0.99] text-[#0F1712] font-['Barlow_Condensed'] font-black text-lg tracking-wider uppercase transition-all shadow-lg shadow-emerald-500/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 group"
             >
-              <span className="absolute inset-0 bg-linear-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out" />
               {loading ? (
                 <>
-                  <span className="w-4 h-4 border-2 border-black/20 border-t-black rounded-full animate-spin" />
-                  Memproses...
+                  <div className="w-5 h-5 border-2 border-[#0F1712] border-t-transparent rounded-full animate-spin" />
+                  <span>MEMVERIFIKASI...</span>
                 </>
               ) : (
                 <>
-                  Masuk Sekarang
-                  <ArrowRight size={16} strokeWidth={2.5} className="group-hover:translate-x-0.5 transition-transform" />
+                  <span>MASUK SEKARANG</span>
+                  <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
                 </>
               )}
             </button>
           </form>
 
-          {/* Divider */}
-          <div className="flex items-center gap-3 my-6">
-            <span className="flex-1 h-px bg-linear-to-r from-transparent to-[#1a1a2a]" />
-            <span className="text-[10px] font-bold text-[#3a4a4a] tracking-widest uppercase">atau</span>
-            <span className="flex-1 h-px bg-linear-to-l from-transparent to-[#1a1a2a]" />
+          {/* Quick Register Divider */}
+          <div className="relative my-8 text-center">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-white/10" />
+            </div>
+            <span className="relative bg-[#0F1712] px-4 text-[11px] font-mono uppercase tracking-widest text-[#FAF8F4]/40">
+              BELUM PUNYA AKUN?
+            </span>
           </div>
 
-          {/* Register CTA */}
+          {/* Register Action */}
           <Link
             to="/register"
-            className="flex items-center justify-center gap-2 w-full py-3.5 rounded-xl border border-[#1a1a2a] hover:border-[#00BFA5]/30 hover:bg-[#00BFA5]/5 text-[#4a5a5a] hover:text-white text-sm font-bold tracking-wide transition-all duration-200 group"
+            className="w-full py-3.5 px-6 rounded-xl border border-white/15 bg-white/5 hover:bg-white/10 hover:border-emerald-500/40 text-white font-sans text-xs font-bold uppercase tracking-wider transition-all flex items-center justify-center gap-2 group"
           >
-            Belum punya akun?
-            <span className="text-[#00BFA5] group-hover:translate-x-0.5 transition-transform inline-flex items-center gap-1">
-              Daftar gratis <ArrowRight size={13} />
-            </span>
+            <span>Daftar Akun Baru Tim Anda</span>
+            <ArrowRight size={14} className="text-emerald-400 group-hover:translate-x-1 transition-transform" />
           </Link>
 
-          {/* Trust line - tanpa emoji */}
-          <div className="flex items-center justify-center gap-3 text-[#1e1e2a] text-[10px] font-semibold tracking-wide uppercase mt-6">
-            <Shield size={12} className="text-[#00BFA5]/40" />
-            <span>SSL Encrypted</span>
-            <BadgeCheck size={12} className="text-[#00BFA5]/40" />
-            <span>100% Secure</span>
-            <Sparkles size={12} className="text-[#00BFA5]/40" />
-            <span>Trusted by 1M+</span>
+          {/* Footer Security Badges */}
+          <div className="mt-10 pt-6 border-t border-white/10 flex items-center justify-center gap-6 text-[11px] font-mono uppercase text-[#FAF8F4]/40">
+            <div className="flex items-center gap-1.5">
+              <ShieldCheck size={14} className="text-emerald-400" />
+              <span>256-Bit SSL</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <CheckCircle2 size={14} className="text-emerald-400" />
+              <span>Official Atelier</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <Sparkles size={14} className="text-emerald-400" />
+              <span>Cicendo BDO</span>
+            </div>
           </div>
         </div>
       </div>
-
-      {/* Animations */}
-      <style>{`
-        @keyframes ticker {
-          from { transform: translateX(0); }
-          to   { transform: translateX(-50%); }
-        }
-        @media (prefers-reduced-motion: reduce) {
-          * { animation-duration: 0.01ms !important; }
-        }
-      `}</style>
     </div>
   );
 }
