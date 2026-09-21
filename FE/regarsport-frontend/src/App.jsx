@@ -94,12 +94,20 @@ export default function App() {
 
                   <Route
                     path="cart"
-                    element={<Cart />}
+                    element={
+                      <ProtectedRoute>
+                        <Cart />
+                      </ProtectedRoute>
+                    }
                   />
 
                   <Route
                     path="favorites"
-                    element={<Favorites />}
+                    element={
+                      <ProtectedRoute>
+                        <Favorites />
+                      </ProtectedRoute>
+                    }
                   />
 
                   {/* PROTECTED CUSTOMER ACTIONS */}

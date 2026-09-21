@@ -187,9 +187,13 @@ export default function QuickSearchModal({ isOpen, onClose }) {
                           src={
                             prod.imageUrl ||
                             prod.image_url ||
-                            "https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=200&q=80"
+                            "/images/products/jersey_football_garuda.jpg"
                           }
                           alt={prod.name}
+                          onError={(e) => {
+                            e.currentTarget.onerror = null;
+                            e.currentTarget.src = "/images/hero-athlete.jpg";
+                          }}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform"
                         />
                       </div>

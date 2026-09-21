@@ -189,6 +189,11 @@ export default function ProductDetail() {
   }, [product]);
 
   const handleAddToCart = () => {
+    if (!user) {
+      toast.error("Silakan login terlebih dahulu untuk menambahkan produk ke keranjang");
+      navigate("/login");
+      return;
+    }
     if (product.stock <= 0) {
       toast.error("Stok produk ini sedang habis");
       return;

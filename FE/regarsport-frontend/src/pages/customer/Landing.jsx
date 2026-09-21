@@ -1,5 +1,6 @@
 import { useEffect, useState, useMemo } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 import {
   Search,
   Menu,
@@ -28,6 +29,7 @@ import CartSlideOver from "../../components/customer/CartSlideOver";
 import QuickSearchModal from "../../components/customer/QuickSearchModal";
 
 export default function Landing() {
+  const navigate = useNavigate();
   const { user } = useAuth();
   const { cartItems = [], addToCart = () => {} } = useCart() || {};
   const wishlist = useWishlist() || {};
@@ -258,21 +260,22 @@ export default function Landing() {
 
               {/* Action Buttons (Pill CTAs) */}
               <div className="pt-2 flex flex-wrap items-center justify-center lg:justify-start gap-4">
-                <Link
-                  to="/dashboard"
-                  className="flex items-center gap-2.5 px-8 py-4 rounded-full bg-[#FAF8F4] hover:bg-white text-[#111613] font-black text-xs uppercase tracking-wider transition-all hover:scale-105 shadow-xl"
+                <a
+                  href="#produk"
+                  className="flex items-center gap-2.5 px-8 py-4 rounded-full bg-[#FAF8F4] hover:bg-white text-[#111613] font-black text-xs uppercase tracking-wider transition-all hover:scale-105 shadow-xl cursor-pointer"
                 >
-                  <span>JELAJAHI KOLEKSI TOKO</span>
+                  <span>JELAJAHI KOLEKSI JERSEY</span>
                   <ArrowRight size={16} />
-                </Link>
+                </a>
 
                 <button
                   type="button"
                   onClick={handleCustomWhatsApp}
                   className="flex items-center gap-2 px-7 py-4 rounded-full bg-white/5 hover:bg-white/10 border border-white/20 text-white font-bold text-xs uppercase tracking-wider transition-all hover:scale-105 cursor-pointer"
+                  title="Konsultasi pembuatan custom jersey tim via WhatsApp Official"
                 >
                   <Phone size={15} className="text-emerald-400" />
-                  <span>KONSULTASI JERSEY TIM</span>
+                  <span>KONSULTASI DESAIN (WHATSAPP)</span>
                 </button>
               </div>
 
@@ -528,7 +531,14 @@ export default function Landing() {
 
                       {/* Wishlist Toggle Button */}
                       <button
-                        onClick={() => toggleWishlist(prod)}
+                        onClick={() => {
+                          if (!user) {
+                            toast.error("Silakan login terlebih dahulu untuk menyimpan jersey favorit!");
+                            navigate("/login");
+                            return;
+                          }
+                          toggleWishlist(prod);
+                        }}
                         className={`absolute top-3 right-3 w-8 h-8 rounded-full flex items-center justify-center transition-all cursor-pointer z-10 ${
                           isFav
                             ? "bg-[#B9382B] text-white shadow"
@@ -564,11 +574,16 @@ export default function Landing() {
                         {/* Add to Cart Quick Pill Button */}
                         <button
                           onClick={async () => {
+                            if (!user) {
+                              toast.error("Silakan login terlebih dahulu untuk memesan jersey ini!");
+                              navigate("/login");
+                              return;
+                            }
                             await addToCart(prod, 1, "L");
                             setIsCartOpen(true);
                           }}
                           className="flex items-center gap-1 px-4 py-2 rounded-full bg-[#111613] hover:bg-black text-white font-bold text-xs uppercase tracking-wider transition-all hover:scale-105 cursor-pointer shadow"
-                          title="Tambah ke Keranjang"
+                          title="Pesan Jersey"
                         >
                           <Plus size={14} />
                           <span>BELI</span>
@@ -648,7 +663,7 @@ export default function Landing() {
                   to="/dashboard/about"
                   className="inline-flex items-center gap-2 px-6 py-3 rounded-full border border-white/30 hover:border-white bg-white/5 hover:bg-white/15 text-white font-bold text-xs uppercase tracking-wider transition-all hover:scale-105"
                 >
-                  <span>BACA KISAH PABRIK KAMI</span>
+                  <span>BACA PROFIL ATELIER BANDUNG</span>
                   <ArrowRight size={15} />
                 </Link>
               </div>
