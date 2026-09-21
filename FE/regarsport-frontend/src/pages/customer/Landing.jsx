@@ -145,7 +145,7 @@ export default function Landing() {
   const filteredProducts = useMemo(() => {
     if (selectedCategory === "ALL") return products;
     return products.filter((p) => {
-      const catName = p.category?.name?.toUpperCase() || "";
+      const catName = (p.categoryName || p.category?.name || "").toUpperCase();
       const prodName = p.name?.toUpperCase() || "";
       return catName.includes(selectedCategory) || prodName.includes(selectedCategory);
     });
@@ -693,22 +693,24 @@ export default function Landing() {
                   >
                     {/* Image & Multi-Badge Container */}
                     <div className="relative aspect-square overflow-hidden bg-slate-100">
-                      <img
-                        src={
-                          prod.imageUrl ||
-                          prod.image_url ||
-                          "/images/hero-athlete.jpg"
-                        }
-                        alt={prod.name}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                        onError={(e) => {
-                          e.currentTarget.onerror = null;
-                          e.currentTarget.src = "/images/hero-athlete.jpg";
-                        }}
-                      />
+                      <Link to={`/dashboard/product/${prod.id}`} className="block w-full h-full">
+                        <img
+                          src={
+                            prod.imageUrl ||
+                            prod.image_url ||
+                            "/images/hero-athlete.jpg"
+                          }
+                          alt={prod.name}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                          onError={(e) => {
+                            e.currentTarget.onerror = null;
+                            e.currentTarget.src = "/images/hero-athlete.jpg";
+                          }}
+                        />
+                      </Link>
 
                       {/* Side-by-Side Multi-Badges (Brigade Overland Style) */}
-                      <div className="absolute top-3 left-3 flex flex-wrap gap-1.5 z-10">
+                      <div className="absolute top-3 left-3 flex flex-wrap gap-1.5 z-10 pointer-events-none">
                         <span className="bg-white/95 backdrop-blur-sm text-black text-[10px] font-black uppercase px-2.5 py-1 rounded-full shadow-sm">
                           DISKON {discountPercent}%
                         </span>
@@ -742,11 +744,13 @@ export default function Landing() {
                     <div className="p-5 flex-1 flex flex-col justify-between space-y-3">
                       <div>
                         <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                          {prod.category?.name || "RegarSport Apparel"}
+                          {prod.categoryName || prod.category?.name || "RegarSport Apparel"}
                         </div>
-                        <h4 className="font-condensed text-lg font-bold text-slate-900 line-clamp-1 group-hover:text-emerald-800 transition-colors mt-0.5">
-                          {prod.name}
-                        </h4>
+                        <Link to={`/dashboard/product/${prod.id}`}>
+                          <h4 className="font-condensed text-lg font-bold text-slate-900 line-clamp-1 group-hover:text-emerald-800 transition-colors mt-0.5">
+                            {prod.name}
+                          </h4>
+                        </Link>
                       </div>
 
                       <div className="pt-2 border-t border-black/5 flex items-center justify-between">

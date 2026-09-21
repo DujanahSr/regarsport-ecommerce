@@ -119,7 +119,7 @@ export default function Checkout() {
       }
 
       if (!postalCode.trim() || !/^\d{5}$/.test(postalCode.trim())) {
-        setValidationError("Kode pos wajib 5 digit angka (contoh: 57612)");
+        setValidationError("Kode pos wajib 5 digit angka (contoh: 40171)");
         return;
       }
 

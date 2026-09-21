@@ -37,7 +37,7 @@ export default function Cart() {
       cartItems
         .filter((item) => selectedItems.includes(item.id))
         .reduce(
-          (sum, item) => sum + Number(item.products.price) * item.quantity,
+          (sum, item) => sum + Number(item.products?.price ?? item.price ?? 0) * item.quantity,
           0
         ),
     [cartItems, selectedItems]
@@ -140,7 +140,14 @@ export default function Cart() {
               {/* Cart Items Cards */}
               {cartItems.map((item) => {
                 const isSelected = selectedItems.includes(item.id);
-                const subtotal = Number(item.products.price) * item.quantity;
+                const itemPrice = Number(item.products?.price ?? item.price ?? 0);
+                const subtotal = itemPrice * item.quantity;
+                const itemName = item.products?.name || item.productName || "Produk";
+                const itemStock = item.products?.stock ?? item.stock ?? 999;
+                const itemImage =
+                  item.products?.image_url ||
+                  item.productImage ||
+                  "https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=400&q=80";
 
                 return (
                   <div
@@ -169,8 +176,8 @@ export default function Cart() {
                       {/* Product Thumbnail */}
                       <div className="h-24 w-24 shrink-0 overflow-hidden rounded-xl bg-[#F3EFE7] border border-[#162018]/10">
                         <img
-                          src={item.products.image_url || "https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=400&q=80"}
-                          alt={item.products.name}
+                          src={itemImage}
+                          alt={itemName}
                           className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
                           onError={(e) => {
                             e.currentTarget.onerror = null;
@@ -185,7 +192,7 @@ export default function Cart() {
                       <div>
                         <div className="flex items-start justify-between gap-4">
                           <h2 className="font-condensed text-lg font-bold uppercase tracking-tight text-[#162018] line-clamp-2">
-                            {item.products.name}
+                            {itemName}
                           </h2>
                           <button
                             type="button"
@@ -201,7 +208,7 @@ export default function Cart() {
                         {/* Price & Size Tag */}
                         <div className="mt-1.5 flex flex-wrap items-center gap-2">
                           <p className="font-condensed text-lg font-black text-[#B9382B]">
-                            Rp {Number(item.products.price).toLocaleString("id-ID")}
+                            Rp {itemPrice.toLocaleString("id-ID")}
                           </p>
 
                           {item.size && (
@@ -212,7 +219,7 @@ export default function Cart() {
 
                           <span className="inline-flex items-center gap-1 text-[10px] font-mono text-slate-400">
                             <Package size={11} />
-                            Stok: {item.products.stock} pcs
+                            Stok: {itemStock} pcs
                           </span>
                         </div>
 
@@ -245,7 +252,7 @@ export default function Cart() {
                             type="button"
                             onClick={() => increaseQty(item.id, item.quantity)}
                             className="flex h-7 w-7 items-center justify-center rounded-lg text-slate-700 transition hover:bg-white disabled:opacity-30 cursor-pointer"
-                            disabled={item.quantity >= item.products.stock}
+                            disabled={item.quantity >= itemStock}
                             aria-label="Tambah jumlah"
                           >
                             <Plus size={13} />
