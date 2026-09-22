@@ -88,7 +88,7 @@ export default function NavDrawer({ isOpen, onClose, onOpenSearch }) {
           <div className="flex items-center gap-2">
             <Compass size={16} className="text-emerald-400 shrink-0" />
             <span className="font-condensed text-xl font-bold tracking-wider uppercase text-slate-100">
-              REGARSPORT APPAREL
+              REGARSTORE APPAREL
             </span>
           </div>
           <button
@@ -204,7 +204,7 @@ export default function NavDrawer({ isOpen, onClose, onOpenSearch }) {
               <span>Testimoni Kapten Tim Se-Indonesia</span>
             </button>
             <a
-              href="https://wa.me/6281234567890?text=Halo%20Tim%20RegarSport%20Cicendo%20Bandung,%20saya%20ingin%20konsultasi%20desain%20jersey%20tim"
+              href="https://wa.me/6281234567890?text=Halo%20Tim%20RegarStore%20Cicendo%20Bandung,%20saya%20ingin%20konsultasi%20desain%20jersey%20tim"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-3 py-2.5 px-3 text-xs font-semibold text-slate-300 hover:text-white hover:bg-white/5 rounded-lg transition-colors group"

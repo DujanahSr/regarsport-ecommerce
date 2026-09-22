@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "../../context/AuthContext";
+import RegarStoreLogo from "../common/RegarStoreLogo";
 
 export default function Sidebar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -80,12 +81,10 @@ export default function Sidebar() {
       >
         {/* Logo */}
         <div className="shrink-0 flex items-center gap-3 px-6 h-18 border-b border-white/10">
-          <div className="w-8 h-8 rounded-lg bg-[#B9382B] flex items-center justify-center text-white shadow-sm shrink-0">
-            <span className="font-black text-xs font-mono">R</span>
-          </div>
+          <RegarStoreLogo size={36} />
           <div className="flex flex-col">
             <span className="text-white font-black tracking-[2px] text-sm uppercase font-['Barlow_Condensed'] leading-none">
-              REGARSPORT
+              REGARSTORE
             </span>
             <span className="text-[9px] font-mono tracking-widest text-emerald-400/90 mt-1 uppercase">
               ATELIER // CICENDO

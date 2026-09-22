@@ -14,7 +14,7 @@
     <artifactId>notification-service</artifactId>
     <packaging>jar</packaging>
     <name>notification-service</name>
-    <description>Event-Driven Notification and Email Microservice for RegarSport</description>
+    <description>Event-Driven Notification and Email Microservice for RegarStore</description>
 
     <dependencies>
         <dependency>

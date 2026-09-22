@@ -24,7 +24,7 @@ public class OpenApiConfig {
                         new Server().url("http://localhost:8088").description("Direct Order Service")
                 ))
                 .info(new Info()
-                        .title("RegarSport - Order & Cart Service API")
+                        .title("RegarStore - Order & Cart Service API")
                         .description("High-concurrency Order Processing Microservice with RabbitMQ Event-Driven Pipeline")
                         .version("v1.0.0")
                         .contact(new Contact()

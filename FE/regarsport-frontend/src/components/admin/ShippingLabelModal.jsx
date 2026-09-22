@@ -78,7 +78,7 @@ export default function ShippingLabelModal({ isOpen, onClose, order }) {
   const orderNumber = order.orderNumber || `#${order.id}`;
   const trackingNo = order.trackingNumber || orderNumber;
   const courierName = (order.shippingCourier || "J&T EXPRESS").toUpperCase();
-  const customerName = order.recipientName || order.customerName || order.users?.full_name || "Pelanggan RegarSport";
+  const customerName = order.recipientName || order.customerName || order.users?.full_name || "Pelanggan RegarStore";
   const customerPhone = order.customerPhone || order.shippingPhone || "";
   const streetAddr = order.shippingAddress || order.shipping_address || "Alamat pengiriman terdaftar pada sistem";
   const cityPostal = [order.shippingCity, order.shippingPostalCode].filter(Boolean).join(" ");
@@ -285,7 +285,7 @@ export default function ShippingLabelModal({ isOpen, onClose, order }) {
                   REGAR
                 </div>
                 <div>
-                  <h1 className="font-black text-sm tracking-tight leading-none">REGARSPORT</h1>
+                  <h1 className="font-black text-sm tracking-tight leading-none">REGARSTORE</h1>
                   <p className="text-[9px] font-bold text-zinc-600 tracking-wider">OFFICIAL STORE</p>
                 </div>
               </div>
@@ -335,7 +335,7 @@ export default function ShippingLabelModal({ isOpen, onClose, order }) {
                 <span className="text-[9px] font-bold uppercase tracking-wider text-zinc-500 block mb-0.5">
                   Dari (Pengirim):
                 </span>
-                <p className="font-bold text-black">RegarSport Pusat</p>
+                <p className="font-bold text-black">RegarStore Pusat</p>
                 <p className="font-mono text-[9.5px]">0812-3456-7890</p>
                 <p className="text-zinc-600 text-[9px] mt-0.5 leading-tight">
                   Wonogiri, Jawa Tengah 57612
@@ -397,7 +397,7 @@ export default function ShippingLabelModal({ isOpen, onClose, order }) {
 
             {/* Footer Note */}
             <div className="text-[8.5px] text-zinc-600 flex items-center justify-between pt-0.5">
-              <span>Fulfillment: RegarSport Warehouse WN</span>
+              <span>Fulfillment: RegarStore Warehouse WN</span>
               <span className="font-mono">{new Date().toLocaleDateString("id-ID")}</span>
             </div>
           </div>

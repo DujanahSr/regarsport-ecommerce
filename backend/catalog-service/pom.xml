@@ -14,7 +14,7 @@
     <artifactId>catalog-service</artifactId>
     <packaging>jar</packaging>
     <name>catalog-service</name>
-    <description>Catalog &amp; Inventory Microservice for RegarSport</description>
+    <description>Catalog &amp; Inventory Microservice for RegarStore</description>
 
     <dependencies>
         <dependency>

@@ -195,7 +195,7 @@ export default function MyOrders() {
   // WhatsApp CS Direct Assistance
   const handleContactCS = (order) => {
     const orderNo = order.orderNumber || `Order #${order.id}`;
-    const text = `Halo Admin RegarSport, saya ingin menanyakan informasi pesanan saya dengan nomor: *${orderNo}*. Mohon bantuannya ya min 🙏`;
+    const text = `Halo Admin RegarStore, saya ingin menanyakan informasi pesanan saya dengan nomor: *${orderNo}*. Mohon bantuannya ya min 🙏`;
     const url = `https://api.whatsapp.com/send?phone=6282133445566&text=${encodeURIComponent(
       text
     )}`;

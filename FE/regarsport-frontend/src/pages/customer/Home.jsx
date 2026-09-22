@@ -71,7 +71,7 @@ const ProductCard = memo(function ProductCard({ product, user, isFav, onToggleFa
       <div className="p-5 flex-1 flex flex-col justify-between space-y-3">
         <div>
           <div className="text-[10px] font-mono font-bold uppercase tracking-widest text-slate-400">
-            {product.category?.name || "REGARSPORT APPAREL"}
+            {product.category?.name || "REGARSTORE APPAREL"}
           </div>
           <Link
             to={`/dashboard/product/${product.id}`}
@@ -296,7 +296,7 @@ export default function Home() {
 
   const handleWhatsAppConsultation = () => {
     const msg = encodeURIComponent(
-      "Halo Tim Desainer RegarSport Atelier Cicendo Bandung, kami ingin konsultasi pembuatan custom jersey tim olahraga (nama, nomor punggung, & logo tim)."
+      "Halo Tim Desainer RegarStore Atelier Cicendo Bandung, kami ingin konsultasi pembuatan custom jersey tim olahraga (nama, nomor punggung, & logo tim)."
     );
     window.open(`https://wa.me/6281234567890?text=${msg}`, "_blank");
   };

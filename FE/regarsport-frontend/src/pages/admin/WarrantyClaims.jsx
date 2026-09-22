@@ -739,7 +739,7 @@ export default function WarrantyClaims() {
                   </label>
                   <textarea
                     rows={3}
-                    placeholder="Contoh: Disetujui. Silakan kirimkan jersey lama ke Gudang RegarSport Wonogiri..."
+                    placeholder="Contoh: Disetujui. Silakan kirimkan jersey lama ke Gudang RegarStore Wonogiri..."
                     value={adminNotes}
                     onChange={(e) => setAdminNotes(e.target.value)}
                     className="w-full p-3 rounded-xl bg-stone-50 border border-stone-200 focus:bg-white focus:border-[#B9382B] focus:ring-1 focus:ring-[#B9382B] text-xs text-slate-900 placeholder:text-stone-400 outline-hidden transition resize-none leading-relaxed font-medium"

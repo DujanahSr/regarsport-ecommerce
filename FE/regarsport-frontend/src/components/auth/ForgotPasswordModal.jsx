@@ -195,7 +195,7 @@ export default function ForgotPasswordModal({
         {step === 1 && (
           <form onSubmit={handleRequestCode} className="space-y-4">
             <p className="text-xs sm:text-sm text-slate-300 leading-relaxed font-sans">
-              Masukkan alamat email akun RegarSport Anda. Kami akan mengirimkan
+              Masukkan alamat email akun RegarStore Anda. Kami akan mengirimkan
               kode verifikasi 6-digit untuk mengatur ulang kata sandi.
             </p>
 

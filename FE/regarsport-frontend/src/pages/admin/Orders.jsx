@@ -244,7 +244,7 @@ export default function Orders() {
           <div className="absolute inset-0 z-0">
             <img
               src="/images/logistics_hero_bg.jpg"
-              alt="RegarSport Logistics Station"
+              alt="RegarStore Logistics Station"
               className="w-full h-full object-cover object-center filter brightness-[0.38] contrast-125"
             />
             <div className="absolute inset-0 bg-gradient-to-r from-[#162018] via-[#162018]/85 to-transparent" />

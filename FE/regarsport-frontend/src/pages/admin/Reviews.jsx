@@ -153,7 +153,7 @@ const ReviewRow = memo(function ReviewRow({ review, index, page, limit, onReplyS
         {existingReply && (
           <div className="mt-2 p-2.5 bg-stone-50 border border-stone-200 rounded-xl text-xs">
             <span className="font-bold text-[#B9382B]">
-              Admin {existingReply.admin_name || "RegarSport"}:
+              Admin {existingReply.admin_name || "RegarStore"}:
             </span>
             <span className="text-slate-700 ml-1">{existingReply.reply}</span>
           </div>

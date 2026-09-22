@@ -14,7 +14,7 @@ export default function JerseyPreviewMockup({
 
   const displayName = customName ? customName.trim().toUpperCase() : 'NAMA ANDA';
   const displayNumber = customNumber ? customNumber.trim() : '10';
-  const displayTeam = customTeam ? customTeam.trim().toUpperCase() : 'REGARSPORT WONOGIRI';
+  const displayTeam = customTeam ? customTeam.trim().toUpperCase() : 'REGARSTORE ATELIER';
 
   return (
     <div className="w-full rounded-2xl bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 border border-slate-800 text-white shadow-xl overflow-hidden flex flex-col items-center">
@@ -221,7 +221,7 @@ export default function JerseyPreviewMockup({
               {productImage ? (
                 <img
                   src={productImage}
-                  alt={productName || 'Jersey RegarSport'}
+                  alt={productName || 'Jersey RegarStore'}
                   className="w-full h-72 sm:h-80 object-cover object-center group-hover:scale-105 transition duration-500"
                 />
               ) : (
@@ -284,7 +284,7 @@ export default function JerseyPreviewMockup({
               {/* Product Name & Sublimation Guarantee at bottom */}
               <div className="absolute bottom-2.5 left-2.5 right-2.5 pointer-events-none z-10">
                 <p className="text-xs font-bold text-white truncate drop-shadow-sm">
-                  {productName || 'Jersey RegarSport'}
+                  {productName || 'Jersey RegarStore'}
                 </p>
                 <div className="flex items-center gap-1 text-[10px] text-emerald-400 font-mono mt-0.5">
                   <CheckCircle2 size={11} />

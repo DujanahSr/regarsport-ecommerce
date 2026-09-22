@@ -68,7 +68,7 @@ export default function About() {
           </h1>
 
           <p className="text-stone-600 text-sm md:text-base leading-relaxed max-w-2xl mx-auto">
-            RegarSport lahir dari gairah mendalam terhadap performa atletik. Kami bukan sekadar penjual pakaian, melainkan bengkel manufaktur terintegrasi tempat seni desain grafis, riset serat mikropori, dan teknologi sublimasi modern menyatu melahirkan seragam tempur para juara.
+            RegarStore lahir dari gairah mendalam terhadap performa atletik. Kami bukan sekadar penjual pakaian, melainkan bengkel manufaktur terintegrasi tempat seni desain grafis, riset serat mikropori, dan teknologi sublimasi modern menyatu melahirkan seragam tempur para juara.
           </p>
         </section>
 
@@ -302,7 +302,7 @@ export default function About() {
             </Link>
 
             <a
-              href="https://wa.me/6281234567890?text=Halo%20Atelier%20RegarSport%20Cicendo%2C%20saya%20ingin%20konsultasi%20pembuatan%20jersey%20custom"
+              href="https://wa.me/6281234567890?text=Halo%20Atelier%20RegarStore%20Cicendo%2C%20saya%20ingin%20konsultasi%20pembuatan%20jersey%20custom"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 rounded-xl border border-stone-300 bg-white hover:bg-stone-100 px-6 py-3.5 font-condensed text-sm font-bold uppercase tracking-wider text-stone-900 transition"

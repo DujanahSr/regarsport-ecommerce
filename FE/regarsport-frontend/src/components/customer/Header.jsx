@@ -20,6 +20,7 @@ import {
 import { useAuth } from "../../context/AuthContext";
 import { useCart } from "../../context/CartContext";
 import { useWishlist } from "../../context/WishlistContext";
+import RegarStoreLogo from "../common/RegarStoreLogo";
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -72,12 +73,12 @@ export default function Header() {
             className="flex shrink-0 items-center gap-2.5 group"
             title="Kembali ke Beranda Utama"
           >
-            <div className="w-8 h-8 bg-[#B9382B] rounded-lg flex items-center justify-center shadow-md group-hover:scale-105 transition-transform">
-              <span className="text-white font-black text-xs">R</span>
+            <div className="group-hover:scale-105 transition-transform drop-shadow-md">
+              <RegarStoreLogo size={34} />
             </div>
             <div>
               <span className="font-condensed text-xl font-black uppercase tracking-wider text-white block leading-none">
-                REGARSPORT
+                REGARSTORE
               </span>
               <span className="text-[9px] font-bold uppercase tracking-widest text-emerald-400/90 block">
                 ATELIER CICENDO BANDUNG

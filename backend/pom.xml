@@ -16,7 +16,7 @@
     <version>1.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>regarsport-parent</name>
-    <description>Enterprise Distributed Microservices Platform for RegarSport</description>
+    <description>Enterprise Distributed Microservices Platform for RegarStore</description>
 
     <modules>
         <module>common-dto</module>

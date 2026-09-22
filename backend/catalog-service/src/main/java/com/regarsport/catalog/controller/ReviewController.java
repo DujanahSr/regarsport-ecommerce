@@ -65,7 +65,7 @@ public class ReviewController {
     public ResponseEntity<ApiResponse<ReviewResponse>> createReview(
             @PathVariable Long productId,
             @RequestHeader(value = "X-User-Id", defaultValue = "1") Long userId,
-            @RequestHeader(value = "X-User-Name", defaultValue = "Pelanggan RegarSport") String customerName,
+            @RequestHeader(value = "X-User-Name", defaultValue = "Pelanggan RegarStore") String customerName,
             @Valid @RequestBody CreateReviewRequest request
     ) {
         String finalName = (request.customerName() != null && !request.customerName().isBlank())
@@ -109,7 +109,7 @@ public class ReviewController {
     @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<ApiResponse<ReviewResponse>> replyToReview(
             @PathVariable Long id,
-            @RequestHeader(value = "X-User-Name", defaultValue = "Admin RegarSport") String adminName,
+            @RequestHeader(value = "X-User-Name", defaultValue = "Admin RegarStore") String adminName,
             @Valid @RequestBody ReviewReplyRequest request
     ) {
         ReviewResponse response = reviewService.replyToReview(id, adminName, request);

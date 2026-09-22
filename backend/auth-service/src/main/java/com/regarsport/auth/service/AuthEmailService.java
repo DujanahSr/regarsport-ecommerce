@@ -14,8 +14,8 @@ import org.springframework.stereotype.Service;
 public class AuthEmailService {
 
     private final JavaMailSender mailSender;
-    private static final String FROM_EMAIL = "noreply@regarsport.com";
-    private static final String BRAND_NAME = "RegarSport Official";
+    private static final String FROM_EMAIL = "noreply@regarstore.com";
+    private static final String BRAND_NAME = "RegarStore Official";
 
     public void sendPasswordResetEmail(String recipientEmail, String recipientName, String resetCode) {
         try {
@@ -25,9 +25,9 @@ public class AuthEmailService {
 
             helper.setFrom(FROM_EMAIL, BRAND_NAME);
             helper.setTo(recipientEmail);
-            helper.setSubject("[RegarSport] Kode Reset Kata Sandi Akun Anda: " + resetCode);
+            helper.setSubject("[RegarStore] Kode Reset Kata Sandi Akun Anda: " + resetCode);
 
-            String displayName = (recipientName != null && !recipientName.isBlank()) ? recipientName : "Sahabat Atlet RegarSport";
+            String displayName = (recipientName != null && !recipientName.isBlank()) ? recipientName : "Sahabat Atlet RegarStore";
 
             String html = String.format("""
                 <!DOCTYPE html>
@@ -49,14 +49,14 @@ public class AuthEmailService {
                 <body>
                     <div class="container">
                         <div class="header">
-                            <h1 style="margin: 0; font-size: 24px; font-weight: 900; letter-spacing: 2px; color: #ffffff;">REGARSPORT</h1>
+                            <h1 style="margin: 0; font-size: 24px; font-weight: 900; letter-spacing: 2px; color: #ffffff;">REGARSTORE</h1>
                             <p style="margin: 6px 0 0; font-size: 11px; color: #34D399; letter-spacing: 1px; text-transform: uppercase; font-weight: 700;">Atelier Cicendo Bandung • Official Security</p>
                         </div>
                         <div class="content">
                             <span class="badge">PEMULIHAN KATA SANDI</span>
                             <h2 style="color: #ffffff; margin-top: 18px; font-size: 20px; font-weight: 700;">Halo, %s</h2>
                             <p style="color: #cbd5e1; font-size: 14px; line-height: 1.6; margin-top: 8px;">
-                                Kami menerima permintaan untuk mengatur ulang kata sandi akun RegarSport Anda. Gunakan 6-digit kode verifikasi berikut untuk melanjutkan proses reset kata sandi:
+                                Kami menerima permintaan untuk mengatur ulang kata sandi akun RegarStore Anda. Gunakan 6-digit kode verifikasi berikut untuk melanjutkan proses reset kata sandi:
                             </p>
 
                             <div class="code-box">
@@ -66,14 +66,14 @@ public class AuthEmailService {
                             </div>
 
                             <p style="color: #94a3b8; font-size: 13px; line-height: 1.6;">
-                                Masukkan kode di atas pada formulir reset kata sandi di situs toko RegarSport.
+                                Masukkan kode di atas pada formulir reset kata sandi di situs toko RegarStore.
                             </p>
                             <p style="color: #64748b; font-size: 12px; line-height: 1.5; margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 16px;">
                                 ⚠️ Jika Anda tidak merasa melakukan permintaan ini, abaikan email ini. Kata sandi akun Anda tetap aman dan tidak akan berubah.
                             </p>
                         </div>
                         <div class="footer">
-                            <p style="margin: 0;">&copy; 2026 PT RegarSport Industri Indonesia. Hak cipta dilindungi.</p>
+                            <p style="margin: 0;">&copy; 2026 PT RegarStore Industri Indonesia. Hak cipta dilindungi.</p>
                             <p style="margin: 4px 0 0;">Atelier Cicendo, Kota Bandung, Jawa Barat</p>
                         </div>
                     </div>

@@ -80,7 +80,7 @@ const getProductType = (prod) => {
   return "clothing";
 };
 
-// Filter untuk kustomisasi sablon: aktif untuk seluruh produk apparel/jersey RegarSport
+// Filter untuk kustomisasi sablon: aktif untuk seluruh produk apparel/jersey RegarStore
 const isCustomizableJersey = (prod) => {
   if (!prod) return true;
   const name = (prod.name || "").toLowerCase();
@@ -229,7 +229,7 @@ export default function ProductDetail() {
 
   const handleShareToWhatsApp = () => {
     const isCustomized = isJersey && isCustomJersey && (customName || customNumber || customTeam);
-    let text = `Halo rekan tim! Cek produk apparel dari RegarSport ini:\n\n`;
+    let text = `Halo rekan tim! Cek produk apparel dari RegarStore ini:\n\n`;
     text += `🏆 *${product.name}*\n`;
     text += `💰 *Harga*: Rp ${Number(product.price).toLocaleString("id-ID")}\n`;
     text += `👕 *Ukuran Dipilih*: ${selectedSize}\n`;
@@ -953,11 +953,11 @@ export default function ProductDetail() {
               </button>
             </div>
 
-            {/* 3 Pilar Garansi Resmi RegarSport 100% Bebas Cemas */}
+            {/* 3 Pilar Garansi Resmi RegarStore 100% Bebas Cemas */}
             <div className="rounded-3xl border border-[#162018]/10 bg-[#FAF8F4] p-5 shadow-2xs">
               <div className="flex items-center gap-2.5 text-xs font-black uppercase tracking-wider text-[#162018] font-mono">
                 <ShieldCheck size={18} className="text-emerald-600" />
-                <span>GARANSI RESMI ATELIER REGARSPORT CICENDO</span>
+                <span>GARANSI RESMI ATELIER REGARSTORE CICENDO</span>
               </div>
 
               <div className="mt-3.5 grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -1183,7 +1183,7 @@ export default function ProductDetail() {
           ) : (
             <div className="space-y-4">
               {reviews.map((review) => {
-                const customerName = review.customerName || review.users?.full_name || "Pelanggan RegarSport";
+                const customerName = review.customerName || review.users?.full_name || "Pelanggan RegarStore";
                 const customerAvatar = review.customerAvatar || review.users?.avatar_url;
                 const reviewDate = review.createdAt || review.created_at;
                 const replies = review.review_replies || review.replies || [];
@@ -1282,7 +1282,7 @@ export default function ProductDetail() {
                         <div className="flex items-center justify-between gap-2 mb-1.5">
                           <div className="flex items-center gap-1.5 font-bold text-emerald-900">
                             <ShieldCheck size={15} className="text-emerald-600" />
-                            <span>Respon Penjual: {replies[0].admin_name || "Admin RegarSport"}</span>
+                            <span>Respon Penjual: {replies[0].admin_name || "Admin RegarStore"}</span>
                           </div>
                           {replies[0].created_at && (
                             <span className="text-[10px] text-emerald-700/60 font-medium">
@@ -1398,7 +1398,7 @@ export default function ProductDetail() {
                       </span>
                     </div>
                     <p className="text-xs text-slate-400 font-mono mt-0.5">
-                      Standar ukuran resmi RegarSport untuk performa atletik dan kenyamanan optimal.
+                      Standar ukuran resmi RegarStore untuk performa atletik dan kenyamanan optimal.
                     </p>
                   </div>
                 </div>
@@ -1619,7 +1619,7 @@ export default function ProductDetail() {
                   <div className="rounded-2xl border border-white/10 bg-white/5 p-4 text-xs text-slate-300 font-mono">
                     <p className="font-bold text-white mb-1 uppercase tracking-wider text-[11px]">Aksesoris &amp; Tas Olahraga:</p>
                     <p className="text-[11px] leading-relaxed text-slate-400">
-                      Kategori tas ransel gym, duffle bag, kaos kaki, dan botol minum RegarSport berukuran <strong className="text-white">All Size</strong> dengan konstruksi ergonomis.
+                      Kategori tas ransel gym, duffle bag, kaos kaki, dan botol minum RegarStore berukuran <strong className="text-white">All Size</strong> dengan konstruksi ergonomis.
                     </p>
                   </div>
                 </div>

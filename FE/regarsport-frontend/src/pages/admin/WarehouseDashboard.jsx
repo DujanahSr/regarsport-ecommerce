@@ -138,7 +138,7 @@ export default function WarehouseDashboard() {
         <div className="absolute inset-0 z-0">
           <img
             src="/images/warehouse_hero_bg.jpg"
-            alt="RegarSport Logistics Hub"
+            alt="RegarStore Logistics Hub"
             className="w-full h-full object-cover object-center filter brightness-[0.4] contrast-125"
           />
           <div className="absolute inset-0 bg-gradient-to-r from-[#162018] via-[#162018]/85 to-transparent" />
@@ -172,7 +172,7 @@ export default function WarehouseDashboard() {
               PUSAT OPERASIONAL <span className="text-[#FAF8F4] opacity-90">GUDANG &amp; PENGIRIMAN</span>
             </h1>
             <p className="text-slate-300 text-xs sm:text-sm mt-2.5 max-w-2xl leading-relaxed">
-              Manajemen antrean kemas pakaian atletik, pencetakan label thermal A6 otomatis, pelacakan barcode resi kurir, dan pengawasan stok fisik garmen PT RegarSport Indonesia.
+              Manajemen antrean kemas pakaian atletik, pencetakan label thermal A6 otomatis, pelacakan barcode resi kurir, dan pengawasan stok fisik garmen PT RegarStore Indonesia.
             </p>
           </div>
 

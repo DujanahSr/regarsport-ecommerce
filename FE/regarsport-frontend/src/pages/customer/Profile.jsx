@@ -491,7 +491,7 @@ export default function Profile() {
     },
     admin: {
       title: "SUPER ADMINISTRATOR / OWNER",
-      subTitle: "REGARSPORT CENTRAL HEADQUARTERS",
+      subTitle: "REGARSTORE CENTRAL HEADQUARTERS",
       badgeClass: isAdminRoute
         ? "bg-teal-500/20 text-teal-400 border border-teal-500/30"
         : "bg-stone-900 text-stone-100 border border-stone-700",
@@ -499,7 +499,7 @@ export default function Profile() {
     },
   }[user.role] || {
     title: "PENGGUNA RESMI",
-    subTitle: "REGARSPORT ATELIER",
+    subTitle: "REGARSTORE ATELIER",
     badgeClass: "bg-stone-100 text-stone-700 border border-stone-200",
     icon: User,
   };
@@ -845,7 +845,7 @@ export default function Profile() {
                 {user.role === "logistics"
                   ? "Informasi profil staf logistik, kontak darurat, dan koordinasi hub Cicendo Bandung."
                   : user.role === "admin"
-                  ? "Informasi akun administrator sentral dan konfigurasi profil sistem RegarSport."
+                  ? "Informasi akun administrator sentral dan konfigurasi profil sistem RegarStore."
                   : "Data kontak dan alamat Anda akan otomatis disinkronkan saat proses checkout pesanan jersey di Atelier Cicendo."}
               </p>
             </div>
@@ -1185,7 +1185,7 @@ export default function Profile() {
                       Pesanan Terbaru Anda
                     </h2>
                     <p className={`text-xs mt-1 ${subText}`}>
-                      Pantau proses manufaktur dan ekspedisi jersey RegarSport Anda langsung dari Atelier Bandung.
+                      Pantau proses manufaktur dan ekspedisi jersey RegarStore Anda langsung dari Atelier Bandung.
                     </p>
                   </div>
                   <Link
@@ -1379,7 +1379,7 @@ export default function Profile() {
                     Pintasan Cepat Manajemen Toko
                   </h2>
                   <p className={`text-xs mt-1 ${subText}`}>
-                    Akses langsung ke modul inti pengelolaan e-commerce RegarSport.
+                    Akses langsung ke modul inti pengelolaan e-commerce RegarStore.
                   </p>
                 </div>
 

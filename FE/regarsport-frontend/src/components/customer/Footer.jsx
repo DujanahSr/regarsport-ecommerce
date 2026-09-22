@@ -7,6 +7,7 @@ import {
   Clock,
   ArrowRight,
 } from "lucide-react";
+import RegarStoreLogo from "../common/RegarStoreLogo";
 
 export default function Footer() {
   const year = new Date().getFullYear();
@@ -21,12 +22,10 @@ export default function Footer() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 text-xs text-slate-400">
           {/* Brand & Atelier Info Column */}
           <div className="space-y-3.5">
-            <div className="flex items-center gap-2">
-              <div className="w-7 h-8 bg-[#B9382B] rounded-b-lg flex items-center justify-center shadow">
-                <span className="text-[10px] font-black text-white">R</span>
-              </div>
+            <div className="flex items-center gap-2.5">
+              <RegarStoreLogo size={32} />
               <span className="font-condensed text-xl font-bold uppercase tracking-wider text-white">
-                PT REGARSPORT INDONESIA
+                PT REGARSTORE INDONESIA
               </span>
             </div>
             <p className="text-[11px] leading-relaxed text-slate-300">
@@ -154,7 +153,7 @@ export default function Footer() {
               </li>
               <li>
                 <a
-                  href="https://wa.me/6281234567890?text=Halo%20RegarSport,%20saya%20ingin%20konsultasi%20layanan%20dan%20garansi"
+                  href="https://wa.me/6281234567890?text=Halo%20RegarStore,%20saya%20ingin%20konsultasi%20layanan%20dan%20garansi"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-emerald-400 font-semibold hover:underline flex items-center gap-1"
@@ -208,7 +207,7 @@ export default function Footer() {
         {/* Copyright Bar */}
         <div className="pt-8 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between text-[11px] text-slate-500 gap-3">
           <div>
-            © {year} PT RegarSport Indonesia. Hak Cipta Dilindungi Undang-Undang.
+            © {year} PT RegarStore Indonesia. Hak Cipta Dilindungi Undang-Undang.
           </div>
           <div className="flex flex-wrap items-center gap-4">
             <Link to="/" className="hover:text-white transition-colors">Beranda Utama</Link>

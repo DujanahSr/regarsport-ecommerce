@@ -55,7 +55,7 @@ export default function InvoiceModal({ isOpen, onClose, order }) {
       doc.setTextColor(15, 23, 42); // slate-900
       doc.setFontSize(13);
       doc.setFont("helvetica", "bold");
-      doc.text("PT REGARSPORT INDONESIA", leftMargin + 13, 20);
+      doc.text("PT REGARSTORE INDONESIA", leftMargin + 13, 20);
 
       // Tagline
       doc.setTextColor(4, 120, 87); // emerald-700
@@ -67,7 +67,7 @@ export default function InvoiceModal({ isOpen, onClose, order }) {
       doc.setFontSize(7);
       doc.setFont("helvetica", "normal");
       doc.text("Jl. Jenderal Sudirman No. 45, Wonogiri, Jawa Tengah 57612", leftMargin, 29);
-      doc.text("NPWP: 01.345.678.9-521.000 | Email: cs@regarsport.com | WA: +62 812-3456-7890", leftMargin, 33);
+      doc.text("NPWP: 01.345.678.9-521.000 | Email: cs@regarstore.com | WA: +62 812-3456-7890", leftMargin, 33);
 
       // Judul Dokumen (Kanan)
       const titleText = isPaid
@@ -211,7 +211,7 @@ export default function InvoiceModal({ isOpen, onClose, order }) {
       doc.setFontSize(8);
 
       items.forEach((item, index) => {
-        const pName = item.productName || item.products?.name || item.name || "Produk RegarSport";
+        const pName = item.productName || item.products?.name || item.name || "Produk RegarStore";
         const size = item.size || "All Size";
         const price = Number(item.price || item.products?.price || 0);
         const qty = Number(item.quantity || 1);
@@ -226,7 +226,7 @@ export default function InvoiceModal({ isOpen, onClose, order }) {
         doc.setFont("helvetica", "normal");
         doc.setFontSize(6.5);
         doc.setTextColor(148, 163, 184);
-        doc.text("RegarSport Original Collection", leftMargin + 12, rowY + 7.5);
+        doc.text("RegarStore Original Collection", leftMargin + 12, rowY + 7.5);
 
         doc.setFontSize(8);
         doc.setTextColor(51, 65, 85);
@@ -293,7 +293,7 @@ export default function InvoiceModal({ isOpen, onClose, order }) {
       doc.setFontSize(7);
       doc.text("• Invoice ini merupakan bukti pembayaran resmi yang sah diterbitkan oleh sistem komputerisasi.", leftMargin, summaryY + 4);
       doc.text("• Simpan invoice ini sebagai syarat klaim garansi atau penukaran ukuran (size exchange).", leftMargin, summaryY + 8);
-      doc.text("• Produk original bergaransi resmi PT RegarSport Indonesia.", leftMargin, summaryY + 12);
+      doc.text("• Produk original bergaransi resmi PT RegarStore Indonesia.", leftMargin, summaryY + 12);
 
       // Tanda Tangan Dept
       doc.text(`Wonogiri, ${new Date(order.createdAt || Date.now()).toLocaleDateString("id-ID")}`, rightMargin - 15, summaryY + 32, { align: "center" });
@@ -303,7 +303,7 @@ export default function InvoiceModal({ isOpen, onClose, order }) {
       doc.setFont("helvetica", "normal");
       doc.setFontSize(6.5);
       doc.setTextColor(100, 116, 139);
-      doc.text("PT RegarSport Indonesia", rightMargin - 15, summaryY + 39, { align: "center" });
+      doc.text("PT RegarStore Indonesia", rightMargin - 15, summaryY + 39, { align: "center" });
 
       // Unduh langsung berkas PDF ke perangkat
       const cleanFilename = `${invoiceNumber.replace(/[^a-zA-Z0-9-]/g, "_")}.pdf`;
@@ -532,7 +532,7 @@ export default function InvoiceModal({ isOpen, onClose, order }) {
                   </div>
                   <div>
                     <h1 className="text-lg font-black text-slate-900 tracking-tight leading-none">
-                      PT REGARSPORT INDONESIA
+                      PT REGARSTORE INDONESIA
                     </h1>
                     <p className="text-[9px] font-bold text-emerald-700 tracking-widest uppercase">
                       Official Athletic Gear & Custom Apparel
@@ -541,7 +541,7 @@ export default function InvoiceModal({ isOpen, onClose, order }) {
                 </div>
                 <p className="text-slate-500 text-[10px] leading-tight max-w-xs">
                   Jl. Jenderal Sudirman No. 45, Wonogiri, Jawa Tengah 57612<br />
-                  NPWP: 01.345.678.9-521.000 | Email: cs@regarsport.com<br />
+                  NPWP: 01.345.678.9-521.000 | Email: cs@regarstore.com<br />
                   Hotline / WhatsApp: +62 812-3456-7890
                 </p>
               </div>
@@ -697,7 +697,7 @@ export default function InvoiceModal({ isOpen, onClose, order }) {
                         <td className="py-1.5 px-2 text-slate-400 font-mono">{idx + 1}</td>
                         <td className="py-1.5 px-2">
                           <p className="font-bold text-slate-800">{it.productName || "Produk Olahraga"}</p>
-                          <p className="text-[9px] text-slate-400">RegarSport Original Collection</p>
+                          <p className="text-[9px] text-slate-400">RegarStore Original Collection</p>
                         </td>
                         <td className="py-1.5 px-2 text-center">
                           {it.size ? (
@@ -755,7 +755,7 @@ export default function InvoiceModal({ isOpen, onClose, order }) {
                 <ul className="list-disc list-inside space-y-0.5">
                   <li>Invoice ini merupakan bukti pembayaran resmi yang sah diterbitkan oleh sistem komputerisasi.</li>
                   <li>Simpan invoice ini sebagai syarat klaim garansi atau penukaran ukuran (size exchange).</li>
-                  <li>Produk original bergaransi resmi PT RegarSport Indonesia.</li>
+                  <li>Produk original bergaransi resmi PT RegarStore Indonesia.</li>
                 </ul>
               </div>
 
@@ -766,7 +766,7 @@ export default function InvoiceModal({ isOpen, onClose, order }) {
                 <div className="inline-block border-b border-slate-400 pb-0.5 text-center min-w-36">
                   <p className="font-bold text-slate-800 text-[10px]">Finance & Logistics Dept</p>
                 </div>
-                <p className="text-[8.5px] text-slate-400 mt-0.5">PT RegarSport Indonesia</p>
+                <p className="text-[8.5px] text-slate-400 mt-0.5">PT RegarStore Indonesia</p>
               </div>
             </div>
           </div>

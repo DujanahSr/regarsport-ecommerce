@@ -20,7 +20,7 @@ public class OpenApiConfig {
                         new io.swagger.v3.oas.models.servers.Server().url("http://localhost:8086").description("Direct Auth Service")
                 ))
                 .info(new Info()
-                        .title("RegarSport - Auth & Identity Service API")
+                        .title("RegarStore - Auth & Identity Service API")
                         .description("Authentication and RBAC Authorization Microservice with Spring Security 6 and JWT")
                         .version("v1.0.0")
                         .contact(new Contact()

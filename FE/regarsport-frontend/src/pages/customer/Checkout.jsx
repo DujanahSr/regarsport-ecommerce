@@ -490,7 +490,7 @@ export default function Checkout() {
             <div className="mt-6 pt-5 border-t border-[#162018]/10">
               <div className="flex items-center gap-2 text-xs font-mono font-bold uppercase tracking-wider text-slate-600 mb-2.5">
                 <Tag size={14} className="text-emerald-600" />
-                <span>Kupon Diskon Resmi RegarSport</span>
+                <span>Kupon Diskon Resmi RegarStore</span>
               </div>
 
               {appliedVoucher ? (

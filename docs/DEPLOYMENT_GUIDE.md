@@ -1,6 +1,6 @@
-# Panduan Deployment Produksi RegarSport (Railway & Cloud)
+# Panduan Deployment Produksi RegarStore (Railway & Cloud)
 
-Dokumen ini berisi panduan terstruktur dan praktis untuk mendeploy ekosistem **RegarSport** (Backend Microservices Spring Boot, Database PostgreSQL, Redis, RabbitMQ, dan Frontend React Vite) ke platform cloud seperti **Railway**, VPS, atau penyedia cloud lainnya.
+Dokumen ini berisi panduan terstruktur dan praktis untuk mendeploy ekosistem **RegarStore** (Backend Microservices Spring Boot, Database PostgreSQL, Redis, RabbitMQ, dan Frontend React Vite) ke platform cloud seperti **Railway**, VPS, atau penyedia cloud lainnya.
 
 ---
 
@@ -42,7 +42,7 @@ Jalankan skrip inisialisasi dari file `docker/init-db/01-init-databases.sql` ke 
 
 ## 3. Deployment Backend Microservices
 
-Di Railway, sambungkan repositori GitHub Anda: `DujanahSr/regarsport-ecommerce`.
+Di Railway, sambungkan repositori GitHub Anda: `DujanahSr/regarstore-ecommerce`.
 
 ### Variabel Lingkungan Bersama (Shared Environment Variables):
 ```env
@@ -82,7 +82,7 @@ MIDTRANS_IS_PRODUCTION=true
    - Root Directory: `backend`
    - Build Command: `mvn clean package -pl api-gateway -am -DskipTests`
    - Start Command: `java -XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0 -jar api-gateway/target/api-gateway-1.0.0-SNAPSHOT.jar`
-   - Buka Domain Publik di Railway (misal: `https://api-regarsport.up.railway.app`).
+   - Buka Domain Publik di Railway (misal: `https://api-regarstore.up.railway.app`).
 
 2. **Auth Service**:
    - Build: `mvn clean package -pl auth-service -am -DskipTests`
@@ -115,7 +115,7 @@ Frontend dapat dideploy ke **Vercel**, **Netlify**, atau layanan static **Railwa
 3. **Output Directory**: `dist`
 4. **Environment Variables**:
    ```env
-   VITE_API_BASE_URL=https://api-regarsport.up.railway.app/api/v1
+   VITE_API_BASE_URL=https://api-regarstore.up.railway.app/api/v1
    VITE_MIDTRANS_CLIENT_KEY=Mid-client-your-production-client-key
    ```
 

@@ -167,7 +167,7 @@ function OrderDetailContent() {
     const recipient = order.recipientName || order.customerName || "Pelanggan";
     const itemNames = (order.items || []).map((it) => it.productName || it.name || "Apparel").join(", ");
     const text = encodeURIComponent(
-      `Halo Customer Service PT RegarSport Indonesia,\n\nSaya ingin konsultasi Garansi / Tukar Ukuran untuk pesanan:\n• No Order: ${orderNum}\n• Atas Nama: ${recipient}\n• Produk: ${itemNames}\n\nMohon petunjuk prosedur klaim penukaran ukuran atau garansi. Terima kasih!`
+      `Halo Customer Service PT RegarStore Indonesia,\n\nSaya ingin konsultasi Garansi / Tukar Ukuran untuk pesanan:\n• No Order: ${orderNum}\n• Atas Nama: ${recipient}\n• Produk: ${itemNames}\n\nMohon petunjuk prosedur klaim penukaran ukuran atau garansi. Terima kasih!`
     );
     window.open(`https://wa.me/6281234567890?text=${text}`, "_blank");
   };
@@ -247,7 +247,7 @@ function OrderDetailContent() {
       await api.post(`/products/${productId}/reviews`, {
         rating: reviewRating,
         comment: reviewComment.trim(),
-        customerName: user?.fullName || user?.full_name || user?.name || "Pelanggan RegarSport",
+        customerName: user?.fullName || user?.full_name || user?.name || "Pelanggan RegarStore",
         customerAvatar: user?.avatarUrl || user?.avatar_url || "",
         images: reviewImages,
       });
@@ -777,7 +777,7 @@ function OrderDetailContent() {
             </div>
           )}
 
-        {/* 3 Pilar Garansi Resmi RegarSport & Klaim Retur */}
+        {/* 3 Pilar Garansi Resmi RegarStore & Klaim Retur */}
         {(() => {
           const isCompleted = (order.status || "").toUpperCase() === "COMPLETED";
           const completedDate = new Date(order.updatedAt || order.createdAt || Date.now());
@@ -802,7 +802,7 @@ function OrderDetailContent() {
                   <div>
                     <div className="flex flex-wrap items-center gap-2">
                       <h4 className="font-condensed text-lg sm:text-xl font-black uppercase tracking-wider text-white">
-                        Garansi Resmi RegarSport 100% Bebas Cemas
+                        Garansi Resmi RegarStore 100% Bebas Cemas
                       </h4>
                       {isCompleted ? (
                         isWarrantyActive ? (
@@ -952,7 +952,7 @@ function OrderDetailContent() {
                             type="button"
                             onClick={() => {
                               const text = encodeURIComponent(
-                                `Halo CS PT RegarSport Indonesia,\n\nSaya ingin follow-up status Tiket Klaim Garansi:\n• No Tiket: #${c.claimNumber}\n• No Order: ${order.orderNumber || `#${order.id}`}\n• Kategori: ${c.category}\n\nMohon bantuannya untuk update proses klaim. Terima kasih!`
+                                `Halo CS PT RegarStore Indonesia,\n\nSaya ingin follow-up status Tiket Klaim Garansi:\n• No Tiket: #${c.claimNumber}\n• No Order: ${order.orderNumber || `#${order.id}`}\n• Kategori: ${c.category}\n\nMohon bantuannya untuk update proses klaim. Terima kasih!`
                               );
                               window.open(`https://wa.me/6281234567890?text=${text}`, "_blank");
                             }}
@@ -1402,7 +1402,7 @@ function OrderDetailContent() {
 
             <form onSubmit={handleCancelOrder} className="space-y-4">
               <p className="text-xs text-slate-300 leading-relaxed font-sans-body">
-                Pesanan yang dibatalkan tidak dapat dipulihkan. Mohon pilih alasan pembatalan agar kami dapat meningkatkan layanan Atelier RegarSport:
+                Pesanan yang dibatalkan tidak dapat dipulihkan. Mohon pilih alasan pembatalan agar kami dapat meningkatkan layanan Atelier RegarStore:
               </p>
 
               <div className="space-y-2">

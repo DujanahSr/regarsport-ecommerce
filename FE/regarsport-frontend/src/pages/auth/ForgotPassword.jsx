@@ -135,7 +135,7 @@ export default function ForgotPassword() {
           <span>Kembali Masuk</span>
         </Link>
         <span className="font-['Barlow_Condensed'] font-black tracking-widest text-base text-emerald-400 uppercase">
-          REGARSPORT
+          REGARSTORE
         </span>
       </div>
 
@@ -176,7 +176,7 @@ export default function ForgotPassword() {
               </span>
             </h1>
             <p className="text-sm text-[#FAF8F4]/70 max-w-md mt-4 leading-relaxed font-sans">
-              Amankan kembali akun RegarSport Anda melalui verifikasi kode 6-digit resmi yang terkirim langsung ke email terdaftar.
+              Amankan kembali akun RegarStore Anda melalui verifikasi kode 6-digit resmi yang terkirim langsung ke email terdaftar.
             </p>
           </div>
         </div>
@@ -208,7 +208,7 @@ export default function ForgotPassword() {
             </Link>
             <div className="flex items-center gap-1.5 text-xs font-mono text-emerald-400/80">
               <Compass size={14} />
-              <span>REGARSPORT HUB</span>
+              <span>REGARSTORE HUB</span>
             </div>
           </div>
 

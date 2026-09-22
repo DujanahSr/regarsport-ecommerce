@@ -79,7 +79,7 @@ export default function Register() {
           <span>Beranda</span>
         </Link>
         <span className="font-['Barlow_Condensed'] font-black tracking-widest text-base text-emerald-400 uppercase">
-          REGARSPORT
+          REGARSTORE
         </span>
         <Link
           to="/login"
@@ -205,7 +205,7 @@ export default function Register() {
             </Link>
             <div className="flex items-center gap-1.5 text-xs font-mono text-emerald-400/80">
               <Compass size={14} />
-              <span>REGARSPORT HUB</span>
+              <span>REGARSTORE HUB</span>
             </div>
           </div>
 

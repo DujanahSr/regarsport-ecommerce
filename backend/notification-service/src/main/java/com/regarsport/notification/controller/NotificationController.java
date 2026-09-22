@@ -31,12 +31,12 @@ public class NotificationController {
     }
 
     @PostMapping("/test-email")
-    public ResponseEntity<ApiResponse<String>> sendTestEmail(@RequestParam(defaultValue = "customer@regarsport.com") String email) {
+    public ResponseEntity<ApiResponse<String>> sendTestEmail(@RequestParam(defaultValue = "customer@regarstore.com") String email) {
         OrderCreatedEvent mockEvent = new OrderCreatedEvent(
                 999L,
                 "REGAR-TEST-EMAIL-001",
                 1L,
-                "Pelanggan Setia RegarSport",
+                "Pelanggan Setia RegarStore",
                 email,
                 BigDecimal.valueOf(175000),
                 "Jl. Stadion Utama No. 88, Wonogiri, Jawa Tengah",

@@ -44,7 +44,7 @@ public class ReviewService {
         }
 
         Product product = productRepository.findById(productId).orElse(null);
-        String prodName = product != null ? product.getName() : "Jersey RegarSport";
+        String prodName = product != null ? product.getName() : "Jersey RegarStore";
         String prodImage = product != null ? product.getImageUrl() : "";
 
         List<ReviewResponse> content = reviewPage.getContent().stream()
@@ -92,7 +92,7 @@ public class ReviewService {
         return reviewRepository.findByProductIdAndUserId(productId, userId)
                 .map(r -> {
                     Product product = productRepository.findById(productId).orElse(null);
-                    String prodName = product != null ? product.getName() : "Jersey RegarSport";
+                    String prodName = product != null ? product.getName() : "Jersey RegarStore";
                     String prodImage = product != null ? product.getImageUrl() : "";
                     return mapToResponse(r, prodName, prodImage);
                 });
@@ -121,7 +121,7 @@ public class ReviewService {
             review = Review.builder()
                     .productId(productId)
                     .userId(userId)
-                    .customerName(customerName != null && !customerName.isBlank() ? customerName : "Pelanggan RegarSport")
+                    .customerName(customerName != null && !customerName.isBlank() ? customerName : "Pelanggan RegarStore")
                     .customerAvatar(customerAvatar)
                     .rating(request.rating())
                     .comment(request.comment().trim())
@@ -191,7 +191,7 @@ public class ReviewService {
 
         ReviewReply reply = ReviewReply.builder()
                 .review(review)
-                .adminName(adminName != null && !adminName.isBlank() ? adminName : "Admin RegarSport")
+                .adminName(adminName != null && !adminName.isBlank() ? adminName : "Admin RegarStore")
                 .reply(request.reply().trim())
                 .build();
 

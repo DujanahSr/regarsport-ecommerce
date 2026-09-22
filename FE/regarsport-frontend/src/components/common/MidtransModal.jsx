@@ -63,7 +63,7 @@ export default function MidtransModal({
             const createRes = await api.post("/payments/create-token", {
               orderId: Number(order.id),
               orderNumber: order.orderNumber || orderNumber,
-              customerEmail: order.customerEmail || "customer@regarsport.com",
+              customerEmail: order.customerEmail || "customer@regarstore.com",
               customerName: order.customerName || "Customer",
               amount: Number(order.totalAmount || order.total_amount || 0),
             });

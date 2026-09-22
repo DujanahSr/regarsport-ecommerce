@@ -24,7 +24,7 @@ public class OpenApiConfig {
                         new Server().url("http://localhost:8089").description("Direct Payment Service")
                 ))
                 .info(new Info()
-                        .title("RegarSport - Payment Service API")
+                        .title("RegarStore - Payment Service API")
                         .description("Payment Gateway Integration with Midtrans Snap, Webhook Idempotency, and Async Mail Notification")
                         .version("v1.0.0")
                         .contact(new Contact()

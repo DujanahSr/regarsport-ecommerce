@@ -100,7 +100,7 @@ export default function Login() {
           <span>Beranda</span>
         </Link>
         <span className="font-['Barlow_Condensed'] font-black tracking-widest text-base text-emerald-400 uppercase">
-          REGARSPORT
+          REGARSTORE
         </span>
         <Link
           to="/register"
@@ -155,7 +155,7 @@ export default function Login() {
               </span>
             </h1>
             <p className="text-sm text-[#FAF8F4]/70 max-w-md mt-4 leading-relaxed font-sans">
-              Akses akun RegarSport untuk memantau status pesanan custom jersey tim, riwayat invoice, serta katalog edisi terbatas berstandar atelier Cicendo Bandung.
+              Akses akun RegarStore untuk memantau status pesanan custom jersey tim, riwayat invoice, serta katalog edisi terbatas berstandar atelier Cicendo Bandung.
             </p>
           </div>
         </div>
@@ -234,7 +234,7 @@ export default function Login() {
             </Link>
             <div className="flex items-center gap-1.5 text-xs font-mono text-emerald-400/80">
               <Compass size={14} />
-              <span>REGARSPORT HUB</span>
+              <span>REGARSTORE HUB</span>
             </div>
           </div>
 

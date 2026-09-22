@@ -196,7 +196,7 @@ export default function Dashboard() {
       const rightMargin = 195;
       const contentWidth = rightMargin - leftMargin;
 
-      // Header PT RegarSport Indonesia
+      // Header PT RegarStore Indonesia
       doc.setFillColor(185, 56, 43); // #B9382B Brand Terracotta
       doc.roundedRect(leftMargin, 15, 10, 10, 2, 2, 'F');
       doc.setTextColor(255, 255, 255);
@@ -206,7 +206,7 @@ export default function Dashboard() {
 
       doc.setTextColor(22, 32, 24);
       doc.setFontSize(13);
-      doc.text('PT REGARSPORT INDONESIA', leftMargin + 13, 20);
+      doc.text('PT REGARSTORE INDONESIA', leftMargin + 13, 20);
       doc.setTextColor(185, 56, 43);
       doc.setFontSize(7.5);
       doc.text('EXECUTIVE FINANCIAL & OPERATIONAL REPORT • ATELIER CICENDO BANDUNG', leftMargin + 13, 24);
@@ -215,7 +215,7 @@ export default function Dashboard() {
       doc.setFontSize(7);
       doc.setFont('helvetica', 'normal');
       doc.text('Pusat Apparel Atletik & Manufaktur Sublimasi • Cicendo, Kota Bandung 40171', leftMargin, 29);
-      doc.text('NPWP: 01.345.678.9-521.000 | finance@regarsport.com', leftMargin, 33);
+      doc.text('NPWP: 01.345.678.9-521.000 | finance@regarstore.com', leftMargin, 33);
 
       const todayStr = new Date().toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' });
       doc.setFont('helvetica', 'bold');
@@ -327,12 +327,12 @@ export default function Dashboard() {
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(7);
       (topProducts.length > 0 ? topProducts.slice(0, 5) : [
-        { name: 'Jersey RegarSport Pro Elite 8902', quantitySold: 24, totalRevenue: 4440000 },
+        { name: 'Jersey RegarStore Pro Elite 8902', quantitySold: 24, totalRevenue: 4440000 },
         { name: 'Running Singlet Athletic Breathable', quantitySold: 18, totalRevenue: 2610000 },
         { name: 'Sepatu Futsal Speed Pro Wonogiri', quantitySold: 12, totalRevenue: 3420000 },
       ]).forEach((prod) => {
         doc.setTextColor(30, 41, 59);
-        doc.text(prod.name || 'Produk RegarSport', leftMargin + 3, rY + 4.5);
+        doc.text(prod.name || 'Produk RegarStore', leftMargin + 3, rY + 4.5);
         doc.setTextColor(71, 85, 105);
         doc.text(`${prod.quantitySold || 0} pcs`, leftMargin + 110, rY + 4.5, { align: 'center' });
         doc.setFont('helvetica', 'bold');
@@ -353,14 +353,14 @@ export default function Dashboard() {
       doc.text(`Wonogiri, ${todayStr}`, rightMargin - 20, signY, { align: 'center' });
       doc.setFont('helvetica', 'bold');
       doc.setTextColor(15, 23, 42);
-      doc.text('PT RegarSport Indonesia', rightMargin - 20, signY + 4, { align: 'center' });
+      doc.text('PT RegarStore Indonesia', rightMargin - 20, signY + 4, { align: 'center' });
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(6.5);
       doc.setTextColor(148, 163, 184);
       doc.text('(Finance & Operations Director)', rightMargin - 20, signY + 20, { align: 'center' });
 
       // Simpan Berkas Langsung
-      const filename = `Laporan_Keuangan_RegarSport_${new Date().toISOString().slice(0, 10)}.pdf`;
+      const filename = `Laporan_Keuangan_RegarStore_${new Date().toISOString().slice(0, 10)}.pdf`;
       doc.save(filename);
       toast.success('Laporan keuangan resmi (PDF) berhasil diunduh!', { id: 'dash-pdf' });
     } catch (err) {
@@ -439,7 +439,7 @@ export default function Dashboard() {
         <div className="absolute inset-0 z-0">
           <img
             src="/images/admin_hero_bg.jpg"
-            alt="RegarSport Executive Atelier"
+            alt="RegarStore Executive Atelier"
             className="w-full h-full object-cover object-center filter brightness-[0.38] contrast-125"
           />
           <div className="absolute inset-0 bg-gradient-to-r from-[#162018] via-[#162018]/85 to-transparent" />
@@ -487,7 +487,7 @@ export default function Dashboard() {
               <span className="text-[#FAF8F4] opacity-90">&amp; KINERJA BISNIS ATELIER</span>
             </h1>
             <p className="text-slate-300 text-xs sm:text-sm mt-2.5 max-w-2xl leading-relaxed">
-              Analisis performa finansial riil, volume konversi pesanan, monitoring perputaran katalog garmen olahraga, dan pemantauan menyeluruh toko PT RegarSport Indonesia.
+              Analisis performa finansial riil, volume konversi pesanan, monitoring perputaran katalog garmen olahraga, dan pemantauan menyeluruh toko PT RegarStore Indonesia.
             </p>
           </div>
 

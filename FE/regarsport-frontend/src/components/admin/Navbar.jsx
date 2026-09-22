@@ -56,7 +56,7 @@ export default function Navbar() {
                 {user?.full_name || user?.fullName || (isLogistics ? "Staf Gudang" : "Super Admin")}
               </div>
               <div className="text-[10px] font-mono text-slate-400 truncate">
-                {user?.email || (isLogistics ? "gudang@regarsport.com" : "admin@regarsport.com")}
+                {user?.email || (isLogistics ? "gudang@regarstore.com" : "admin@regarstore.com")}
               </div>
             </div>
 

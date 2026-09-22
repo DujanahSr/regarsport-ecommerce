@@ -40,7 +40,7 @@ public class EmailNotificationService {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
-            helper.setFrom("no-reply@regarsport.com", "RegarSport Official Store");
+            helper.setFrom("no-reply@regarstore.com", "RegarStore Official Store");
             helper.setTo(toEmail.trim());
             helper.setSubject("Faktur Pembelian Resmi - Pesanan #" + orderNumber + " [LUNAS]");
 
@@ -115,8 +115,8 @@ public class EmailNotificationService {
                           </div>
                         </div>
                         <div class="footer">
-                          &copy; 2026 PT RegarSport Indonesia. Jl. Jenderal Sudirman No. 45, Wonogiri, Jawa Tengah.<br>
-                          Email ini dikirim otomatis oleh sistem e-commerce terdistribusi RegarSport.
+                          &copy; 2026 PT RegarStore Indonesia. Jl. Jenderal Sudirman No. 45, Wonogiri, Jawa Tengah.<br>
+                          Email ini dikirim otomatis oleh sistem e-commerce terdistribusi RegarStore.
                         </div>
                       </div>
                     </body>

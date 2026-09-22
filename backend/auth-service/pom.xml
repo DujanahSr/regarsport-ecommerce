@@ -14,7 +14,7 @@
     <artifactId>auth-service</artifactId>
     <packaging>jar</packaging>
     <name>auth-service</name>
-    <description>Authentication, Authorization, and Identity Microservice for RegarSport</description>
+    <description>Authentication, Authorization, and Identity Microservice for RegarStore</description>
 
     <properties>
         <jjwt.version>0.12.6</jjwt.version>

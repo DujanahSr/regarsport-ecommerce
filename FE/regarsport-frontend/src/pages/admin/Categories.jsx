@@ -141,7 +141,7 @@ export default function Categories() {
               MANAJEMEN KATEGORI PRODUK
             </h1>
             <p className="text-stone-500 text-xs">
-              Struktur klasifikasi katalog apparel olahraga dan perlengkapan atletik RegarSport.
+              Struktur klasifikasi katalog apparel olahraga dan perlengkapan atletik RegarStore.
             </p>
           </div>
         </div>

@@ -1,6 +1,6 @@
-# RegarSport – Frontend
+# RegarStore – Frontend
 
-Frontend aplikasi e-commerce RegarSport untuk perlengkapan olahraga. Dibangun dengan React, Vite, Tailwind CSS, dan React Router.
+Frontend aplikasi e-commerce RegarStore untuk perlengkapan atletik & custom jersey. Dibangun dengan React, Vite, Tailwind CSS, dan React Router.
 
 ## 🚀 Fitur Utama (Customer)
 
@@ -50,4 +50,4 @@ cp .env.example .env
 pnpm run dev
 
 Author: Abu
-License: MIT © 2026 RegarSport
+License: MIT © 2026 RegarStore

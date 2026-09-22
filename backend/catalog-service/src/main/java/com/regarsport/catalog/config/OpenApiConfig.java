@@ -24,7 +24,7 @@ public class OpenApiConfig {
                         new Server().url("http://localhost:8087").description("Direct Catalog Service")
                 ))
                 .info(new Info()
-                        .title("RegarSport - Catalog Service API")
+                        .title("RegarStore - Catalog Service API")
                         .description("High-performance Catalog & Inventory Microservice with Redis Caching and Optimistic Locking")
                         .version("v1.0.0")
                         .contact(new Contact()

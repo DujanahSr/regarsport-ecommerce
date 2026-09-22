@@ -22,8 +22,8 @@ import java.util.Locale;
 public class EmailService {
 
     private final JavaMailSender mailSender;
-    private static final String FROM_EMAIL = "noreply@regarsport.com";
-    private static final String BRAND_NAME = "RegarSport Official";
+    private static final String FROM_EMAIL = "noreply@regarstore.com";
+    private static final String BRAND_NAME = "RegarStore Official";
 
     private String formatRp(BigDecimal amount) {
         if (amount == null) return "Rp 0";
@@ -40,7 +40,7 @@ public class EmailService {
 
             helper.setFrom(FROM_EMAIL, BRAND_NAME);
             helper.setTo(event.customerEmail());
-            helper.setSubject("[RegarSport] Konfirmasi Pemesanan #" + event.orderNumber());
+            helper.setSubject("[RegarStore] Konfirmasi Pemesanan #" + event.orderNumber());
 
             StringBuilder itemsHtml = new StringBuilder();
             if (event.items() != null) {
@@ -90,14 +90,14 @@ public class EmailService {
                 <body>
                     <div class="container">
                         <div class="header">
-                            <h1 style="margin: 0; font-size: 24px; letter-spacing: 1px;">REGARSPORT</h1>
+                            <h1 style="margin: 0; font-size: 24px; letter-spacing: 1px;">REGARSTORE</h1>
                             <p style="margin: 4px 0 0; font-size: 12px; color: #94a3b8; text-transform: uppercase;">Wonogiri Factory Direct - Official E-Commerce</p>
                         </div>
                         <div class="content">
                             <span class="badge">PESANAN DITERIMA</span>
                             <h2 style="color: #0f172a; margin-top: 16px; font-size: 20px;">Halo, %s!</h2>
                             <p style="color: #475569; font-size: 14px; line-height: 1.6;">
-                                Terima kasih telah berbelanja di <strong>RegarSport Indonesia</strong>. Pesanan Anda dengan nomor <strong>%s</strong> telah kami catat di sistem dan siap untuk diproses.
+                                Terima kasih telah berbelanja di <strong>RegarStore Indonesia</strong>. Pesanan Anda dengan nomor <strong>%s</strong> telah kami catat di sistem dan siap untuk diproses.
                             </p>
                             
                             <table style="width: 100%%; border-collapse: collapse; margin-top: 24px;">
@@ -129,8 +129,8 @@ public class EmailService {
                             </div>
                         </div>
                         <div class="footer">
-                            <p style="margin: 0 0 6px;">PT REGARSPORT INDONESIA - Wonogiri, Jawa Tengah</p>
-                            <p style="margin: 0;">Layanan Pelanggan WhatsApp: +62 812-3456-7890 | Email: cs@regarsport.com</p>
+                            <p style="margin: 0 0 6px;">PT REGARSTORE INDONESIA - Wonogiri, Jawa Tengah</p>
+                            <p style="margin: 0;">Layanan Pelanggan WhatsApp: +62 812-3456-7890 | Email: cs@regarstore.com</p>
                         </div>
                     </div>
                 </body>
@@ -154,8 +154,8 @@ public class EmailService {
     @Async
     public void sendPaymentSuccessEmail(PaymentStatusUpdatedEvent event) {
         try {
-            String recipientEmail = event.customerEmail() != null ? event.customerEmail() : "customer@regarsport.com";
-            String recipientName = event.customerName() != null ? event.customerName() : "Pelanggan RegarSport";
+            String recipientEmail = event.customerEmail() != null ? event.customerEmail() : "customer@regarstore.com";
+            String recipientName = event.customerName() != null ? event.customerName() : "Pelanggan RegarStore";
 
             log.info("Sending Payment Success E-Invoice to: {} for order: {}", recipientEmail, event.orderNumber());
             MimeMessage message = mailSender.createMimeMessage();
@@ -163,7 +163,7 @@ public class EmailService {
 
             helper.setFrom(FROM_EMAIL, BRAND_NAME);
             helper.setTo(recipientEmail);
-            helper.setSubject("[RegarSport] Pembayaran Berhasil & E-Invoice #" + event.orderNumber());
+            helper.setSubject("[RegarStore] Pembayaran Berhasil & E-Invoice #" + event.orderNumber());
 
             String html = """
                 <!DOCTYPE html>
@@ -182,7 +182,7 @@ public class EmailService {
                 <body>
                     <div class="container">
                         <div class="header">
-                            <h1 style="margin: 0; font-size: 24px; letter-spacing: 1px;">REGARSPORT</h1>
+                            <h1 style="margin: 0; font-size: 24px; letter-spacing: 1px;">REGARSTORE</h1>
                             <p style="margin: 4px 0 0; font-size: 12px; color: #a7f3d0; text-transform: uppercase;">Bukti Pembayaran Resmi (E-Invoice)</p>
                         </div>
                         <div class="content">
@@ -198,7 +198,7 @@ public class EmailService {
                             </div>
 
                             <p style="color: #475569; font-size: 14px; line-height: 1.6;">
-                                Pesanan Anda saat ini telah diteruskan ke antrean operasional <strong>Staf Gudang RegarSport di Wonogiri</strong> untuk proses quality control sablon dan pengemasan.
+                                Pesanan Anda saat ini telah diteruskan ke antrean operasional <strong>Staf Gudang RegarStore di Wonogiri</strong> untuk proses quality control sablon dan pengemasan.
                             </p>
 
                             <div style="text-align: center; margin-top: 32px;">
@@ -206,8 +206,8 @@ public class EmailService {
                             </div>
                         </div>
                         <div class="footer">
-                            <p style="margin: 0 0 6px;">PT REGARSPORT INDONESIA - Wonogiri, Jawa Tengah</p>
-                            <p style="margin: 0;">Layanan Pelanggan WhatsApp: +62 812-3456-7890 | Email: cs@regarsport.com</p>
+                            <p style="margin: 0 0 6px;">PT REGARSTORE INDONESIA - Wonogiri, Jawa Tengah</p>
+                            <p style="margin: 0;">Layanan Pelanggan WhatsApp: +62 812-3456-7890 | Email: cs@regarstore.com</p>
                         </div>
                     </div>
                 </body>
@@ -236,7 +236,7 @@ public class EmailService {
 
             helper.setFrom(FROM_EMAIL, BRAND_NAME);
             helper.setTo(event.customerEmail());
-            helper.setSubject("[RegarSport] Pesanan #" + event.orderNumber() + " Sedang Dikirim (" + event.shippingCourier() + ")");
+            helper.setSubject("[RegarStore] Pesanan #" + event.orderNumber() + " Sedang Dikirim (" + event.shippingCourier() + ")");
 
             String html = """
                 <!DOCTYPE html>
@@ -255,7 +255,7 @@ public class EmailService {
                 <body>
                     <div class="container">
                         <div class="header">
-                            <h1 style="margin: 0; font-size: 24px; letter-spacing: 1px;">REGARSPORT</h1>
+                            <h1 style="margin: 0; font-size: 24px; letter-spacing: 1px;">REGARSTORE</h1>
                             <p style="margin: 4px 0 0; font-size: 12px; color: #bfdbfe; text-transform: uppercase;">Paket Anda Dalam Perjalanan</p>
                         </div>
                         <div class="content">
@@ -280,7 +280,7 @@ public class EmailService {
                             </div>
                         </div>
                         <div class="footer">
-                            <p style="margin: 0 0 6px;">PT REGARSPORT INDONESIA - Wonogiri, Jawa Tengah</p>
+                            <p style="margin: 0 0 6px;">PT REGARSTORE INDONESIA - Wonogiri, Jawa Tengah</p>
                             <p style="margin: 0;">Garansi 100%% Ukuran Pas & Tukar Ukuran: WhatsApp +62 812-3456-7890</p>
                         </div>
                     </div>

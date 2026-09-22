@@ -38,6 +38,7 @@ import { useWishlist } from "../../context/WishlistContext";
 import NavDrawer from "../../components/customer/NavDrawer";
 import CartSlideOver from "../../components/customer/CartSlideOver";
 import QuickSearchModal from "../../components/customer/QuickSearchModal";
+import RegarStoreLogo from "../../components/common/RegarStoreLogo";
 
 export default function Landing() {
   const navigate = useNavigate();
@@ -75,7 +76,7 @@ export default function Landing() {
   // Coupon / Newsletter state
   const [newsletterEmail, setNewsletterEmail] = useState("");
   const [couponClaimed, setCouponClaimed] = useState(() => {
-    return localStorage.getItem("regarsport_coupon_claimed") === "true";
+    return localStorage.getItem("regarstore_coupon_claimed") === "true";
   });
   const [couponCopied, setCouponCopied] = useState(false);
 
@@ -115,7 +116,7 @@ export default function Landing() {
 
   const handleCustomWhatsApp = () => {
     const msg = encodeURIComponent(
-      "Halo Tim Desain RegarSport Cicendo Bandung, saya ingin konsultasi pembuatan custom jersey tim olahraga kami. Mohon info katalog bahan dry-fit dan pricelist."
+      "Halo Tim Desain RegarStore Cicendo Bandung, saya ingin konsultasi pembuatan custom jersey tim olahraga kami. Mohon info katalog bahan dry-fit dan pricelist."
     );
     window.open(`https://wa.me/6281234567890?text=${msg}`, "_blank");
   };
@@ -126,8 +127,8 @@ export default function Landing() {
       toast.error("Mohon masukkan format email yang valid!");
       return;
     }
-    localStorage.setItem("regarsport_subscriber", newsletterEmail);
-    localStorage.setItem("regarsport_coupon_claimed", "true");
+    localStorage.setItem("regarstore_subscriber", newsletterEmail);
+    localStorage.setItem("regarstore_coupon_claimed", "true");
     setCouponClaimed(true);
     setShowCouponModal(true);
     toast.success("Kupon eksklusif REGARJUARA berhasil diaktifkan!");
@@ -207,19 +208,14 @@ export default function Landing() {
           </div>
 
           {/* Center: Shield Crest Brand Emblem */}
-          <Link to="/" className="flex items-center gap-2.5 group">
-            {/* Tactical Crest SVG Emblem */}
-            <div className="relative w-9 h-10 bg-[#B9382B] rounded-b-xl flex items-center justify-center shadow-lg shadow-[#B9382B]/20 group-hover:scale-105 transition-transform">
-              <div className="w-5 h-5 border-2 border-white transform rotate-45 flex items-center justify-center">
-                <span className="text-[10px] font-black transform -rotate-45 text-white">
-                  R
-                </span>
-              </div>
+          <Link to="/" className="flex items-center gap-3 group">
+            <div className="group-hover:scale-105 transition-transform drop-shadow-md">
+              <RegarStoreLogo size={40} />
             </div>
 
             <div className="text-left">
               <span className="font-condensed text-2xl sm:text-3xl font-extrabold tracking-tight uppercase text-white block leading-none">
-                REGARSPORT
+                REGARSTORE
               </span>
               <span className="text-[9px] font-bold uppercase tracking-[2px] text-emerald-400/90 block">
                 APPAREL • CICENDO BANDUNG
@@ -436,7 +432,7 @@ export default function Landing() {
 
               <p className="text-sm sm:text-base text-slate-300 max-w-xl mx-auto lg:mx-0 leading-relaxed font-normal">
                 Pusat apparel & jersey olahraga custom berstandar profesional.
-                Dibuat langsung di atelier PT RegarSport Indonesia (Cicendo, Kota Bandung) dengan
+                Dibuat langsung di atelier PT RegarStore Indonesia (Cicendo, Kota Bandung) dengan
                 bahan Dry-Fit Microfiber berpori aktif, sublimasi permanen anti-luntur,
                 dan komitmen garansi tukar ukuran 100%.
               </p>
@@ -503,7 +499,7 @@ export default function Landing() {
                 <div className="relative aspect-4/5 overflow-hidden">
                   <img
                     src="/images/hero-athlete.jpg"
-                    alt="RegarSport Pro Athlete"
+                    alt="RegarStore Pro Athlete"
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-[#162018] via-transparent to-black/30" />
@@ -511,7 +507,7 @@ export default function Landing() {
                   {/* Floating Crest Badge */}
                   <div className="absolute top-4 left-4 flex items-center gap-2 bg-black/70 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/15 text-[11px] font-bold text-white uppercase tracking-wider">
                     <Award size={14} className="text-[#B9382B]" />
-                    <span>REGARSPORT PRO ELITE SERIES</span>
+                    <span>REGARSTORE PRO ELITE SERIES</span>
                   </div>
 
                   {/* Bottom Card Information */}
@@ -725,7 +721,7 @@ export default function Landing() {
                     <div className="p-5 flex-1 flex flex-col justify-between space-y-3">
                       <div>
                         <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                          {prod.categoryName || prod.category?.name || "RegarSport Apparel"}
+                          {prod.categoryName || prod.category?.name || "RegarStore Apparel"}
                         </div>
                         <Link to={`/dashboard/product/${prod.id}`}>
                           <h4 className="font-condensed text-lg font-bold text-slate-900 line-clamp-1 group-hover:text-emerald-800 transition-colors mt-0.5">
@@ -797,7 +793,7 @@ export default function Landing() {
               <div className="relative rounded-3xl overflow-hidden shadow-2xl border border-white/15 aspect-16/10">
                 <img
                   src="/images/story-factory.jpg"
-                  alt="Atelier RegarSport Cicendo Bandung"
+                  alt="Atelier RegarStore Cicendo Bandung"
                   className="w-full h-full object-cover"
                 />
                 <div className="absolute bottom-4 left-4 bg-black/70 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-white/15 text-[10px] font-bold text-white uppercase tracking-wider">
@@ -818,7 +814,7 @@ export default function Landing() {
               </h2>
 
               <p className="text-sm text-slate-300 leading-relaxed">
-                Di RegarSport, kami tidak sekadar menjual jersey. Kami mengoperasikan
+                Di RegarStore, kami tidak sekadar menjual jersey. Kami mengoperasikan
                 fasilitas manufaktur & atelier tekstil terpadu di Cicendo, Kota Bandung. Mulai
                 dari riset kain Dry-Fit berpori aktif, pencetakan tinta sublimasi
                 standar OEKO-TEX ramah lingkungan, hingga penjahitan presisi tinggi
@@ -853,7 +849,7 @@ export default function Landing() {
               STANDAR MUTU UTAMA
             </span>
             <h2 className="font-condensed text-3xl sm:text-4xl font-extrabold uppercase tracking-tight text-[#111613] mt-1">
-              MENGAPA 10.000+ TIM MEMILIH REGARSPORT?
+              MENGAPA 10.000+ TIM MEMILIH REGARSTORE?
             </h2>
           </div>
 
@@ -1021,7 +1017,7 @@ export default function Landing() {
                   KUPON EKSKLUSIF & RILIS SERI BARU
                 </span>
                 <h3 className="font-condensed text-2xl sm:text-3xl font-bold uppercase tracking-tight text-white">
-                  GABUNG DENGAN KOMUNITAS ATLET REGARSPORT
+                  GABUNG DENGAN KOMUNITAS ATLET REGARSTORE
                 </h3>
                 <p className="text-xs text-slate-400 max-w-lg">
                   Daftarkan email kapten atau manajer tim Anda untuk langsung mengklaim kupon diskon 15% serta info rilis jersey terbaru.
@@ -1055,12 +1051,10 @@ export default function Landing() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 text-xs text-slate-400">
             {/* Brand & Atelier Info Column */}
             <div className="space-y-3.5">
-              <div className="flex items-center gap-2">
-                <div className="w-7 h-8 bg-[#B9382B] rounded-b-lg flex items-center justify-center shadow">
-                  <span className="text-[10px] font-black text-white">R</span>
-                </div>
+              <div className="flex items-center gap-2.5">
+                <RegarStoreLogo size={32} />
                 <span className="font-condensed text-xl font-bold uppercase tracking-wider text-white">
-                  PT REGARSPORT INDONESIA
+                  PT REGARSTORE INDONESIA
                 </span>
               </div>
               <p className="text-[11px] leading-relaxed text-slate-300">
@@ -1197,7 +1191,7 @@ export default function Landing() {
                 </li>
                 <li>
                   <a
-                    href="https://wa.me/6281234567890?text=Halo%20RegarSport,%20saya%20ingin%20konsultasi%20layanan%20dan%20garansi"
+                    href="https://wa.me/6281234567890?text=Halo%20RegarStore,%20saya%20ingin%20konsultasi%20layanan%20dan%20garansi"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-emerald-400 font-semibold hover:underline flex items-center gap-1"
@@ -1251,7 +1245,7 @@ export default function Landing() {
           {/* Copyright Bar */}
           <div className="pt-8 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between text-[11px] text-slate-500 gap-3">
             <div>
-              © {new Date().getFullYear()} PT RegarSport Indonesia. Hak Cipta Dilindungi Undang-Undang.
+              © {new Date().getFullYear()} PT RegarStore Indonesia. Hak Cipta Dilindungi Undang-Undang.
             </div>
             <div className="flex flex-wrap items-center gap-4">
               <Link to="/dashboard/about" className="hover:text-white transition-colors">Tentang Perusahaan</Link>
@@ -1291,7 +1285,7 @@ export default function Landing() {
               <div className="flex items-center gap-2">
                 <Tag size={14} className="text-emerald-400 shrink-0" />
                 <span className="font-condensed text-lg font-bold tracking-wider uppercase text-emerald-300">
-                  VOUCHER EKSKLUSIF REGARSPORT
+                  VOUCHER EKSKLUSIF REGARSTORE
                 </span>
               </div>
               <button
@@ -1311,7 +1305,7 @@ export default function Landing() {
                 DISKON 15% PEMESANAN TIM
               </h4>
               <p className="text-xs text-slate-300 leading-relaxed">
-                Kupon ini berlaku untuk seluruh koleksi jersey ready stock &amp; custom di RegarSport Cicendo Bandung. Sudah termasuk gratis kustom nama dan nomor punggung pemain!
+                Kupon ini berlaku untuk seluruh koleksi jersey ready stock &amp; custom di RegarStore Cicendo Bandung. Sudah termasuk gratis kustom nama dan nomor punggung pemain!
               </p>
             </div>
 
@@ -1375,7 +1369,7 @@ export default function Landing() {
             </div>
 
             <p className="text-xs text-slate-300 leading-relaxed">
-              Standar ukuran jersey RegarSport dirancang pas di badan atlet (Athletic Slim-Fit) dengan bahan Dry-Fit Microfiber berpori aktif yang memiliki kelenturan 4-way stretch.
+              Standar ukuran jersey RegarStore dirancang pas di badan atlet (Athletic Slim-Fit) dengan bahan Dry-Fit Microfiber berpori aktif yang memiliki kelenturan 4-way stretch.
             </p>
 
             <div className="overflow-x-auto rounded-2xl border border-white/10 bg-black/40">
@@ -1470,7 +1464,7 @@ export default function Landing() {
 
             <div className="space-y-3 text-xs text-slate-300 leading-relaxed">
               <p>
-                RegarSport Atelier Cicendo Bandung menjamin setiap kapten tim mendapatkan jersey dengan ukuran yang benar-benar pas untuk bertanding.
+                RegarStore Atelier Cicendo Bandung menjamin setiap kapten tim mendapatkan jersey dengan ukuran yang benar-benar pas untuk bertanding.
               </p>
 
               <div className="space-y-2.5 pt-1">
@@ -1515,7 +1509,7 @@ export default function Landing() {
                 Tutup
               </button>
               <a
-                href="https://wa.me/6281234567890?text=Halo%20Admin%20RegarSport,%20saya%20ingin%20klaim%20garansi%20tukar%20ukuran%20jersey%20tim"
+                href="https://wa.me/6281234567890?text=Halo%20Admin%20RegarStore,%20saya%20ingin%20klaim%20garansi%20tukar%20ukuran%20jersey%20tim"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="py-3 text-center rounded-xl bg-emerald-500 hover:bg-emerald-400 text-[#0F1712] font-black text-xs uppercase tracking-wider transition-all shadow-lg shadow-emerald-500/20"

@@ -133,7 +133,7 @@ export default function WarrantyClaimModal({ isOpen, onClose, order, onSuccess }
       SOLUTIONS.find((s) => s.id === submittedClaim.solution)?.label ||
       submittedClaim.solution;
 
-    let text = `Halo Customer Care PT RegarSport Indonesia,\n\nSaya telah mengajukan *Klaim Garansi Resmi* melalui website:\n`;
+    let text = `Halo Customer Care PT RegarStore Indonesia,\n\nSaya telah mengajukan *Klaim Garansi Resmi* melalui website:\n`;
     text += `• *No. Tiket Klaim*: ${submittedClaim.claimNumber}\n`;
     text += `• *No. Pesanan*: ${submittedClaim.orderNumber}\n`;
     text += `• *Produk*: ${submittedClaim.productName}\n`;
@@ -359,7 +359,7 @@ export default function WarrantyClaimModal({ isOpen, onClose, order, onSuccess }
                   ))}
                 </div>
                 <p className="text-[11px] font-mono text-slate-400 leading-relaxed">
-                  💡 RegarSport akan memproduksi dan mengirimkan ukuran baru pengganti setelah konfirmasi verifikasi klaim.
+                  💡 RegarStore akan memproduksi dan mengirimkan ukuran baru pengganti setelah konfirmasi verifikasi klaim.
                 </p>
               </div>
             )}

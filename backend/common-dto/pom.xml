@@ -14,7 +14,7 @@
     <artifactId>common-dto</artifactId>
     <packaging>jar</packaging>
     <name>common-dto</name>
-    <description>Shared DTOs, Event Models, and Response Wrappers for RegarSport</description>
+    <description>Shared DTOs, Event Models, and Response Wrappers for RegarStore</description>
 
     <dependencies>
         <dependency>

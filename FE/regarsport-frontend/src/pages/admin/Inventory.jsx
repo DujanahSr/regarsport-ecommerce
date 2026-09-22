@@ -133,7 +133,7 @@ export default function Inventory() {
         <div className="absolute inset-0 z-0">
           <img
             src="/images/inventory_hero_bg.jpg"
-            alt="RegarSport Inventory Atelier"
+            alt="RegarStore Inventory Atelier"
             className="w-full h-full object-cover object-center filter brightness-[0.38] contrast-125"
           />
           <div className="absolute inset-0 bg-gradient-to-r from-[#162018] via-[#162018]/85 to-transparent" />
@@ -448,7 +448,7 @@ export default function Inventory() {
                 </div>
                 <div>
                   <h3 className="text-base font-bold text-slate-900">Tambah Stok Masuk Konveksi</h3>
-                  <p className="text-[11px] text-stone-500">Penerimaan barang fisik dari pabrik RegarSport</p>
+                  <p className="text-[11px] text-stone-500">Penerimaan barang fisik dari pabrik RegarStore</p>
                 </div>
               </div>
               <button
