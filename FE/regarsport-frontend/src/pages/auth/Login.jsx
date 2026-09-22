@@ -10,12 +10,12 @@ import {
   EyeOff,
   ShieldCheck,
   CheckCircle2,
-  Sparkles,
   Compass,
 } from "lucide-react";
 import api from "../../services/api";
 import { useAuth } from "../../context/AuthContext";
 import toast from "react-hot-toast";
+import ForgotPasswordModal from "../../components/auth/ForgotPasswordModal";
 
 const TICKER_ITEMS = [
   "TACTICAL ATHLETICS",
@@ -34,6 +34,7 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [isForgotModalOpen, setIsForgotModalOpen] = useState(false);
   const emailRef = useRef(null);
 
   useEffect(() => {
@@ -138,7 +139,7 @@ export default function Login() {
             </Link>
 
             <div className="flex items-center gap-2 text-[10px] font-mono uppercase tracking-widest text-emerald-400/80 bg-emerald-950/60 border border-emerald-500/30 px-3 py-1 rounded-full">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              <span className="px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 font-mono text-[9px] font-bold border border-emerald-500/40">RS-BDG</span>
               ATELIER // CICENDO BANDUNG
             </div>
           </div>
@@ -294,6 +295,13 @@ export default function Login() {
                 >
                   Kata Sandi
                 </label>
+                <button
+                  type="button"
+                  onClick={() => setIsForgotModalOpen(true)}
+                  className="text-[11px] font-mono text-emerald-400 hover:text-emerald-300 transition-colors uppercase tracking-wider cursor-pointer"
+                >
+                  Lupa Kata Sandi?
+                </button>
               </div>
               <div className="relative flex items-center bg-[#18221B] border border-white/10 rounded-xl focus-within:border-emerald-400 focus-within:ring-2 focus-within:ring-emerald-400/20 transition-all">
                 <Lock size={16} className="text-[#FAF8F4]/40 ml-4 pointer-events-none" />
@@ -369,12 +377,24 @@ export default function Login() {
               <span>Official Atelier</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <Sparkles size={14} className="text-emerald-400" />
+              <Compass size={14} className="text-emerald-400" />
               <span>Cicendo BDO</span>
             </div>
           </div>
         </div>
       </div>
+
+      {/* Forgot Password Modal */}
+      <ForgotPasswordModal
+        isOpen={isForgotModalOpen}
+        onClose={() => setIsForgotModalOpen(false)}
+        defaultEmail={form.email}
+        onPasswordReset={(newPass) => {
+          setForm((prev) => ({ ...prev, password: newPass }));
+          setIsForgotModalOpen(false);
+          toast.success("Kata sandi berhasil diperbarui! Silakan klik 'Masuk Sekarang'.");
+        }}
+      />
     </div>
   );
 }

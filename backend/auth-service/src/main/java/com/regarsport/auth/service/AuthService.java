@@ -32,6 +32,8 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final UserMapper userMapper;
+    private final com.regarsport.auth.repository.PasswordResetTokenRepository passwordResetTokenRepository;
+    private final AuthEmailService authEmailService;
 
     @Transactional
     public AuthResponse register(RegisterRequest request) {
@@ -239,5 +241,78 @@ public class AuthService {
         long admins = userRepository.countByRole(Role.ROLE_ADMIN);
         long customers = userRepository.countByRole(Role.ROLE_CUSTOMER);
         return new UserStatsResponse(total, admins, customers);
+    }
+
+    @Transactional
+    public java.util.Map<String, Object> forgotPassword(ForgotPasswordRequest request) {
+        String email = request.email().trim().toLowerCase();
+        log.info("Processing forgot password request for email: {}", email);
+
+        User user = userRepository.findByEmailIgnoreCase(email)
+                .orElseThrow(() -> new ResourceNotFoundException("Akun dengan email " + email + " tidak ditemukan di sistem kami."));
+
+        // Invalidate any previously generated pending reset tokens
+        passwordResetTokenRepository.invalidateAllActiveTokensForEmail(email);
+
+        // Generate 6-digit numeric OTP code
+        String resetCode = String.format("%06d", java.util.concurrent.ThreadLocalRandom.current().nextInt(100000, 1000000));
+
+        com.regarsport.auth.entity.PasswordResetToken resetToken = com.regarsport.auth.entity.PasswordResetToken.builder()
+                .email(email)
+                .token(resetCode)
+                .expiryDate(java.time.Instant.now().plus(java.time.Duration.ofMinutes(15)))
+                .used(false)
+                .build();
+        passwordResetTokenRepository.save(resetToken);
+
+        // Send official HTML reset email via Mailpit / SMTP
+        authEmailService.sendPasswordResetEmail(email, user.getFullName(), resetCode);
+
+        log.info("Generated password reset OTP for {}: {}", email, resetCode);
+        return java.util.Map.of(
+                "email", email,
+                "resetCode", resetCode,
+                "message", "Kode verifikasi telah dikirim ke email " + email + ". Kode berlaku selama 15 menit."
+        );
+    }
+
+    public boolean verifyResetToken(VerifyResetTokenRequest request) {
+        String email = request.email().trim().toLowerCase();
+        String tokenStr = request.token().trim();
+
+        com.regarsport.auth.entity.PasswordResetToken token = passwordResetTokenRepository
+                .findFirstByEmailAndTokenAndUsedFalseOrderByCreatedAtDesc(email, tokenStr)
+                .orElseThrow(() -> new BadRequestException("Kode verifikasi tidak valid atau sudah digunakan. Silakan periksa kembali atau minta kode baru."));
+
+        if (token.isExpired()) {
+            throw new BadRequestException("Kode verifikasi telah kedaluwarsa (melebihi 15 menit). Silakan minta kode baru.");
+        }
+
+        return true;
+    }
+
+    @Transactional
+    public void resetPassword(ResetPasswordRequest request) {
+        String email = request.email().trim().toLowerCase();
+        String tokenStr = request.token().trim();
+
+        com.regarsport.auth.entity.PasswordResetToken token = passwordResetTokenRepository
+                .findFirstByEmailAndTokenAndUsedFalseOrderByCreatedAtDesc(email, tokenStr)
+                .orElseThrow(() -> new BadRequestException("Kode verifikasi tidak valid atau sudah digunakan."));
+
+        if (token.isExpired()) {
+            throw new BadRequestException("Kode verifikasi telah kedaluwarsa (melebihi 15 menit). Silakan minta kode baru.");
+        }
+
+        User user = userRepository.findByEmailIgnoreCase(email)
+                .orElseThrow(() -> new ResourceNotFoundException("User tidak ditemukan dengan email: " + email));
+
+        user.setPassword(passwordEncoder.encode(request.newPassword()));
+        userRepository.save(user);
+
+        token.setUsed(true);
+        passwordResetTokenRepository.save(token);
+
+        log.info("Password successfully reset and updated for user: {}", email);
     }
 }

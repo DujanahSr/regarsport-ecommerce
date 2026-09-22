@@ -1,0 +1,91 @@
+package com.regarsport.auth.service;
+
+import jakarta.mail.internet.MimeMessage;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.stereotype.Service;
+
+@Slf4j
+@Service
+@RequiredArgsConstructor
+public class AuthEmailService {
+
+    private final JavaMailSender mailSender;
+    private static final String FROM_EMAIL = "noreply@regarsport.com";
+    private static final String BRAND_NAME = "RegarSport Official";
+
+    public void sendPasswordResetEmail(String recipientEmail, String recipientName, String resetCode) {
+        try {
+            log.info("Preparing Password Reset Email for: {} with code: {}", recipientEmail, resetCode);
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+
+            helper.setFrom(FROM_EMAIL, BRAND_NAME);
+            helper.setTo(recipientEmail);
+            helper.setSubject("[RegarSport] Kode Reset Kata Sandi Akun Anda: " + resetCode);
+
+            String displayName = (recipientName != null && !recipientName.isBlank()) ? recipientName : "Sahabat Atlet RegarSport";
+
+            String html = String.format("""
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <meta charset="utf-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <style>
+                        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #0b110e; margin: 0; padding: 24px; color: #FAF8F4; }
+                        .container { max-width: 580px; margin: 0 auto; background: #141c16; border: 1px solid rgba(255,255,255,0.12); border-radius: 20px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
+                        .header { background: #18221B; padding: 32px 24px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); }
+                        .content { padding: 36px 30px; }
+                        .badge { background: #059669; color: #ffffff; padding: 6px 14px; border-radius: 9999px; font-size: 11px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; display: inline-block; }
+                        .code-box { background: #0b110e; border: 2px dashed #10B981; border-radius: 14px; padding: 20px; text-align: center; margin: 28px 0; }
+                        .code-number { font-family: 'Courier New', Courier, monospace; font-size: 36px; font-weight: 900; letter-spacing: 10px; color: #34D399; margin: 0; }
+                        .footer { background: #0e1611; padding: 24px; text-align: center; font-size: 12px; color: #8a9c90; border-top: 1px solid rgba(255,255,255,0.06); }
+                    </style>
+                </head>
+                <body>
+                    <div class="container">
+                        <div class="header">
+                            <h1 style="margin: 0; font-size: 24px; font-weight: 900; letter-spacing: 2px; color: #ffffff;">REGARSPORT</h1>
+                            <p style="margin: 6px 0 0; font-size: 11px; color: #34D399; letter-spacing: 1px; text-transform: uppercase; font-weight: 700;">Atelier Cicendo Bandung • Official Security</p>
+                        </div>
+                        <div class="content">
+                            <span class="badge">PEMULIHAN KATA SANDI</span>
+                            <h2 style="color: #ffffff; margin-top: 18px; font-size: 20px; font-weight: 700;">Halo, %s</h2>
+                            <p style="color: #cbd5e1; font-size: 14px; line-height: 1.6; margin-top: 8px;">
+                                Kami menerima permintaan untuk mengatur ulang kata sandi akun RegarSport Anda. Gunakan 6-digit kode verifikasi berikut untuk melanjutkan proses reset kata sandi:
+                            </p>
+
+                            <div class="code-box">
+                                <p style="font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: #94a3b8; margin: 0 0 8px 0; font-weight: 600;">KODE VERIFIKASI RESMI</p>
+                                <p class="code-number">%s</p>
+                                <p style="font-size: 11px; color: #64748b; margin: 8px 0 0 0;">Berlaku selama 15 menit</p>
+                            </div>
+
+                            <p style="color: #94a3b8; font-size: 13px; line-height: 1.6;">
+                                Masukkan kode di atas pada formulir reset kata sandi di situs toko RegarSport.
+                            </p>
+                            <p style="color: #64748b; font-size: 12px; line-height: 1.5; margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 16px;">
+                                ⚠️ Jika Anda tidak merasa melakukan permintaan ini, abaikan email ini. Kata sandi akun Anda tetap aman dan tidak akan berubah.
+                            </p>
+                        </div>
+                        <div class="footer">
+                            <p style="margin: 0;">&copy; 2026 PT RegarSport Industri Indonesia. Hak cipta dilindungi.</p>
+                            <p style="margin: 4px 0 0;">Atelier Cicendo, Kota Bandung, Jawa Barat</p>
+                        </div>
+                    </div>
+                </body>
+                </html>
+                """, displayName, resetCode);
+
+            helper.setText(html, true);
+            mailSender.send(message);
+            log.info("Password Reset Email sent successfully to: {}", recipientEmail);
+        } catch (Exception e) {
+            log.warn("Could not send email via SMTP (Mailpit): {}. Code was: {}", e.getMessage(), resetCode);
+        }
+    }
+}

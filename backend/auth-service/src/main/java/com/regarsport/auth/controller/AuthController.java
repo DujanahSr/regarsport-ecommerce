@@ -73,4 +73,34 @@ public class AuthController {
         authService.changePassword(userDetails.getUsername(), request);
         return ResponseEntity.ok(ApiResponse.success("Password berhasil diperbarui", null));
     }
+
+    @PostMapping("/forgot-password")
+    @Operation(summary = "Request password reset", description = "Send 6-digit OTP code to email for password reset")
+    public ResponseEntity<ApiResponse<java.util.Map<String, Object>>> forgotPassword(
+            @Valid @RequestBody ForgotPasswordRequest request
+    ) {
+        java.util.Map<String, Object> result = authService.forgotPassword(request);
+        return ResponseEntity.ok(ApiResponse.success(
+                "Kode verifikasi telah dikirim ke email " + request.email() + ". Silakan periksa kotak masuk atau spam.",
+                result
+        ));
+    }
+
+    @PostMapping("/verify-reset-token")
+    @Operation(summary = "Verify reset token", description = "Verify if 6-digit OTP reset token is valid and not expired")
+    public ResponseEntity<ApiResponse<Boolean>> verifyResetToken(
+            @Valid @RequestBody VerifyResetTokenRequest request
+    ) {
+        boolean valid = authService.verifyResetToken(request);
+        return ResponseEntity.ok(ApiResponse.success("Kode verifikasi valid", valid));
+    }
+
+    @PostMapping("/reset-password")
+    @Operation(summary = "Reset password", description = "Reset account password using valid OTP reset token")
+    public ResponseEntity<ApiResponse<Void>> resetPassword(
+            @Valid @RequestBody ResetPasswordRequest request
+    ) {
+        authService.resetPassword(request);
+        return ResponseEntity.ok(ApiResponse.success("Kata sandi berhasil diperbarui. Silakan masuk menggunakan kata sandi baru Anda.", null));
+    }
 }

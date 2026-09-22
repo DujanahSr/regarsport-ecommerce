@@ -11,7 +11,6 @@ import {
   EyeOff,
   ShieldCheck,
   CheckCircle2,
-  Sparkles,
   Compass,
 } from "lucide-react";
 import api from "../../services/api";
@@ -119,7 +118,7 @@ export default function Register() {
             </Link>
 
             <div className="flex items-center gap-2 text-[10px] font-mono uppercase tracking-widest text-emerald-400/80 bg-emerald-950/60 border border-emerald-500/30 px-3 py-1 rounded-full">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              <span className="px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 font-mono text-[9px] font-bold border border-emerald-500/40">RS-BDG</span>
               ATELIER // CICENDO BANDUNG
             </div>
           </div>
@@ -365,7 +364,7 @@ export default function Register() {
               <span>Garansi 100%</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <Sparkles size={14} className="text-emerald-400" />
+              <Compass size={14} className="text-emerald-400" />
               <span>Cicendo BDO</span>
             </div>
           </div>

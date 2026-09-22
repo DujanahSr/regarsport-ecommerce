@@ -16,6 +16,7 @@ import About from "./pages/customer/About";
 
 const Login = lazy(() => import("./pages/auth/Login"));
 const Register = lazy(() => import("./pages/auth/Register"));
+const ForgotPassword = lazy(() => import("./pages/auth/ForgotPassword"));
 const Dashboard = lazy(() => import("./pages/admin/Dashboard"));
 const Categories = lazy(() => import("./pages/admin/Categories"));
 const Products = lazy(() => import("./pages/admin/Products"));
@@ -73,6 +74,11 @@ export default function App() {
                 <Route
                   path="/register"
                   element={<Register />}
+                />
+
+                <Route
+                  path="/forgot-password"
+                  element={<ForgotPassword />}
                 />
 
                 {/* CUSTOMER SHOP & BROWSING (PUBLIC ACCESS) */}
