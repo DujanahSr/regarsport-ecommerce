@@ -25,6 +25,7 @@ import {
   ExternalLink,
   PieChart as PieChartIcon,
   FileText,
+  Activity,
 } from 'lucide-react';
 import { jsPDF } from 'jspdf';
 import {
@@ -703,62 +704,113 @@ export default function Dashboard() {
           </ResponsiveContainer>
         </div>
 
-        {/* Donut Chart: Order Status Distribution (Span 1) */}
+        {/* Executive Fulfillment Telemetry & Efficiency (Bespoke Enterprise Metric Widget) */}
         <div className="bg-white border border-stone-200/80 rounded-3xl p-6 sm:p-7 shadow-xs flex flex-col justify-between">
           <div>
-            <div className="flex items-center gap-3 mb-6">
-              <div className="bg-stone-100 p-2.5 rounded-2xl text-[#162018]">
-                <PieChartIcon size={20} />
+            <div className="flex items-center justify-between mb-5">
+              <div className="flex items-center gap-3">
+                <div className="bg-stone-100 p-2.5 rounded-2xl text-[#162018]">
+                  <Activity size={20} />
+                </div>
+                <div>
+                  <h2 className="text-base sm:text-lg font-bold text-slate-900 font-['Barlow_Condensed'] uppercase tracking-wide">
+                    Efisiensi &amp; Rasio Fulfillment
+                  </h2>
+                  <p className="text-xs text-stone-500">Tingkat konversi &amp; realisasi pesanan toko</p>
+                </div>
               </div>
-              <div>
-                <h2 className="text-base sm:text-lg font-bold text-slate-900 font-['Barlow_Condensed'] uppercase tracking-wide">
-                  Rasio Status Pesanan
-                </h2>
-                <p className="text-xs text-stone-500">Komposisi pesanan &amp; tingkat konversi</p>
+              <span className="px-2.5 py-1 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider bg-emerald-50 text-emerald-800 border border-emerald-200">
+                LIVE
+              </span>
+            </div>
+
+            {/* Prominent Fulfillment Health Score Card */}
+            <div className="p-4 rounded-2xl bg-stone-50/80 border border-stone-200/80 mb-5">
+              <div className="flex items-end justify-between">
+                <div>
+                  <span className="text-[10px] font-mono uppercase tracking-wider text-stone-500 font-bold block mb-1">
+                    Fulfillment Success Rate
+                  </span>
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-4xl font-black text-slate-900 font-['Barlow_Condensed'] tracking-tight">
+                      {stats.completionRate}%
+                    </span>
+                    <span className="text-xs font-semibold text-emerald-700 bg-emerald-100/60 px-2 py-0.5 rounded-md">
+                      Optimal
+                    </span>
+                  </div>
+                </div>
+                <div className="text-right text-[11px] font-mono text-stone-500">
+                  <span className="font-bold text-slate-900">{stats.completedOrders}</span> dari <span className="font-bold text-slate-900">{stats.orders}</span> order sukses
+                </div>
+              </div>
+
+              {/* Multi-segment continuous horizontal telemetry bar */}
+              <div className="w-full h-3 rounded-full bg-stone-200 overflow-hidden flex gap-0.5 mt-3 p-0.5">
+                {statusDistribution.map((item, idx) => {
+                  const pct = stats.orders > 0 ? (item.value / stats.orders) * 100 : 0;
+                  if (pct === 0) return null;
+                  return (
+                    <div
+                      key={idx}
+                      className="h-full rounded-xs transition-all duration-500 hover:opacity-80"
+                      style={{
+                        width: `${pct}%`,
+                        backgroundColor: item.color,
+                      }}
+                      title={`${item.name}: ${item.value} order (${Math.round(pct)}%)`}
+                    />
+                  );
+                })}
               </div>
             </div>
 
-            <ResponsiveContainer width="100%" height={230}>
-              <PieChart>
-                <Pie
-                  data={statusDistribution}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={60}
-                  outerRadius={85}
-                  paddingAngle={4}
-                  dataKey="value"
-                >
-                  {statusDistribution.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color || '#162018'} />
-                  ))}
-                </Pie>
-                <Tooltip
-                  formatter={(value, name) => [`${value} pesanan`, name]}
-                  contentStyle={{
-                    backgroundColor: '#162018',
-                    border: '1px solid rgba(255, 255, 255, 0.1)',
-                    borderRadius: '16px',
-                    color: '#FAF8F4'
-                  }}
-                />
-              </PieChart>
-            </ResponsiveContainer>
+            {/* Interactive Breakdown List with Micro Progress Bars */}
+            <div className="space-y-3">
+              {statusDistribution.map((item, idx) => {
+                const pct = stats.orders > 0 ? Math.round((item.value / stats.orders) * 100) : 0;
+                return (
+                  <div
+                    key={idx}
+                    onClick={() => navigate('/admin/orders')}
+                    className="group p-2.5 rounded-xl hover:bg-stone-50 border border-transparent hover:border-stone-200 transition-all cursor-pointer"
+                  >
+                    <div className="flex items-center justify-between text-xs mb-1.5">
+                      <div className="flex items-center gap-2">
+                        <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: item.color }} />
+                        <span className="text-slate-800 font-semibold group-hover:text-[#B9382B] transition-colors">{item.name}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="font-bold text-slate-900 font-mono">{item.value} <span className="text-stone-400 font-normal">order</span></span>
+                        <span className="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-stone-100 text-stone-600">
+                          {pct}%
+                        </span>
+                      </div>
+                    </div>
+                    {/* Micro Progress Bar */}
+                    <div className="w-full h-1.5 rounded-full bg-stone-100 overflow-hidden">
+                      <div
+                        className="h-full rounded-full transition-all duration-500"
+                        style={{
+                          width: `${pct}%`,
+                          backgroundColor: item.color,
+                        }}
+                      />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
 
-          {/* Status Legend Badges */}
-          <div className="space-y-2 mt-4 pt-4 border-t border-stone-100">
-            {statusDistribution.map((item, idx) => (
-              <div key={idx} className="flex items-center justify-between text-xs">
-                <div className="flex items-center gap-2">
-                  <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: item.color }} />
-                  <span className="text-stone-600 font-medium">{item.name}</span>
-                </div>
-                <span className="font-bold text-stone-900">
-                  {item.value} <span className="text-stone-400 font-normal">({stats.orders > 0 ? Math.round((item.value / stats.orders) * 100) : 0}%)</span>
-                </span>
-              </div>
-            ))}
+          <div className="pt-4 mt-2 border-t border-stone-100 flex items-center justify-between text-[11px] text-stone-500">
+            <span>Klik status untuk filter pesanan</span>
+            <button
+              onClick={() => navigate('/admin/orders')}
+              className="font-bold text-[#B9382B] hover:underline cursor-pointer"
+            >
+              Buka Semua Order &rarr;
+            </button>
           </div>
         </div>
       </div>
