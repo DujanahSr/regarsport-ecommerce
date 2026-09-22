@@ -2,7 +2,7 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 // FRONTEND/src/pages/admin/Orders.jsx
 
-import { useCallback, useEffect, useState, useMemo } from "react";
+import { useCallback, useEffect, useState, useMemo, useRef } from "react";
 import {
   Download,
   Filter,
@@ -18,6 +18,9 @@ import {
   CheckSquare,
   Square,
   Layers,
+  RefreshCw,
+  CheckCircle2,
+  Ban,
 } from "lucide-react";
 import api from "../../services/api";
 import { EmptyState, ScreenLoader } from "../../components/common/UiStates";
@@ -59,6 +62,7 @@ export default function Orders() {
 
   // Search & Barcode Scan State
   const [searchQuery, setSearchQuery] = useState("");
+  const searchInputRef = useRef(null);
 
   // Bulk Selection & Print State
   const [selectedOrderIds, setSelectedOrderIds] = useState([]);
@@ -104,6 +108,15 @@ export default function Orders() {
     setSelectedOrderIds([]);
   }, [getOrders]);
 
+  useEffect(() => {
+    if (isLogistics) {
+      const timer = setTimeout(() => {
+        searchInputRef.current?.focus();
+      }, 150);
+      return () => clearTimeout(timer);
+    }
+  }, [isLogistics]);
+
   const filteredOrders = useMemo(() => {
     if (!searchQuery.trim()) return orders;
     const q = searchQuery.toLowerCase().trim();
@@ -144,7 +157,27 @@ export default function Orders() {
     }
   };
 
-  const updateStatus = async (id, status) => {
+  const [syncingOrderId, setSyncingOrderId] = useState(null);
+
+  const handleSyncPayment = async (order) => {
+    try {
+      setSyncingOrderId(order.id);
+      const res = await api.get(`/payments/sync/${order.orderNumber}`);
+      const st = res.data?.data?.paymentStatus || "";
+      toast.success(`Sinkronisasi Midtrans: ${st || "Berhasil diperbarui"}`);
+      getOrders();
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Gagal sinkronisasi dengan Midtrans");
+    } finally {
+      setSyncingOrderId(null);
+    }
+  };
+
+  const updateStatus = async (id, status, currentStatus) => {
+    if (currentStatus === "pending" && status.toLowerCase() === "paid") {
+      toast.error("Status PAID tidak dapat diubah sembarangan manual. Gunakan tombol 'Sync' untuk verifikasi Midtrans.");
+      return;
+    }
     try {
       await api.patch(`/orders/${id}/status`, { status: status.toUpperCase() });
       toast.success("Status pesanan berhasil diperbarui");
@@ -204,38 +237,130 @@ export default function Orders() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0D0D0D]">
+    <div className={isLogistics ? "space-y-8 animate-in fade-in duration-300" : "min-h-screen bg-[#0D0D0D]"}>
       {/* Header */}
-      <div className="flex items-center gap-4 mb-10">
-        <div className="relative">
-          <div className="absolute inset-0 bg-[#00BFA5]/20 blur-xl rounded-2xl" />
-          <div className="relative bg-[#00BFA5]/10 border border-[#00BFA5]/30 p-3 rounded-2xl">
-            <ShoppingCart size={28} className="text-[#00BFA5]" />
+      {isLogistics ? (
+        <div className="relative overflow-hidden rounded-3xl border border-black/10 shadow-xl bg-[#162018]">
+          <div className="absolute inset-0 z-0">
+            <img
+              src="/images/logistics_hero_bg.jpg"
+              alt="RegarSport Logistics Station"
+              className="w-full h-full object-cover object-center filter brightness-[0.38] contrast-125"
+            />
+            <div className="absolute inset-0 bg-gradient-to-r from-[#162018] via-[#162018]/85 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#162018] via-transparent to-black/30" />
+            <div className="absolute inset-0 bg-topography opacity-15 mix-blend-overlay pointer-events-none" />
+          </div>
+
+          <div className="relative z-10 p-6 sm:p-8 lg:p-10 flex flex-col justify-between min-h-[200px]">
+            <div className="flex flex-wrap items-center justify-between gap-4">
+              <div className="flex items-center gap-2">
+                <span className="px-3 py-1 rounded-full bg-white/10 text-emerald-400 font-mono text-[10px] font-black tracking-widest border border-white/10 uppercase">
+                  RS // PACKING &amp; DISPATCH STATION
+                </span>
+                <span className="text-[11px] font-mono uppercase tracking-widest text-slate-300">
+                  ATELIER CICENDO HUB
+                </span>
+              </div>
+
+              <button
+                onClick={getOrders}
+                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold transition-all border border-white/10 shadow-xs cursor-pointer active:scale-95"
+              >
+                <RefreshCw size={13} className={loading ? "animate-spin" : ""} />
+                <span>Refresh Antrean</span>
+              </button>
+            </div>
+
+            <div className="my-3 max-w-3xl">
+              <h1 className="font-['Barlow_Condensed'] font-black text-3xl sm:text-5xl uppercase tracking-tight text-white leading-none">
+                LOGISTIK &amp; PENGIRIMAN
+              </h1>
+              <p className="text-slate-300 text-xs sm:text-sm mt-2 max-w-2xl leading-relaxed">
+                Operasional pengepakan pesanan jersey, pencetakan label resi thermal A6 berstandar ekspedisi, dan sinkronisasi status kurir.
+              </p>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-3 pt-3 border-t border-white/10 text-[11px] font-mono text-slate-300">
+              <div className="flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-emerald-400" />
+                <span>STATUS DISPATCH: ONLINE</span>
+              </div>
+              <span className="text-white/30">•</span>
+              <div className="flex items-center gap-1.5">
+                <Printer size={13} className="text-amber-400" />
+                <span>FORMAT THERMAL: A6 (100x150MM)</span>
+              </div>
+              <span className="text-white/30">•</span>
+              <div className="flex items-center gap-1.5">
+                <Truck size={13} className="text-emerald-400" />
+                <span>TERTAMPIL: {filteredOrders.length} PESANAN</span>
+              </div>
+            </div>
           </div>
         </div>
-        <div>
-          <h1 className="text-4xl font-black text-white tracking-[-1px]">
-            {isLogistics ? "LOGISTIK & PENGIRIMAN" : "ORDERS"}
-          </h1>
-          <p className="text-[#2a3a3a] text-sm">
-            {isLogistics
-              ? "Operasional packing gudang, cetak label resi thermal A6, dan update kurir"
-              : "Kelola semua pesanan pelanggan RegarSport"}
-          </p>
+      ) : (
+        <div className="flex items-center gap-4 mb-8">
+          <div className="p-3.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400">
+            <ShoppingCart size={28} />
+          </div>
+          <div>
+            <div className="flex items-center gap-2 mb-1">
+              <span className="px-2.5 py-0.5 rounded-md font-mono text-[10px] font-black tracking-widest bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
+                RS // ORDER CENTER
+              </span>
+              <span className="text-[11px] font-mono uppercase tracking-widest text-slate-400">
+                CENTRAL SALES MANAGEMENT
+              </span>
+            </div>
+            <h1 className="font-['Barlow_Condensed'] font-black text-3xl sm:text-4xl uppercase tracking-tight leading-none text-white">
+              MANAJEMEN PESANAN
+            </h1>
+            <p className="text-xs sm:text-sm mt-1.5 text-slate-400">
+              Kelola semua pesanan pelanggan RegarSport
+            </p>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Quick Filter Tabs */}
       <div className="flex items-center gap-2 overflow-x-auto pb-2 mb-6 no-scrollbar">
         {[
           { label: "Semua Pesanan", value: "" },
-          { label: "Perlu Dikemas", value: "PAID", badge: "Siap Kirim", badgeColor: "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30" },
-          { label: "Sedang Diproses", value: "PROCESSING", badgeColor: "bg-blue-500/20 text-blue-400 border border-blue-500/30" },
-          { label: "Dalam Pengiriman", value: "SHIPPED", badgeColor: "bg-purple-500/20 text-purple-400 border border-purple-500/30" },
-          { label: "Selesai", value: "COMPLETED", badgeColor: "bg-green-500/20 text-green-400 border border-green-500/30" },
-          { label: "Dibatalkan", value: "CANCELLED", badgeColor: "bg-red-500/20 text-red-400 border border-red-500/30" },
+          { label: "Perlu Dikemas", value: "PAID", badge: "Siap Kirim" },
+          { label: "Sedang Diproses", value: "PROCESSING" },
+          { label: "Dalam Pengiriman", value: "SHIPPED" },
+          { label: "Selesai", value: "COMPLETED" },
+          { label: "Dibatalkan", value: "CANCELLED" },
         ].map((tab) => {
           const isActive = (statusFilter || "").toUpperCase() === (tab.value || "").toUpperCase();
+          if (isLogistics) {
+            return (
+              <button
+                key={tab.value}
+                onClick={() => {
+                  setPage(1);
+                  setStatusFilter(tab.value);
+                }}
+                className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${
+                  isActive
+                    ? tab.value === "PAID"
+                      ? "bg-[#B9382B] text-white shadow-md"
+                      : "bg-[#162018] text-white shadow-md"
+                    : "bg-white text-stone-600 hover:text-black hover:bg-stone-100 border border-stone-200"
+                }`}
+              >
+                <span>{tab.label}</span>
+                {tab.badge && (
+                  <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${
+                    isActive ? "bg-white/20 text-white" : "bg-[#FAF0ED] text-[#B9382B] border border-[#B9382B]/20"
+                  }`}>
+                    {tab.badge}
+                  </span>
+                )}
+              </button>
+            );
+          }
           return (
             <button
               key={tab.value}
@@ -251,7 +376,7 @@ export default function Orders() {
             >
               <span>{tab.label}</span>
               {tab.badge && (
-                <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${isActive ? "bg-black/20 text-black font-black" : tab.badgeColor}`}>
+                <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${isActive ? "bg-black/20 text-black font-black" : "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"}`}>
                   {tab.badge}
                 </span>
               )}
@@ -264,20 +389,27 @@ export default function Orders() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
         {/* Barcode & Text Search */}
         <div className="flex-1 max-w-lg">
-          <div className="flex items-center bg-[#14141E] border border-white/10 rounded-2xl px-4 py-2.5 focus-within:border-[#00BFA5]/60 focus-within:bg-[#00BFA5]/5 transition-all shadow-inner">
-            <Scan size={18} className="text-[#00BFA5] mr-2.5 shrink-0 animate-pulse" />
+          <div className={`flex items-center rounded-2xl px-4 py-2.5 transition-all ${
+            isLogistics
+              ? "bg-white border border-stone-200 focus-within:border-[#162018] shadow-xs"
+              : "bg-[#14141E] border border-white/10 focus-within:border-[#00BFA5]/60 shadow-inner"
+          }`}>
+            <Scan size={18} className={`mr-2.5 shrink-0 ${isLogistics ? "text-stone-400" : "text-[#00BFA5]"}`} />
             <input
+              ref={searchInputRef}
               type="text"
               placeholder="Cari No. Order, Scan Barcode Resi, Nama, Kota, atau HP..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-transparent text-white text-xs sm:text-sm outline-none placeholder:text-white/30"
+              className={`w-full bg-transparent text-xs sm:text-sm outline-none font-mono ${
+                isLogistics ? "text-slate-900 placeholder:text-stone-400" : "text-white placeholder:text-white/30"
+              }`}
             />
             {searchQuery && (
               <button
                 type="button"
                 onClick={() => setSearchQuery("")}
-                className="text-white/40 hover:text-white ml-2 p-1"
+                className={`${isLogistics ? "text-stone-400 hover:text-black" : "text-white/40 hover:text-white"} ml-2 p-1 cursor-pointer`}
                 title="Hapus pencarian"
               >
                 <X size={15} />
@@ -292,11 +424,15 @@ export default function Orders() {
             <button
               type="button"
               onClick={toggleSelectAll}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white border border-white/5 text-xs font-semibold transition cursor-pointer"
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-semibold transition cursor-pointer ${
+                isLogistics
+                  ? "bg-white hover:bg-stone-100 text-stone-700 border border-stone-200 shadow-xs"
+                  : "bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white border border-white/5"
+              }`}
             >
               {selectedOrderIds.length > 0 && selectedOrderIds.length === filteredOrders.length ? (
                 <>
-                  <CheckSquare size={16} className="text-[#00BFA5]" />
+                  <CheckSquare size={16} className={isLogistics ? "text-emerald-800" : "text-[#00BFA5]"} />
                   <span>Batal Pilih Semua</span>
                 </>
               ) : (
@@ -333,36 +469,40 @@ export default function Orders() {
           }
         />
       ) : (
-        <div className="bg-[#14141E] border border-white/5 rounded-3xl overflow-hidden">
-          <div className="overflow-x-auto">
+        <div className={`rounded-3xl overflow-hidden shadow-sm ${
+          isLogistics
+            ? "bg-white border border-stone-200/80"
+            : "relative bg-[#14141E] border border-white/10 shadow-xl"
+        }`}>
+          <div className="overflow-x-auto relative z-10">
             <table className="w-full min-w-225">
               <thead>
-                <tr className="border-b border-white/5 bg-white/5">
-                  <th className="p-5 pl-6 text-center w-12">
+                <tr className={`border-b ${isLogistics ? "bg-stone-50 border-stone-200 text-stone-600" : "bg-white/5 border-white/5 text-slate-400"}`}>
+                  <th className={`${isLogistics ? "py-3 px-3 pl-4" : "p-5 pl-6"} text-center w-12`}>
                     <button
                       type="button"
                       onClick={toggleSelectAll}
-                      className="text-slate-400 hover:text-white cursor-pointer"
+                      className={isLogistics ? "text-stone-500 hover:text-black cursor-pointer" : "text-slate-400 hover:text-white cursor-pointer"}
                       title="Pilih semua pesanan"
                     >
                       {selectedOrderIds.length > 0 && selectedOrderIds.length === filteredOrders.length ? (
-                        <CheckSquare size={18} className="text-[#00BFA5]" />
+                        <CheckSquare size={18} className={isLogistics ? "text-emerald-800" : "text-[#00BFA5]"} />
                       ) : (
                         <Square size={18} />
                       )}
                     </button>
                   </th>
-                  <th className="p-5 text-left text-xs font-bold text-slate-400 uppercase tracking-wider">Order ID</th>
-                  <th className="p-5 text-left text-xs font-bold text-slate-400 uppercase tracking-wider">Pelanggan</th>
-                  <th className="p-5 text-left text-xs font-bold text-slate-400 uppercase tracking-wider">Item & Ukuran</th>
-                  <th className="p-5 text-left text-xs font-bold text-slate-400 uppercase tracking-wider">Total</th>
-                  <th className="p-5 text-left text-xs font-bold text-slate-400 uppercase tracking-wider">Status</th>
-                  <th className="p-5 text-left text-xs font-bold text-slate-400 uppercase tracking-wider">Pengiriman & Resi</th>
-                  <th className="p-5 text-left text-xs font-bold text-slate-400 uppercase tracking-wider">Label Logistik</th>
-                  <th className="p-5 text-left text-xs font-bold text-slate-400 uppercase tracking-wider">Ubah Status</th>
+                  <th className={`${isLogistics ? "py-3 px-3.5" : "p-5"} text-left text-xs font-bold uppercase tracking-wider`}>Order ID</th>
+                  <th className={`${isLogistics ? "py-3 px-3.5" : "p-5"} text-left text-xs font-bold uppercase tracking-wider`}>Pelanggan</th>
+                  <th className={`${isLogistics ? "py-3 px-3.5" : "p-5"} text-left text-xs font-bold uppercase tracking-wider`}>Item &amp; Ukuran</th>
+                  <th className={`${isLogistics ? "py-3 px-3.5" : "p-5"} text-left text-xs font-bold uppercase tracking-wider`}>Total</th>
+                  <th className={`${isLogistics ? "py-3 px-3.5" : "p-5"} text-left text-xs font-bold uppercase tracking-wider`}>Status</th>
+                  <th className={`${isLogistics ? "py-3 px-3.5" : "p-5"} text-left text-xs font-bold uppercase tracking-wider`}>Pengiriman &amp; Resi</th>
+                  <th className={`${isLogistics ? "py-3 px-3.5" : "p-5"} text-left text-xs font-bold uppercase tracking-wider`}>Label Logistik</th>
+                  <th className={`${isLogistics ? "py-3 px-3.5" : "p-5"} text-left text-xs font-bold uppercase tracking-wider`}>Ubah Status</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-white/5">
+              <tbody className={`divide-y ${isLogistics ? "divide-stone-100" : "divide-white/5"}`}>
                 {filteredOrders.map((order) => {
                   const s = (order.status || "").toLowerCase();
                   const hasShipping = order.shippingCourier || order.trackingNumber;
@@ -370,46 +510,50 @@ export default function Orders() {
                   return (
                     <tr
                       key={order.id}
-                      className={`hover:bg-white/5 transition-all duration-200 group ${
-                        selectedOrderIds.includes(order.id) ? "bg-[#00BFA5]/5" : ""
+                      className={`transition-all duration-200 group ${
+                        isLogistics
+                          ? `hover:bg-stone-50 ${selectedOrderIds.includes(order.id) ? "bg-stone-100/80" : ""}`
+                          : `hover:bg-white/5 ${selectedOrderIds.includes(order.id) ? "bg-[#00BFA5]/5" : ""}`
                       }`}
                     >
-                      <td className="p-5 pl-6 text-center">
+                      <td className={`${isLogistics ? "py-3 px-3 pl-4" : "p-5 pl-6"} text-center`}>
                         <input
                           type="checkbox"
                           checked={selectedOrderIds.includes(order.id)}
                           onChange={() => toggleSelectOrder(order.id)}
-                          className="w-4 h-4 rounded accent-[#00BFA5] cursor-pointer"
+                          className={`w-4 h-4 rounded cursor-pointer ${isLogistics ? "accent-[#111613]" : "accent-[#00BFA5]"}`}
                         />
                       </td>
-                      <td className="p-5 text-white/60 font-mono text-sm">
+                      <td className={`${isLogistics ? "py-3 px-3.5" : "p-5"} font-mono text-sm font-bold ${isLogistics ? "text-slate-900" : "text-white/60"}`}>
                         {order.orderNumber || `#${order.id}`}
                       </td>
-                      <td className="p-6">
-                        <div className="font-medium text-white">
+                      <td className={`${isLogistics ? "py-3 px-3.5" : "p-6"}`}>
+                        <div className={`font-bold ${isLogistics ? "text-slate-900" : "text-white"}`}>
                           {order.recipientName || order.customerName || order.users?.full_name || "Customer"}
                         </div>
-                        <div className="text-xs text-slate-400 mt-0.5">
+                        <div className={`text-xs mt-0.5 ${isLogistics ? "text-stone-500" : "text-slate-400"}`}>
                           {order.customerPhone || order.customerEmail || order.users?.email || "-"}
                         </div>
                         {order.shippingCity && (
-                          <div className="text-[11px] text-[#00BFA5]/80 mt-0.5">
+                          <div className={`text-[11px] mt-0.5 ${isLogistics ? "text-stone-500 font-medium" : "text-[#00BFA5]/80"}`}>
                             📍 {order.shippingCity}
                           </div>
                         )}
                       </td>
-                      <td className="p-6">
+                      <td className={`${isLogistics ? "py-3 px-3.5" : "p-6"}`}>
                         <div className="space-y-1.5 min-w-44 max-w-xs">
                           {(order.items || []).map((it, itIdx) => (
                             <div key={itIdx} className="flex flex-wrap items-center gap-1.5 text-xs">
-                              <span className="font-medium text-white/90 truncate max-w-36">
+                              <span className={`font-medium truncate max-w-36 ${isLogistics ? "text-slate-800" : "text-white/90"}`}>
                                 {it.productName}
                               </span>
-                              <span className="text-white/40 font-mono text-[11px]">
+                              <span className={`font-mono text-[11px] ${isLogistics ? "text-stone-400" : "text-white/40"}`}>
                                 {it.quantity}x
                               </span>
                               {it.size && (
-                                <span className="px-1.5 py-0.5 rounded-md bg-[#00BFA5]/15 text-[#00BFA5] border border-[#00BFA5]/30 font-bold text-[10px]">
+                                <span className={`px-1.5 py-0.5 rounded-md font-bold text-[10px] ${
+                                  isLogistics ? "bg-stone-100 text-stone-800 border border-stone-200" : "bg-[#00BFA5]/15 text-[#00BFA5] border border-[#00BFA5]/30"
+                                }`}>
                                   {it.size}
                                 </span>
                               )}
@@ -417,60 +561,161 @@ export default function Orders() {
                           ))}
                         </div>
                       </td>
-                      <td className="p-6">
-                        <span className="text-lg font-bold text-white">
+                      <td className={`${isLogistics ? "py-3 px-3.5" : "p-6"}`}>
+                        <span className={`text-base font-bold font-mono ${isLogistics ? "text-slate-900" : "text-white"}`}>
                           Rp {Number(order.totalAmount || order.total_amount).toLocaleString("id-ID")}
                         </span>
                       </td>
-                      <td className="p-6">
+                      <td className={`${isLogistics ? "py-3 px-3.5" : "p-6"}`}>
                         <span
-                          className={`inline-block text-xs font-bold px-4 py-1.5 rounded-2xl border ${statusColors[s] || "bg-white/10 text-white/70"}`}
+                          className={`inline-block text-xs font-bold px-3 py-1 rounded-full border ${
+                            isLogistics
+                              ? s === "paid"
+                                ? "bg-[#FAF0ED] text-[#B9382B] border-[#B9382B]/30 font-mono"
+                                : s === "shipped"
+                                ? "bg-blue-50 text-blue-800 border-blue-200 font-mono"
+                                : s === "completed"
+                                ? "bg-stone-100 text-stone-800 border-stone-200 font-mono"
+                                : "bg-stone-100 text-stone-600 border-stone-200 font-mono"
+                              : statusColors[s] || "bg-white/10 text-white/70"
+                          }`}
                         >
-                          {s.charAt(0).toUpperCase() + s.slice(1)}
+                          {s === "paid" && isLogistics ? "🔥 Perlu Dikemas" : s.charAt(0).toUpperCase() + s.slice(1)}
                         </span>
                       </td>
-                      <td className="p-6">
+                      <td className={`${isLogistics ? "py-3 px-3.5" : "p-6"}`}>
                         {hasShipping ? (
                           <div className="flex flex-col gap-1">
-                            <span className="text-xs font-bold text-[#00BFA5] flex items-center gap-1">
+                            <span className={`text-xs font-bold flex items-center gap-1 ${isLogistics ? "text-slate-900" : "text-[#00BFA5]"}`}>
                               <Truck size={12} /> {order.shippingCourier || "Ekspedisi"}
                             </span>
-                            <span className="text-xs font-mono text-white/80 bg-white/5 px-2 py-0.5 rounded border border-white/10 w-fit">
+                            <span className={`text-xs font-mono px-2 py-0.5 rounded border w-fit ${
+                              isLogistics ? "text-slate-900 bg-stone-100 border-stone-200" : "text-white/80 bg-white/5 border-white/10"
+                            }`}>
                               {order.trackingNumber}
                             </span>
                           </div>
                         ) : s === "paid" || s === "processing" ? (
                           <button
                             onClick={() => handleOpenShipModal(order)}
-                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#00BFA5]/10 hover:bg-[#00BFA5]/20 text-[#00BFA5] border border-[#00BFA5]/30 text-xs font-semibold transition active:scale-95"
+                            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-semibold transition active:scale-95 cursor-pointer ${
+                              isLogistics
+                                ? "bg-stone-100 hover:bg-stone-200 text-stone-800 border-stone-200"
+                                : "bg-[#00BFA5]/10 hover:bg-[#00BFA5]/20 text-[#00BFA5] border border-[#00BFA5]/30"
+                            }`}
                           >
                             <Truck size={14} /> Input Resi
                           </button>
                         ) : (
-                          <span className="text-xs text-white/30 italic">-</span>
+                          <span className={`text-xs italic ${isLogistics ? "text-stone-400" : "text-white/30"}`}>-</span>
                         )}
                       </td>
-                      <td className="p-6">
+                      <td className={`${isLogistics ? "py-3 px-3.5" : "p-6"}`}>
                         <button
                           onClick={() => setLabelOrder(order)}
-                          className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-purple-500/10 hover:bg-purple-500/20 text-purple-300 border border-purple-500/30 text-xs font-semibold transition active:scale-95 whitespace-nowrap cursor-pointer hover:shadow-lg hover:shadow-purple-500/10"
+                          className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-semibold transition active:scale-95 whitespace-nowrap cursor-pointer ${
+                            isLogistics
+                              ? "bg-[#162018] hover:bg-black text-white shadow-xs"
+                              : "bg-purple-500/10 hover:bg-purple-500/20 text-purple-300 border border-purple-500/30"
+                          }`}
                           title="Cetak Label Pengiriman Thermal A6 & Packing Slip"
                         >
                           <Printer size={14} /> Cetak Label A6
                         </button>
                       </td>
-                      <td className="p-6">
-                        <select
-                          value={s}
-                          onChange={(e) => updateStatus(order.id, e.target.value)}
-                          className="bg-[#0D0D0D] border border-white/10 hover:border-[#00BFA5]/40 focus:border-[#00BFA5] rounded-2xl px-4 py-2.5 text-sm text-white outline-none transition-all cursor-pointer"
-                        >
-                          {orderStatuses.map((stat) => (
-                            <option key={stat} value={stat}>
-                              {stat.charAt(0).toUpperCase() + stat.slice(1)}
-                            </option>
-                          ))}
-                        </select>
+                      <td className={`${isLogistics ? "py-3 px-3.5" : "p-6"}`}>
+                        {s === "completed" ? (
+                          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 text-xs font-mono font-bold whitespace-nowrap">
+                            <CheckCircle2 size={13} /> Selesai
+                          </span>
+                        ) : s === "cancelled" ? (
+                          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-rose-500/15 text-rose-300 border border-rose-500/30 text-xs font-mono font-bold whitespace-nowrap">
+                            <Ban size={13} /> Dibatalkan
+                          </span>
+                        ) : s === "pending" ? (
+                          <div className="flex items-center gap-1.5 whitespace-nowrap">
+                            <button
+                              type="button"
+                              onClick={() => handleSyncPayment(order)}
+                              disabled={syncingOrderId === order.id}
+                              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/30 text-xs font-mono font-bold transition active:scale-95 cursor-pointer disabled:opacity-50"
+                              title="Sinkronkan status pembayaran terkini dari Midtrans"
+                            >
+                              <RefreshCw size={12} className={syncingOrderId === order.id ? "animate-spin" : ""} />
+                              <span>Sync</span>
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => updateStatus(order.id, "cancelled", s)}
+                              className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 border border-rose-500/30 text-xs font-mono font-bold transition active:scale-95 cursor-pointer"
+                              title="Batalkan pesanan ini"
+                            >
+                              <Ban size={12} />
+                              <span>Batal</span>
+                            </button>
+                          </div>
+                        ) : s === "paid" ? (
+                          <div className="flex items-center gap-1.5 whitespace-nowrap">
+                            <button
+                              type="button"
+                              onClick={() => updateStatus(order.id, "processing", s)}
+                              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-[#00BFA5]/20 hover:bg-[#00BFA5]/30 text-[#00BFA5] border border-[#00BFA5]/40 text-xs font-mono font-bold transition active:scale-95 cursor-pointer"
+                              title="Pindahkan ke antrean produksi Atelier"
+                            >
+                              <span>Mulai Jahit →</span>
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => updateStatus(order.id, "cancelled", s)}
+                              className="p-1.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 border border-rose-500/30 text-xs transition cursor-pointer"
+                              title="Batalkan pesanan"
+                            >
+                              <Ban size={13} />
+                            </button>
+                          </div>
+                        ) : s === "processing" ? (
+                          <div className="flex items-center gap-1.5 whitespace-nowrap">
+                            <button
+                              type="button"
+                              onClick={() => handleOpenShipModal(order)}
+                              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-blue-500/20 hover:bg-blue-500/30 text-blue-300 border border-blue-500/40 text-xs font-mono font-bold transition active:scale-95 cursor-pointer"
+                              title="Input nomor resi pengiriman kurir"
+                            >
+                              <Truck size={13} />
+                              <span>Kirim Resi</span>
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => updateStatus(order.id, "cancelled", s)}
+                              className="p-1.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 border border-rose-500/30 text-xs transition cursor-pointer"
+                              title="Batalkan pesanan"
+                            >
+                              <Ban size={13} />
+                            </button>
+                          </div>
+                        ) : s === "shipped" ? (
+                          <div className="flex items-center gap-1.5 whitespace-nowrap">
+                            <button
+                              type="button"
+                              onClick={async () => {
+                                try {
+                                  await api.patch(`/orders/${order.id}/complete`);
+                                  toast.success("Pesanan berhasil ditandai selesai");
+                                  getOrders();
+                                } catch (e) {
+                                  toast.error(e.response?.data?.message || "Gagal menyelesaikan pesanan");
+                                }
+                              }}
+                              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 text-xs font-mono font-bold transition active:scale-95 cursor-pointer"
+                              title="Tandai pesanan telah sampai dan selesai"
+                            >
+                              <CheckCircle2 size={13} />
+                              <span>Selesaikan</span>
+                            </button>
+                          </div>
+                        ) : (
+                          <span className="text-xs text-white/40 font-mono">-</span>
+                        )}
                       </td>
                     </tr>
                   );

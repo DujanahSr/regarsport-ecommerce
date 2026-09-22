@@ -26,6 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -183,44 +184,43 @@ public class OrderService {
         return orderMapper.toResponse(savedOrder);
     }
 
+    @Transactional
+    public boolean autoExpireIfPending(Order order) {
+        if (order != null && order.getStatus() == OrderStatus.PENDING && order.getCreatedAt() != null) {
+            long hours = Duration.between(order.getCreatedAt(), Instant.now()).toHours();
+            if (hours >= 24) {
+                order.setStatus(OrderStatus.CANCELLED);
+                order.setCancellationReason("Batas waktu pembayaran kedaluwarsa (melebihi 24 jam)");
+                orderRepository.save(order);
+                log.info("Auto-expired order {} (created at {}, {} hours ago)", order.getOrderNumber(), order.getCreatedAt(), hours);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Transactional
     public OrderResponse getOrderById(Long orderId, Long userId, boolean isAdmin) {
         log.info("Fetching order by id: {}", orderId);
         Order order = orderRepository.findByIdWithItems(orderId)
-                .orElseThrow(() -> new ResourceNotFoundException("Order not found with id: " + orderId));
+                .orElseThrow(() -> new ResourceNotFoundException("Pesanan tidak ditemukan dengan id: " + orderId));
 
         if (!isAdmin && !order.getUserId().equals(userId)) {
             throw new BadRequestException("Access denied: You can only view your own orders");
         }
 
+        autoExpireIfPending(order);
+
         return orderMapper.toResponse(order);
     }
 
+    @Transactional
     public PageResponse<OrderResponse> getMyOrders(Long userId, int page, int size) {
         log.info("Fetching orders for userId: {}, page: {}, size: {}", userId, page, size);
         Pageable pageable = PageRequest.of(Math.max(0, page - 1), Math.min(50, Math.max(1, size)), Sort.by("createdAt").descending());
 
         Page<Order> orderPage = orderRepository.findByUserId(userId, pageable);
-        var content = orderPage.getContent().stream().map(orderMapper::toResponse).toList();
-
-        return new PageResponse<>(
-                content,
-                orderPage.getNumber() + 1,
-                orderPage.getSize(),
-                orderPage.getTotalElements(),
-                orderPage.getTotalPages(),
-                orderPage.isFirst(),
-                orderPage.isLast()
-        );
-    }
-
-    public PageResponse<OrderResponse> getAllOrders(OrderStatus status, int page, int size) {
-        log.info("Admin fetching all orders with status filter: {}, page: {}, size: {}", status, page, size);
-        Pageable pageable = PageRequest.of(Math.max(0, page - 1), Math.min(100, Math.max(1, size)), Sort.by("createdAt").descending());
-
-        Page<Order> orderPage = status != null
-                ? orderRepository.findByStatus(status, pageable)
-                : orderRepository.findAll(pageable);
-
+        orderPage.getContent().forEach(this::autoExpireIfPending);
         var content = orderPage.getContent().stream().map(orderMapper::toResponse).toList();
 
         return new PageResponse<>(
@@ -235,10 +235,91 @@ public class OrderService {
     }
 
     @Transactional
-    public OrderResponse updateOrderStatus(Long orderId, OrderStatus newStatus) {
-        log.info("Updating order status for id: {} to: {}", orderId, newStatus);
+    public PageResponse<OrderResponse> getAllOrders(OrderStatus status, int page, int size) {
+        log.info("Admin fetching all orders with status filter: {}, page: {}, size: {}", status, page, size);
+        Pageable pageable = PageRequest.of(Math.max(0, page - 1), Math.min(100, Math.max(1, size)), Sort.by("createdAt").descending());
+
+        Page<Order> orderPage = status != null
+                ? orderRepository.findByStatus(status, pageable)
+                : orderRepository.findAll(pageable);
+
+        orderPage.getContent().forEach(this::autoExpireIfPending);
+        var content = orderPage.getContent().stream().map(orderMapper::toResponse).toList();
+
+        return new PageResponse<>(
+                content,
+                orderPage.getNumber() + 1,
+                orderPage.getSize(),
+                orderPage.getTotalElements(),
+                orderPage.getTotalPages(),
+                orderPage.isFirst(),
+                orderPage.isLast()
+        );
+    }
+
+    @Transactional
+    public OrderResponse updateOrderStatus(Long orderId, OrderStatus newStatus, String role) {
+        log.info("Updating order status for id: {} to: {} by role: {}", orderId, newStatus, role);
+        boolean isAdminOrLogistics = "ROLE_ADMIN".equalsIgnoreCase(role) || "ADMIN".equalsIgnoreCase(role)
+                || "ROLE_LOGISTICS".equalsIgnoreCase(role) || "LOGISTICS".equalsIgnoreCase(role);
+        if (!isAdminOrLogistics) {
+            throw new BadRequestException("Akses ditolak: Hanya Administrator atau Staf Logistik yang berwenang memperbarui status pesanan.");
+        }
+
         Order order = orderRepository.findByIdWithItems(orderId)
-                .orElseThrow(() -> new ResourceNotFoundException("Order not found with id: " + orderId));
+                .orElseThrow(() -> new ResourceNotFoundException("Pesanan tidak ditemukan dengan id: " + orderId));
+
+        OrderStatus currentStatus = order.getStatus();
+
+        if (currentStatus == newStatus) {
+            return orderMapper.toResponse(order);
+        }
+
+        // Terminal states cannot be altered
+        if (currentStatus == OrderStatus.COMPLETED) {
+            throw new BadRequestException("Pesanan yang sudah SELESAI (COMPLETED) tidak dapat diubah statusnya lagi.");
+        }
+        if (currentStatus == OrderStatus.CANCELLED) {
+            throw new BadRequestException("Pesanan yang sudah DIBATALKAN (CANCELLED) tidak dapat diaktifkan kembali.");
+        }
+
+        // Admin CANNOT arbitrarily mark an unpaid order as PAID!
+        if (newStatus == OrderStatus.PAID) {
+            throw new BadRequestException("Status LUNAS (PAID) tidak dapat diubah sembarangan secara manual oleh admin. Status PAID hanya dapat diproses otomatis melalui verifikasi pembayaran Midtrans Gateway.");
+        }
+
+        // Validate state machine transitions
+        switch (currentStatus) {
+            case PENDING -> {
+                if (newStatus != OrderStatus.CANCELLED) {
+                    throw new BadRequestException("Pesanan berstatus PENDING belum dibayar dan tidak dapat langsung diubah ke " + newStatus + ". Pesanan hanya dapat dibatalkan atau menunggu konfirmasi pembayaran Midtrans.");
+                }
+                order.setCancellationReason("Dibatalkan oleh administrator");
+            }
+            case PAID -> {
+                if (newStatus != OrderStatus.PROCESSING && newStatus != OrderStatus.CANCELLED) {
+                    throw new BadRequestException("Pesanan berstatus PAID (Lunas) hanya dapat diubah ke PROCESSING (Produksi) atau CANCELLED.");
+                }
+                if (newStatus == OrderStatus.CANCELLED) {
+                    order.setCancellationReason("Dibatalkan oleh administrator setelah pembayaran");
+                }
+            }
+            case PROCESSING -> {
+                if (newStatus != OrderStatus.SHIPPED && newStatus != OrderStatus.CANCELLED) {
+                    throw new BadRequestException("Pesanan berstatus PROCESSING hanya dapat diubah ke SHIPPED (Dikirim) atau CANCELLED.");
+                }
+                if (newStatus == OrderStatus.SHIPPED && (order.getShippingCourier() == null || order.getTrackingNumber() == null)) {
+                    throw new BadRequestException("Pesanan tidak dapat diubah ke SHIPPED tanpa menginput nama kurir dan nomor resi pengiriman. Gunakan tombol Input Resi.");
+                }
+            }
+            case SHIPPED -> {
+                if (newStatus != OrderStatus.COMPLETED) {
+                    throw new BadRequestException("Pesanan yang sudah dikirim (SHIPPED) hanya dapat diubah ke COMPLETED (Selesai).");
+                }
+                order.setCompletedAt(Instant.now());
+            }
+            default -> throw new BadRequestException("Transisi status dari " + currentStatus + " ke " + newStatus + " tidak valid.");
+        }
 
         order.setStatus(newStatus);
         if (newStatus == OrderStatus.SHIPPED && order.getShippedAt() == null) {
@@ -251,11 +332,39 @@ public class OrderService {
         return orderMapper.toResponse(updated);
     }
 
+    // Overload for backward compatibility / internal calls
     @Transactional
-    public OrderResponse shipOrder(Long orderId, com.regarsport.order.dto.ShipOrderRequest request) {
-        log.info("Shipping order id: {} with courier: {}, tracking: {}", orderId, request.courier(), request.trackingNumber());
+    public OrderResponse updateOrderStatus(Long orderId, OrderStatus newStatus) {
+        return updateOrderStatus(orderId, newStatus, "ROLE_ADMIN");
+    }
+
+    @Transactional
+    public OrderResponse shipOrder(Long orderId, com.regarsport.order.dto.ShipOrderRequest request, String role) {
+        log.info("Shipping order id: {} with courier: {}, tracking: {} by role: {}", orderId, request.courier(), request.trackingNumber(), role);
+        boolean isAdminOrLogistics = "ROLE_ADMIN".equalsIgnoreCase(role) || "ADMIN".equalsIgnoreCase(role)
+                || "ROLE_LOGISTICS".equalsIgnoreCase(role) || "LOGISTICS".equalsIgnoreCase(role);
+        if (!isAdminOrLogistics) {
+            throw new BadRequestException("Akses ditolak: Hanya Administrator atau Staf Logistik yang berwenang mengirimkan pesanan.");
+        }
+
         Order order = orderRepository.findByIdWithItems(orderId)
-                .orElseThrow(() -> new ResourceNotFoundException("Order not found with id: " + orderId));
+                .orElseThrow(() -> new ResourceNotFoundException("Pesanan tidak ditemukan dengan id: " + orderId));
+
+        if (order.getStatus() == OrderStatus.PENDING) {
+            throw new BadRequestException("Pesanan belum dibayar (PENDING). Tidak dapat mengirim pesanan sebelum pembayaran lunas.");
+        }
+        if (order.getStatus() == OrderStatus.CANCELLED) {
+            throw new BadRequestException("Pesanan sudah dibatalkan. Tidak dapat melakukan pengiriman.");
+        }
+        if (order.getStatus() == OrderStatus.COMPLETED) {
+            throw new BadRequestException("Pesanan sudah selesai.");
+        }
+        if (request.courier() == null || request.courier().isBlank()) {
+            throw new BadRequestException("Nama kurir / ekspedisi tidak boleh kosong.");
+        }
+        if (request.trackingNumber() == null || request.trackingNumber().isBlank()) {
+            throw new BadRequestException("Nomor resi pengiriman tidak boleh kosong.");
+        }
 
         order.setStatus(OrderStatus.SHIPPED);
         order.setShippingCourier(request.courier().trim());
@@ -282,17 +391,37 @@ public class OrderService {
         return orderMapper.toResponse(updated);
     }
 
+    // Overload for backward compatibility / internal calls
     @Transactional
-    public OrderResponse completeOrder(Long orderId) {
-        log.info("Completing order id: {}", orderId);
+    public OrderResponse shipOrder(Long orderId, com.regarsport.order.dto.ShipOrderRequest request) {
+        return shipOrder(orderId, request, "ROLE_ADMIN");
+    }
+
+    @Transactional
+    public OrderResponse completeOrder(Long orderId, Long userId, boolean isAdmin) {
+        log.info("Completing order id: {} by userId: {}, isAdmin: {}", orderId, userId, isAdmin);
         Order order = orderRepository.findByIdWithItems(orderId)
-                .orElseThrow(() -> new ResourceNotFoundException("Order not found with id: " + orderId));
+                .orElseThrow(() -> new ResourceNotFoundException("Pesanan tidak ditemukan dengan id: " + orderId));
+
+        if (!isAdmin && !order.getUserId().equals(userId)) {
+            throw new BadRequestException("Akses ditolak: Anda hanya dapat menyelesaikan pesanan milik Anda sendiri.");
+        }
+
+        if (order.getStatus() != OrderStatus.SHIPPED) {
+            throw new BadRequestException("Pesanan hanya dapat diselesaikan jika sudah dalam status pengiriman (SHIPPED). Status pesanan saat ini: " + order.getStatus());
+        }
 
         order.setStatus(OrderStatus.COMPLETED);
         order.setCompletedAt(Instant.now());
 
         Order updated = orderRepository.save(order);
         return orderMapper.toResponse(updated);
+    }
+
+    // Overload for backward compatibility / internal calls
+    @Transactional
+    public OrderResponse completeOrder(Long orderId) {
+        return completeOrder(orderId, 1L, true);
     }
 
     @Transactional
@@ -307,8 +436,9 @@ public class OrderService {
 
         if ("PAID".equalsIgnoreCase(event.paymentStatus()) || "SETTLEMENT".equalsIgnoreCase(event.paymentStatus())) {
             order.setStatus(OrderStatus.PAID);
-        } else if ("EXPIRE".equalsIgnoreCase(event.paymentStatus()) || "CANCEL".equalsIgnoreCase(event.paymentStatus())) {
+        } else if ("EXPIRE".equalsIgnoreCase(event.paymentStatus()) || "CANCEL".equalsIgnoreCase(event.paymentStatus()) || "DENY".equalsIgnoreCase(event.paymentStatus())) {
             order.setStatus(OrderStatus.CANCELLED);
+            order.setCancellationReason("Batas waktu pembayaran kedaluwarsa (Expired by Midtrans)");
         }
 
         orderRepository.save(order);
@@ -319,7 +449,11 @@ public class OrderService {
     public OrderResponse cancelOrder(Long orderId, Long userId, boolean isAdmin, String reason) {
         log.info("Cancelling order id: {} by userId: {}, isAdmin: {}", orderId, userId, isAdmin);
         Order order = orderRepository.findByIdWithItems(orderId)
-                .orElseThrow(() -> new ResourceNotFoundException("Order not found with id: " + orderId));
+                .orElseThrow(() -> new ResourceNotFoundException("Pesanan tidak ditemukan dengan id: " + orderId));
+
+        if (order.getStatus() == OrderStatus.CANCELLED) {
+            throw new BadRequestException("Pesanan ini sudah dibatalkan sebelumnya");
+        }
 
         if (!isAdmin && !order.getUserId().equals(userId)) {
             throw new BadRequestException("Akses ditolak: Anda hanya dapat membatalkan pesanan milik Anda sendiri");

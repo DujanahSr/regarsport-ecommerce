@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useRef } from "react";
+import React, { useRef, useEffect } from "react";
 import { Printer, X, CheckSquare, Truck, Package, ShieldCheck } from "lucide-react";
 
 // Helper to generate realistic SVG barcode patterns from string
@@ -167,6 +167,20 @@ export default function ShippingLabelModal({ isOpen, onClose, order }) {
       iframe.contentWindow.print();
     }, 250);
   };
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "p") {
+        e.preventDefault();
+        handlePrint();
+      } else if (e.key === "Escape") {
+        onClose();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isOpen, order]);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm overflow-y-auto animate-in fade-in duration-200">
@@ -390,19 +404,24 @@ export default function ShippingLabelModal({ isOpen, onClose, order }) {
         </div>
 
         {/* Modal Footer Controls */}
-        <div className="flex justify-end gap-3 mt-5 print:hidden">
-          <button
-            onClick={onClose}
-            className="px-5 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-white/70 hover:text-white text-xs font-semibold transition"
-          >
-            Tutup
-          </button>
-          <button
-            onClick={handlePrint}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#00BFA5] hover:bg-[#00BFA5]/90 text-black text-xs font-bold transition shadow-lg shadow-[#00BFA5]/20 active:scale-95 cursor-pointer"
-          >
-            <Printer size={16} /> Cetak Label Sekarang
-          </button>
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 mt-5 pt-3 border-t border-white/10 print:hidden">
+          <span className="text-[11px] font-mono text-slate-400">
+            Pintasan: <kbd className="px-1.5 py-0.5 rounded bg-white/10 font-bold text-white">Ctrl + P</kbd> untuk cetak langsung, <kbd className="px-1.5 py-0.5 rounded bg-white/10 font-bold text-white">Esc</kbd> tutup
+          </span>
+          <div className="flex gap-2 w-full sm:w-auto justify-end">
+            <button
+              onClick={onClose}
+              className="px-4 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-white/70 hover:text-white text-xs font-semibold transition cursor-pointer"
+            >
+              Tutup [Esc]
+            </button>
+            <button
+              onClick={handlePrint}
+              className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#162018] hover:bg-black text-white text-xs font-bold transition shadow-lg border border-white/20 active:scale-95 cursor-pointer"
+            >
+              <Printer size={16} /> Cetak Label Thermal
+            </button>
+          </div>
         </div>
       </div>
     </div>

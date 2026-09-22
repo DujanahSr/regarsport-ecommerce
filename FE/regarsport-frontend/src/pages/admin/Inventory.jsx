@@ -11,9 +11,10 @@ import {
   CheckCircle2,
   X,
   Loader2,
-  ArrowUpRight,
   TrendingDown,
   ShieldCheck,
+  Tag,
+  Boxes,
 } from "lucide-react";
 import api from "../../services/api";
 import toast from "react-hot-toast";
@@ -125,106 +126,150 @@ export default function Inventory() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0D0D0D] text-white">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
-        <div className="flex items-center gap-4">
-          <div className="relative">
-            <div className="absolute inset-0 bg-[#00BFA5]/20 blur-xl rounded-2xl" />
-            <div className="relative bg-[#00BFA5]/10 border border-[#00BFA5]/30 p-3 rounded-2xl">
-              <Layers size={28} className="text-[#00BFA5]" />
-            </div>
-          </div>
-          <div>
-            <h1 className="text-3xl sm:text-4xl font-black text-white tracking-[-1px]">
-              INVENTARIS & STOK GUDANG
-            </h1>
-            <p className="text-slate-400 text-xs sm:text-sm">
-              {isLogistics
-                ? "Pantau ketersediaan varian ukuran apparel dan lakukan penambahan stok masuk konveksi"
-                : "Pengawasan menyeluruh ketersediaan stok fisik produk RegarSport"}
-            </p>
-          </div>
+    <div className="space-y-8 animate-in fade-in duration-300">
+      {/* ATELIER INVENTORY HERO BANNER */}
+      <div className="relative overflow-hidden rounded-3xl border border-black/10 shadow-xl bg-[#162018]">
+        {/* Background Image with Deep Gradient & Topography */}
+        <div className="absolute inset-0 z-0">
+          <img
+            src="/images/inventory_hero_bg.jpg"
+            alt="RegarSport Inventory Atelier"
+            className="w-full h-full object-cover object-center filter brightness-[0.38] contrast-125"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#162018] via-[#162018]/85 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#162018] via-transparent to-black/30" />
+          <div className="absolute inset-0 bg-topography opacity-15 mix-blend-overlay pointer-events-none" />
         </div>
 
-        <button
-          onClick={fetchProducts}
-          className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white border border-white/10 text-xs font-bold transition-all w-fit cursor-pointer"
-        >
-          <RefreshCw size={14} className={loading ? "animate-spin" : ""} />
-          <span>Refresh Data</span>
-        </button>
+        {/* Content Inside Hero */}
+        <div className="relative z-10 p-6 sm:p-8 lg:p-10 flex flex-col justify-between min-h-[220px]">
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div className="flex items-center gap-2">
+              <span className="px-3 py-1 rounded-full bg-white/10 text-emerald-400 font-mono text-[10px] font-black tracking-widest border border-white/10 uppercase">
+                RS // INVENTORY HUB
+              </span>
+              <span className="text-[11px] font-mono uppercase tracking-widest text-slate-300">
+                CENTRAL APPAREL WAREHOUSE
+              </span>
+            </div>
+
+            <button
+              onClick={fetchProducts}
+              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold transition-all border border-white/10 shadow-xs cursor-pointer active:scale-95"
+            >
+              <RefreshCw size={13} className={loading ? "animate-spin" : ""} />
+              <span>Refresh Katalog</span>
+            </button>
+          </div>
+
+          <div className="my-4 max-w-3xl">
+            <h1 className="font-['Barlow_Condensed'] font-black text-3xl sm:text-5xl uppercase tracking-tight text-white leading-none">
+              INVENTARIS &amp; STOK GUDANG
+            </h1>
+            <p className="text-slate-300 text-xs sm:text-sm mt-2 max-w-2xl leading-relaxed">
+              Monitoring real-time kuota rak fisik Cicendo &amp; Wonogiri Hub, alokasi matriks varian ukuran (S-XXL), dan kontrol restock konveksi jersey atletik.
+            </p>
+          </div>
+
+          {/* Live Indicator Badges */}
+          <div className="flex flex-wrap items-center gap-3 pt-3 border-t border-white/10 text-[11px] font-mono text-slate-300">
+            <div className="flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-emerald-400" />
+              <span>STATUS RAK: TERVERIFIKASI</span>
+            </div>
+            <span className="text-white/30">•</span>
+            <div className="flex items-center gap-1.5">
+              <Package size={13} className="text-emerald-400" />
+              <span>TOTAL KATALOG: {stats.totalItems} MODEL</span>
+            </div>
+            <span className="text-white/30">•</span>
+            <div className="flex items-center gap-1.5">
+              <Boxes size={13} className="text-amber-400" />
+              <span>TOTAL UNIT FISIK: {stats.totalStockPcs.toLocaleString("id-ID")} PCS</span>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* KPI Cards Overview */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <div className="p-5 rounded-2xl bg-[#14141E] border border-white/5">
-          <div className="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Model Produk</div>
-          <div className="text-2xl sm:text-3xl font-black text-white mt-1">{stats.totalItems} Model</div>
-          <div className="text-[11px] text-slate-500 mt-1">Tercatat di sistem katalog</div>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="p-6 rounded-3xl bg-white border border-stone-200/80 shadow-sm">
+          <div className="text-xs font-mono font-bold text-stone-500 uppercase tracking-wider">Total Model Produk</div>
+          <div className="text-3xl font-black text-slate-900 mt-1.5 font-['Barlow_Condensed'] tracking-tight">
+            {stats.totalItems} <span className="text-sm font-sans font-bold text-stone-400 uppercase">Model</span>
+          </div>
+          <div className="text-[11px] text-stone-400 mt-1">Tercatat di sistem katalog</div>
         </div>
 
-        <div className="p-5 rounded-2xl bg-[#14141E] border border-white/5">
-          <div className="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Fisik di Gudang</div>
-          <div className="text-2xl sm:text-3xl font-black text-[#00BFA5] mt-1">{stats.totalStockPcs.toLocaleString("id-ID")} pcs</div>
-          <div className="text-[11px] text-emerald-400/80 mt-1">Ready stock Wonogiri</div>
+        <div className="p-6 rounded-3xl bg-white border border-stone-200/80 shadow-sm">
+          <div className="text-xs font-mono font-bold text-stone-500 uppercase tracking-wider">Total Fisik di Gudang</div>
+          <div className="text-3xl font-black text-slate-900 mt-1.5 font-['Barlow_Condensed'] tracking-tight">
+            {stats.totalStockPcs.toLocaleString("id-ID")} <span className="text-sm font-sans font-bold text-stone-400 uppercase">pcs</span>
+          </div>
+          <div className="text-[11px] text-emerald-800 font-semibold mt-1">Ready stock Cicendo &amp; Wonogiri</div>
         </div>
 
         <div
           onClick={() => setFilterMode(filterMode === "low" ? "all" : "low")}
-          className={`p-5 rounded-2xl border cursor-pointer transition-all ${
+          className={`p-6 rounded-3xl border cursor-pointer transition-all duration-200 shadow-sm ${
             filterMode === "low"
-              ? "bg-amber-500/20 border-amber-500/50 shadow-lg shadow-amber-500/20"
-              : "bg-[#14141E] border-white/5 hover:border-amber-500/30"
+              ? "bg-[#FAF0ED] border-[#B9382B]/40 ring-2 ring-[#B9382B]/20"
+              : "bg-white border-stone-200/80 hover:border-amber-400"
           }`}
         >
-          <div className="flex items-center justify-between text-xs font-bold text-amber-400 uppercase tracking-wider">
+          <div className="flex items-center justify-between text-xs font-mono font-bold text-amber-800 uppercase tracking-wider">
             <span>Stok Menipis (≤10)</span>
             <AlertTriangle size={16} />
           </div>
-          <div className="text-2xl sm:text-3xl font-black text-amber-400 mt-1">{stats.lowStockCount} Model</div>
-          <div className="text-[11px] text-amber-300/80 mt-1">Perlu restock segera</div>
+          <div className="text-3xl font-black text-amber-800 mt-1.5 font-['Barlow_Condensed'] tracking-tight">
+            {stats.lowStockCount} <span className="text-sm font-sans font-bold text-stone-400 uppercase">Model</span>
+          </div>
+          <div className="text-[11px] text-amber-700 mt-1">Perlu restock konveksi segera</div>
         </div>
 
         <div
           onClick={() => setFilterMode(filterMode === "out" ? "all" : "out")}
-          className={`p-5 rounded-2xl border cursor-pointer transition-all ${
+          className={`p-6 rounded-3xl border cursor-pointer transition-all duration-200 shadow-sm ${
             filterMode === "out"
-              ? "bg-rose-500/20 border-rose-500/50 shadow-lg shadow-rose-500/20"
-              : "bg-[#14141E] border-white/5 hover:border-rose-500/30"
+              ? "bg-[#FAF0ED] border-[#B9382B]/40 ring-2 ring-[#B9382B]/20"
+              : "bg-white border-stone-200/80 hover:border-[#B9382B]/50"
           }`}
         >
-          <div className="flex items-center justify-between text-xs font-bold text-rose-400 uppercase tracking-wider">
+          <div className="flex items-center justify-between text-xs font-mono font-bold text-[#B9382B] uppercase tracking-wider">
             <span>Stok Habis (0 pcs)</span>
             <TrendingDown size={16} />
           </div>
-          <div className="text-2xl sm:text-3xl font-black text-rose-400 mt-1">{stats.outOfStockCount} Model</div>
-          <div className="text-[11px] text-rose-300/80 mt-1">Barang kosong di rak</div>
+          <div className="text-3xl font-black text-[#B9382B] mt-1.5 font-['Barlow_Condensed'] tracking-tight">
+            {stats.outOfStockCount} <span className="text-sm font-sans font-bold text-stone-400 uppercase">Model</span>
+          </div>
+          <div className="text-[11px] text-rose-700 mt-1">Barang kosong di rak gudang</div>
         </div>
       </div>
 
       {/* Filter Tabs & Search Bar */}
-      <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 mb-6">
-        <div className="flex items-center gap-2 overflow-x-auto pb-1">
+      <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
+        <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
           {[
             { label: "Semua Produk", value: "all", count: stats.totalItems },
-            { label: "Stok Menipis", value: "low", count: stats.lowStockCount, badge: "Perlu Restock" },
-            { label: "Stok Habis", value: "out", count: stats.outOfStockCount, badge: "Kosong" },
+            { label: "Stok Menipis", value: "low", count: stats.lowStockCount },
+            { label: "Stok Habis", value: "out", count: stats.outOfStockCount },
           ].map((tab) => {
             const isActive = filterMode === tab.value;
             return (
               <button
                 key={tab.value}
                 onClick={() => setFilterMode(tab.value)}
-                className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${
+                className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${
                   isActive
-                    ? "bg-[#00BFA5] text-black shadow-lg shadow-[#00BFA5]/25"
-                    : "bg-[#14141E] text-slate-400 hover:text-white hover:bg-white/5 border border-white/5"
+                    ? tab.value === "out"
+                      ? "bg-[#B9382B] text-white shadow-md"
+                      : "bg-[#162018] text-white shadow-md"
+                    : "bg-white text-stone-600 hover:text-black hover:bg-stone-100 border border-stone-200"
                 }`}
               >
                 <span>{tab.label}</span>
-                <span className={`px-1.5 py-0.5 rounded-full text-[10px] ${
-                  isActive ? "bg-black/20 text-black font-black" : "bg-white/10 text-slate-300"
+                <span className={`px-2 py-0.5 rounded-full text-[10px] font-mono font-bold ${
+                  isActive ? "bg-white/20 text-white" : "bg-stone-100 text-stone-700"
                 }`}>
                   {tab.count}
                 </span>
@@ -233,21 +278,21 @@ export default function Inventory() {
           })}
         </div>
 
-        <div className="relative min-w-[280px]">
-          <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500" />
+        <div className="relative min-w-[320px]">
+          <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-400" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Cari nama produk atau kategori..."
-            className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#14141E] border border-white/10 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-[#00BFA5]"
+            placeholder="Cari nama produk, SKU, atau kategori..."
+            className="w-full pl-11 pr-4 py-2.5 rounded-full bg-white border border-stone-200 text-xs text-stone-900 placeholder:text-stone-400 focus:outline-none focus:border-[#162018] shadow-xs transition-all font-mono"
           />
         </div>
       </div>
 
-      {/* Product Inventory Table / Cards */}
+      {/* Product Inventory Cards (Spacious, Structured, Zero Horizontal Squeezing) */}
       {loading ? (
-        <ScreenLoader />
+        <ScreenLoader label="Memuat inventaris produk..." />
       ) : filteredProducts.length === 0 ? (
         <EmptyState
           title="Tidak Ada Produk Ditemukan"
@@ -264,39 +309,91 @@ export default function Inventory() {
             return (
               <div
                 key={product.id}
-                className="p-5 rounded-2xl bg-[#14141E] border border-white/5 hover:border-white/15 transition-all flex flex-col lg:flex-row lg:items-center justify-between gap-6"
+                className="p-5 sm:p-6 rounded-3xl bg-white border border-stone-200/80 hover:border-stone-300 shadow-xs hover:shadow-md transition-all group"
               >
-                {/* Left: Product Info */}
-                <div className="flex items-center gap-4 min-w-[280px]">
-                  <div className="w-16 h-16 rounded-xl bg-black/40 border border-white/10 overflow-hidden shrink-0">
-                    <img
-                      src={product.imageUrl || "https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=200&q=80"}
-                      alt={product.name}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <div>
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                      {product.category?.name || "Apparel"}
-                    </span>
-                    <h3 className="text-base font-bold text-white line-clamp-1">{product.name}</h3>
-                    <div className="flex items-center gap-2 mt-1">
-                      <span className="text-xs font-black text-[#00BFA5]">
-                        Rp {Number(product.price || 0).toLocaleString("id-ID")}
-                      </span>
-                      <span className="text-slate-600">•</span>
-                      <span className="text-xs text-slate-400">SKU #{product.id}</span>
+                {/* Upper Tier: Product Info, Stock Status, and Restock Action */}
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                  {/* Left: Thumbnail & Details */}
+                  <div className="flex items-center gap-4 min-w-0">
+                    <div className="w-16 h-16 sm:w-18 sm:h-18 rounded-2xl bg-stone-100 border border-stone-200 overflow-hidden shrink-0">
+                      <img
+                        src={product.imageUrl || "https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=200&q=80"}
+                        alt={product.name}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
                     </div>
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase tracking-wider bg-stone-100 text-stone-600 border border-stone-200">
+                          {product.category?.name || "Apparel"}
+                        </span>
+                        <span className="text-[10px] font-mono font-bold text-stone-400">
+                          SKU #{product.id}
+                        </span>
+                      </div>
+                      <h3 className="text-base sm:text-lg font-bold text-slate-900 truncate group-hover:text-emerald-950 transition-colors">
+                        {product.name}
+                      </h3>
+                      <div className="text-xs font-mono font-bold text-slate-800 mt-0.5">
+                        Rp {Number(product.price || 0).toLocaleString("id-ID")}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Right: Status Pill, Total Stock, and Main Restock Button */}
+                  <div className="flex items-center justify-between md:justify-end gap-5 pt-3 md:pt-0 border-t md:border-t-0 border-stone-100 shrink-0">
+                    {/* Status Pill */}
+                    <div>
+                      {isOutOfStock ? (
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-mono font-black uppercase tracking-wider bg-[#FAF0ED] text-[#B9382B] border border-[#B9382B]/30">
+                          <span className="w-1.5 h-1.5 rounded-full bg-[#B9382B] animate-pulse" />
+                          HABIS (0 PCS)
+                        </span>
+                      ) : isLowStock ? (
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-mono font-black uppercase tracking-wider bg-amber-50 text-amber-800 border border-amber-200">
+                          <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+                          MENIPIS (≤10 PCS)
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-mono font-black uppercase tracking-wider bg-emerald-50 text-emerald-800 border border-emerald-200">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                          READY STOCK
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Total Count */}
+                    <div className="text-right">
+                      <div className="text-[9px] font-mono uppercase tracking-wider text-stone-400">Total Fisik</div>
+                      <div className="font-['Barlow_Condensed'] text-2xl font-black text-slate-900 leading-none">
+                        {totalStock} <span className="text-xs font-sans font-bold text-stone-400 uppercase">pcs</span>
+                      </div>
+                    </div>
+
+                    {/* Restock Button */}
+                    <button
+                      onClick={() => handleOpenRestock(product)}
+                      className="flex items-center gap-1.5 px-4 sm:px-5 py-2.5 rounded-xl bg-[#162018] hover:bg-black text-white font-bold text-xs uppercase tracking-wider transition-all shadow-sm active:scale-95 cursor-pointer"
+                    >
+                      <Plus size={14} strokeWidth={2.5} />
+                      <span>Restock</span>
+                    </button>
                   </div>
                 </div>
 
-                {/* Middle: Size Breakdown Pills */}
-                <div className="flex-1">
-                  <div className="text-[11px] font-semibold text-slate-400 mb-2 flex items-center justify-between">
-                    <span>Rincian Stok Varian Ukuran:</span>
-                    <span className="text-[10px] text-slate-500">Klik tombol restock untuk menambah</span>
+                {/* Lower Tier: Dedicated Full-Width Size Variant Matrix */}
+                <div className="mt-4 pt-3.5 border-t border-stone-100">
+                  <div className="flex items-center justify-between text-[11px] font-semibold text-stone-500 mb-2.5">
+                    <span className="flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-wider text-stone-600">
+                      <Layers size={13} className="text-[#B9382B]" />
+                      Matriks Varian Ukuran Rak:
+                    </span>
+                    <span className="text-[10px] text-stone-400 font-mono">
+                      Klik salah satu ukuran untuk restock instan
+                    </span>
                   </div>
-                  <div className="flex flex-wrap items-center gap-2">
+
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-6 gap-2">
                     {Object.entries(sizeStocks).length > 0 ? (
                       Object.entries(sizeStocks).map(([sizeName, qty]) => {
                         const q = Number(qty || 0);
@@ -306,54 +403,33 @@ export default function Inventory() {
                           <div
                             key={sizeName}
                             onClick={() => handleOpenRestock(product, sizeName)}
-                            className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border text-xs cursor-pointer transition-all hover:scale-105 ${
+                            className={`flex items-center justify-between p-2.5 px-3 rounded-xl border text-xs cursor-pointer transition-all duration-150 hover:shadow-sm hover:-translate-y-0.5 ${
                               isSizeOut
-                                ? "bg-rose-500/10 border-rose-500/30 text-rose-400"
+                                ? "bg-[#FAF0ED] border-[#B9382B]/30 text-[#B9382B] hover:border-[#B9382B]"
                                 : isSizeLow
-                                ? "bg-amber-500/10 border-amber-500/30 text-amber-300"
-                                : "bg-white/5 border-white/10 text-slate-200"
+                                ? "bg-amber-50/80 border-amber-200 text-amber-900 hover:border-amber-400"
+                                : "bg-[#FAF8F4] border-stone-200 text-stone-800 hover:border-stone-400 hover:bg-white"
                             }`}
                             title={`Klik untuk restock ukuran ${sizeName}`}
                           >
-                            <span className="font-bold">{sizeName}:</span>
-                            <span className="font-mono font-black">{q} pcs</span>
-                            <Plus size={12} className="opacity-60 hover:opacity-100" />
+                            <div className="flex items-center gap-2">
+                              <span className="font-['Barlow_Condensed'] font-black text-sm uppercase px-1.5 py-0.5 rounded bg-white border border-stone-200 shadow-2xs">
+                                {sizeName}
+                              </span>
+                              <span className="font-mono font-bold text-xs">{q} pcs</span>
+                            </div>
+                            <span className="w-5 h-5 rounded-md bg-white border border-stone-300 flex items-center justify-center text-stone-500 hover:text-black">
+                              <Plus size={11} strokeWidth={2.5} />
+                            </span>
                           </div>
                         );
                       })
                     ) : (
-                      <span className="text-xs text-slate-500 italic">Varian All Size ({totalStock} pcs)</span>
+                      <div className="col-span-full py-2 text-xs text-stone-400 italic">
+                        Belum ada matriks ukuran individual. Gunakan tombol restock untuk inisialisasi varian (S, M, L, XL, XXL).
+                      </div>
                     )}
                   </div>
-                </div>
-
-                {/* Right: Total Stock Badge & Quick Action Button */}
-                <div className="flex items-center justify-between lg:justify-end gap-4 shrink-0 pt-3 lg:pt-0 border-t lg:border-t-0 border-white/5">
-                  <div className="text-right">
-                    <div className="text-[10px] text-slate-400 uppercase font-semibold">Total Stok Fisik</div>
-                    <div className="flex items-center gap-1.5 justify-end mt-0.5">
-                      <span
-                        className={`inline-block w-2 h-2 rounded-full ${
-                          isOutOfStock ? "bg-rose-500 animate-pulse" : isLowStock ? "bg-amber-400" : "bg-emerald-400"
-                        }`}
-                      />
-                      <span
-                        className={`text-lg font-black ${
-                          isOutOfStock ? "text-rose-400" : isLowStock ? "text-amber-400" : "text-emerald-400"
-                        }`}
-                      >
-                        {totalStock} pcs
-                      </span>
-                    </div>
-                  </div>
-
-                  <button
-                    onClick={() => handleOpenRestock(product)}
-                    className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#00BFA5] text-black font-extrabold text-xs tracking-wider uppercase hover:shadow-lg hover:shadow-[#00BFA5]/25 hover:scale-105 transition-all cursor-pointer"
-                  >
-                    <Plus size={16} strokeWidth={3} />
-                    <span>Restock</span>
-                  </button>
                 </div>
               </div>
             );
@@ -363,49 +439,49 @@ export default function Inventory() {
 
       {/* QUICK RESTOCK MODAL */}
       {restockProduct && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="relative w-full max-w-md rounded-2xl bg-[#14141E] border border-white/10 p-6 shadow-2xl space-y-5">
-            <div className="flex items-center justify-between pb-3 border-b border-white/10">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="relative w-full max-w-md rounded-3xl bg-white border border-stone-200 p-6 shadow-2xl space-y-5 text-slate-900">
+            <div className="flex items-center justify-between pb-3 border-b border-stone-100">
               <div className="flex items-center gap-2.5">
-                <div className="bg-[#00BFA5]/10 p-2 rounded-lg text-[#00BFA5]">
+                <div className="bg-[#162018] p-2.5 rounded-xl text-white">
                   <Plus size={18} strokeWidth={3} />
                 </div>
                 <div>
-                  <h3 className="text-base font-bold text-white">Tambah Stok Masuk Konveksi</h3>
-                  <p className="text-[11px] text-slate-400">Penerimaan barang dari pabrik RegarSport</p>
+                  <h3 className="text-base font-bold text-slate-900">Tambah Stok Masuk Konveksi</h3>
+                  <p className="text-[11px] text-stone-500">Penerimaan barang fisik dari pabrik RegarSport</p>
                 </div>
               </div>
               <button
                 onClick={() => setRestockProduct(null)}
-                className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-white/10"
+                className="text-stone-400 hover:text-black p-1 rounded-lg hover:bg-stone-100 transition-colors"
               >
                 <X size={18} />
               </button>
             </div>
 
             <form onSubmit={handleRestockSubmit} className="space-y-4">
-              <div className="p-3 rounded-xl bg-white/5 border border-white/5 flex items-center gap-3">
+              <div className="p-3 rounded-2xl bg-stone-50 border border-stone-200 flex items-center gap-3">
                 <img
                   src={restockProduct.imageUrl || "https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=120&q=80"}
                   alt={restockProduct.name}
-                  className="w-12 h-12 rounded-lg object-cover bg-black/40"
+                  className="w-12 h-12 rounded-xl object-cover bg-stone-200 border border-stone-200"
                 />
                 <div>
-                  <div className="text-xs font-bold text-white line-clamp-1">{restockProduct.name}</div>
-                  <div className="text-[11px] text-slate-400 mt-0.5">
-                    Sisa stok saat ini: <strong className="text-white">{restockProduct.stock} pcs</strong>
+                  <div className="text-xs font-bold text-slate-900 line-clamp-1">{restockProduct.name}</div>
+                  <div className="text-[11px] text-stone-500 mt-0.5">
+                    Sisa stok saat ini: <strong className="text-slate-900 font-mono">{restockProduct.stock} pcs</strong>
                   </div>
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">
+                <label className="block text-xs font-mono font-bold text-stone-700 uppercase tracking-wider mb-2">
                   Pilih Varian Ukuran Masuk
                 </label>
                 <select
                   value={selectedSize}
                   onChange={(e) => setSelectedSize(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-xl bg-[#0D0D0D] border border-white/10 text-xs text-white focus:outline-none focus:border-[#00BFA5]"
+                  className="w-full px-4 py-2.5 rounded-xl bg-stone-50 border border-stone-200 text-xs text-slate-900 focus:outline-none focus:border-[#162018] font-mono"
                 >
                   {Object.keys(restockProduct.sizeStocks || {}).length > 0 ? (
                     Object.entries(restockProduct.sizeStocks).map(([size, qty]) => (
@@ -427,7 +503,7 @@ export default function Inventory() {
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">
+                <label className="block text-xs font-mono font-bold text-stone-700 uppercase tracking-wider mb-2">
                   Jumlah Barang Masuk (+ pcs)
                 </label>
                 <input
@@ -436,7 +512,7 @@ export default function Inventory() {
                   max="1000"
                   value={restockQty}
                   onChange={(e) => setRestockQty(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-xl bg-[#0D0D0D] border border-white/10 text-sm font-bold text-white focus:outline-none focus:border-[#00BFA5]"
+                  className="w-full px-4 py-2.5 rounded-xl bg-stone-50 border border-stone-200 text-sm font-bold text-slate-900 focus:outline-none focus:border-[#162018] font-mono"
                   placeholder="Contoh: 10, 25, 50"
                   required
                 />
@@ -446,14 +522,14 @@ export default function Inventory() {
                 <button
                   type="button"
                   onClick={() => setRestockProduct(null)}
-                  className="px-4 py-2 text-xs font-bold text-slate-400 hover:text-white"
+                  className="px-4 py-2 text-xs font-bold text-stone-500 hover:text-black transition-colors"
                 >
                   Batal
                 </button>
                 <button
                   type="submit"
                   disabled={restocking}
-                  className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#00BFA5] text-black font-extrabold text-xs uppercase tracking-wider hover:shadow-lg hover:shadow-[#00BFA5]/25 disabled:opacity-50 cursor-pointer"
+                  className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#111613] hover:bg-black text-white font-bold text-xs uppercase tracking-wider disabled:opacity-50 transition-all cursor-pointer shadow-md active:scale-95"
                 >
                   {restocking && <Loader2 size={14} className="animate-spin" />}
                   <span>Simpan Stok Masuk</span>

@@ -75,26 +75,34 @@ public class OrderController {
     @Operation(summary = "Admin: Update order status", description = "Update the processing status of an order")
     public ResponseEntity<ApiResponse<OrderResponse>> updateOrderStatus(
             @PathVariable Long id,
+            @RequestHeader(value = "X-User-Role", defaultValue = "ROLE_CUSTOMER") String role,
             @Valid @RequestBody OrderStatusUpdateRequest request
     ) {
-        OrderResponse response = orderService.updateOrderStatus(id, request.status());
-        return ResponseEntity.ok(ApiResponse.success("Order status updated successfully", response));
+        OrderResponse response = orderService.updateOrderStatus(id, request.status(), role);
+        return ResponseEntity.ok(ApiResponse.success("Status pesanan berhasil diperbarui", response));
     }
 
     @PatchMapping("/{id}/ship")
-    @Operation(summary = "Admin: Ship order", description = "Fulfill order by adding courier name and tracking number")
+    @Operation(summary = "Admin/Logistics: Ship order", description = "Fulfill order by adding courier name and tracking number")
     public ResponseEntity<ApiResponse<OrderResponse>> shipOrder(
             @PathVariable Long id,
+            @RequestHeader(value = "X-User-Role", defaultValue = "ROLE_CUSTOMER") String role,
             @Valid @RequestBody com.regarsport.order.dto.ShipOrderRequest request
     ) {
-        OrderResponse response = orderService.shipOrder(id, request);
+        OrderResponse response = orderService.shipOrder(id, request, role);
         return ResponseEntity.ok(ApiResponse.success("Pesanan berhasil dikirim dengan nomor resi", response));
     }
 
     @PatchMapping("/{id}/complete")
     @Operation(summary = "Customer/Admin: Complete order", description = "Confirm order receipt and mark as completed")
-    public ResponseEntity<ApiResponse<OrderResponse>> completeOrder(@PathVariable Long id) {
-        OrderResponse response = orderService.completeOrder(id);
+    public ResponseEntity<ApiResponse<OrderResponse>> completeOrder(
+            @PathVariable Long id,
+            @RequestHeader(value = "X-User-Id", defaultValue = "1") Long userId,
+            @RequestHeader(value = "X-User-Role", defaultValue = "ROLE_CUSTOMER") String role
+    ) {
+        boolean isAdmin = "ROLE_ADMIN".equalsIgnoreCase(role) || "ADMIN".equalsIgnoreCase(role)
+                || "ROLE_LOGISTICS".equalsIgnoreCase(role) || "LOGISTICS".equalsIgnoreCase(role);
+        OrderResponse response = orderService.completeOrder(id, userId, isAdmin);
         return ResponseEntity.ok(ApiResponse.success("Pesanan telah selesai dan berhasil diterima", response));
     }
 

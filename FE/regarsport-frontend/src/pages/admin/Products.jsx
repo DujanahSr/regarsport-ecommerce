@@ -2,7 +2,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-hooks/set-state-in-effect */
 import { useEffect, useRef, useState } from "react";
-import { Search, Plus, Pencil, Trash2, X, Package, Upload, Sparkles, Sliders } from "lucide-react";
+import { Search, Plus, Pencil, Trash2, X, Package, Upload, Sliders } from "lucide-react";
 import api from "../../services/api";
 import { EmptyState, ScreenLoader } from "../../components/common/UiStates";
 import ManageSizeStockModal from "../../components/admin/ManageSizeStockModal";
@@ -291,7 +291,7 @@ export default function Products() {
         <h2 className="text-lg font-bold text-white mb-6 flex items-center gap-3">
           {editingId ? (
             <>
-              <Sparkles size={20} className="text-[#00BFA5]" />
+              <Pencil size={20} className="text-[#00BFA5]" />
               Edit Produk
             </>
           ) : (

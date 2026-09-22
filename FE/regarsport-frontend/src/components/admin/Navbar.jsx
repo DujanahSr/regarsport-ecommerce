@@ -7,6 +7,7 @@ export default function Navbar() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const isLogistics = user?.role === "logistics";
 
   const handleLogout = async () => {
     await logout();
@@ -14,59 +15,82 @@ export default function Navbar() {
   };
 
   return (
-    <header className="sticky top-0 z-30 bg-[#0D0D0D]/80 backdrop-blur-lg border-b border-white/5 px-6 py-3 flex justify-between items-center">
-      <h2 className="text-sm font-semibold text-white/70 tracking-wide">
-        {user?.role === "logistics" ? (
-          <>
-            <span className="text-purple-400">/</span> Panel Gudang & Logistik
-          </>
-        ) : (
-          <>
-            <span className="text-[#00BFA5]">/</span> Admin Panel
-          </>
-        )}
-      </h2>
+    <header
+      className={`sticky top-0 z-30 px-6 py-3.5 flex justify-between items-center backdrop-blur-md transition-colors ${
+        isLogistics
+          ? "bg-[#162018] text-white border-b border-white/10 shadow-sm"
+          : "bg-[#0D0D0D]/80 text-white border-b border-white/5"
+      }`}
+    >
+      <div className="flex items-center gap-2">
+        <span className="font-mono text-[10px] uppercase font-bold tracking-widest px-2 py-0.5 rounded bg-white/10 text-emerald-300 border border-emerald-500/20">
+          LOGISTIK
+        </span>
+        <h2 className="text-xs sm:text-sm font-bold text-slate-200 tracking-wide">
+          Atelier Logistics &amp; Distribution Hub
+        </h2>
+      </div>
 
       <div className="flex items-center gap-3">
         <button
           onClick={() => setDropdownOpen(!dropdownOpen)}
-          className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-white/10 hover:bg-white/5 transition-all duration-200 group"
+          className={`flex items-center gap-2.5 px-3 py-1.5 rounded-xl border transition-all duration-200 cursor-pointer ${
+            isLogistics
+              ? "border-white/15 bg-white/5 hover:bg-white/10 text-white"
+              : "border-white/10 hover:bg-white/5 text-white"
+          }`}
         >
-          <div className="w-8 h-8 rounded-full overflow-hidden bg-linear-to-br from-[#00BFA5]/20 to-[#00BFA5]/5 border border-[#00BFA5]/30 flex items-center justify-center shrink-0">
-            {user?.avatar_url ? (
+          <div className="w-7 h-7 rounded-full overflow-hidden bg-white/15 border border-white/20 flex items-center justify-center shrink-0">
+            {user?.avatar_url || user?.avatarUrl ? (
               <img
-                src={user.avatar_url}
-                alt={user?.full_name || "Avatar"}
+                src={user.avatar_url || user.avatarUrl}
+                alt={user?.full_name || user?.fullName || "Avatar"}
                 className="w-full h-full object-cover"
               />
             ) : (
-              <span className="text-xs font-bold text-[#00BFA5]">
-                {user?.full_name?.charAt(0)?.toUpperCase() || "U"}
+              <span className="text-xs font-bold text-white">
+                {(user?.full_name || user?.fullName || "G").charAt(0).toUpperCase()}
               </span>
             )}
           </div>
-          <span className="text-sm font-medium text-white/80 hidden sm:inline">
-            {user?.full_name || "Admin"}
+          <span className="text-xs sm:text-sm font-semibold text-white/90 hidden sm:inline">
+            {user?.full_name || user?.fullName || "Staf Gudang"}
           </span>
-          <ChevronDown size={14} className="text-white/40 group-hover:text-white/70 transition-colors" />
+          <ChevronDown size={14} className="text-slate-400" />
         </button>
 
         {dropdownOpen && (
-          <div className="absolute right-6 top-16 mt-1 w-48 bg-[#14141E] border border-white/10 rounded-xl shadow-2xl py-1 z-50">
+          <div
+            className={`absolute right-6 top-16 mt-1 w-52 rounded-2xl shadow-2xl py-1.5 z-50 border ${
+              isLogistics
+                ? "bg-[#162018] border-white/10 text-white"
+                : "bg-[#14141E] border-white/10 text-white"
+            }`}
+          >
+            <div className="px-4 py-2 border-b border-white/10">
+              <div className="text-xs font-bold text-white truncate">
+                {user?.full_name || user?.fullName || "Staf Gudang"}
+              </div>
+              <div className="text-[10px] font-mono text-slate-400 truncate">
+                {user?.email || "gudang@regarsport.com"}
+              </div>
+            </div>
+
             <Link
               to="/admin/profile"
-              className="flex items-center gap-3 px-4 py-2.5 text-sm text-white/70 hover:text-white hover:bg-white/5 transition-colors"
+              className="flex items-center gap-3 px-4 py-2.5 text-xs text-slate-300 hover:text-white hover:bg-white/5 transition-colors"
               onClick={() => setDropdownOpen(false)}
             >
               <User size={15} />
-              Profil Saya
+              <span>Profil Pengguna</span>
             </Link>
+
             <button
               onClick={handleLogout}
-              className="flex items-center gap-3 px-4 py-2.5 text-sm text-red-400 hover:text-red-300 hover:bg-white/5 transition-colors w-full"
+              className="w-full flex items-center gap-3 px-4 py-2.5 text-xs text-rose-400 hover:text-rose-300 hover:bg-white/5 transition-colors text-left cursor-pointer"
             >
               <LogOut size={15} />
-              Logout
+              <span>Keluar Akun</span>
             </button>
           </div>
         )}

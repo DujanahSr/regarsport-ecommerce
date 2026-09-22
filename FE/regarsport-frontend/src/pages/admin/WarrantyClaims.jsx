@@ -18,7 +18,6 @@ import {
   X,
   MessageSquare,
   ArrowRight,
-  Sparkles,
 } from "lucide-react";
 import api from "../../services/api";
 import { EmptyState, ScreenLoader } from "../../components/common/UiStates";
@@ -223,26 +222,30 @@ export default function WarrantyClaims() {
   }, [claims]);
 
   return (
-    <div className="min-h-screen bg-[#0D0D0D] pb-12">
+    <div className={isLogistics ? "space-y-8 animate-in fade-in duration-300 pb-12" : "min-h-screen bg-[#0D0D0D] pb-12"}>
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
         <div className="flex items-center gap-4">
-          <div className="relative">
-            <div className="absolute inset-0 bg-[#00BFA5]/20 blur-xl rounded-2xl" />
-            <div className="relative bg-[#00BFA5]/10 border border-[#00BFA5]/30 p-3.5 rounded-2xl">
-              <ShieldCheck size={32} className="text-[#00BFA5]" />
-            </div>
+          <div className={`p-3.5 rounded-2xl ${isLogistics ? "bg-[#162018] text-white shadow-sm" : "bg-emerald-500/10 border border-emerald-500/30 text-emerald-400"}`}>
+            <ShieldCheck size={32} />
           </div>
           <div>
-            <div className="flex items-center gap-2">
-              <h1 className="text-3xl font-black text-white tracking-[-1px]">
-                {isLogistics ? "RETUR & PENGGANTIAN GARANSI" : "KLAIM GARANSI & RETUR"}
-              </h1>
-              <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-[#00BFA5]/20 text-[#00BFA5] border border-[#00BFA5]/30">
-                Resmi 100%
+            <div className="flex items-center gap-2 mb-1">
+              <span className={`px-2.5 py-0.5 rounded-md font-mono text-[10px] font-black tracking-widest ${
+                isLogistics ? "bg-[#162018] text-[#FAF8F4]" : "bg-emerald-500/20 text-emerald-300 border border-emerald-500/40"
+              }`}>
+                {isLogistics ? "RS // WARRANTY DISPATCH" : "RS // WARRANTY CENTER"}
+              </span>
+              <span className={`text-[11px] font-mono uppercase tracking-widest ${isLogistics ? "text-stone-500" : "text-slate-400"}`}>
+                {isLogistics ? "INSPEKSI FISIK & PENGGANTIAN RESMI" : "VERIFIKASI KLAIM PELANGGAN"}
               </span>
             </div>
-            <p className="text-slate-400 text-sm mt-0.5">
+            <h1 className={`font-['Barlow_Condensed'] font-black text-3xl sm:text-4xl uppercase tracking-tight leading-none ${
+              isLogistics ? "text-slate-900" : "text-white"
+            }`}>
+              {isLogistics ? "RETUR & PENGGANTIAN GARANSI" : "KLAIM GARANSI & RETUR"}
+            </h1>
+            <p className={`text-xs sm:text-sm mt-1.5 ${isLogistics ? "text-stone-500" : "text-slate-400"}`}>
               {isLogistics
                 ? "Pemeriksaan paket retur masuk, pengepakan tukar ukuran, dan pengiriman resi pengganti"
                 : "Verifikasi tiket kendala pelanggan, validasi bukti foto, dan persetujuan klaim garansi"}
@@ -253,7 +256,11 @@ export default function WarrantyClaims() {
         <button
           onClick={fetchClaims}
           disabled={loading}
-          className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#14141E] border border-white/10 hover:border-white/20 text-slate-300 hover:text-white text-xs font-bold transition active:scale-95 cursor-pointer self-start md:self-auto"
+          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition active:scale-95 cursor-pointer self-start md:self-auto ${
+            isLogistics
+              ? "bg-white hover:bg-stone-100 text-stone-700 border border-stone-200 shadow-xs"
+              : "bg-[#14141E] border border-white/10 hover:border-white/20 text-slate-300 hover:text-white"
+          }`}
         >
           <RefreshCw size={14} className={loading ? "animate-spin" : ""} />
           <span>Segarkan Data</span>
@@ -262,43 +269,67 @@ export default function WarrantyClaims() {
 
       {/* KPI Stats Bar */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
-        <div className="p-4 rounded-2xl bg-[#14141E] border border-white/5 flex items-center gap-3.5">
-          <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center shrink-0">
+        <div className={`p-5 rounded-3xl border flex items-center gap-3.5 shadow-sm ${
+          isLogistics ? "bg-white border-stone-200/80" : "bg-[#14141E] border-white/5"
+        }`}>
+          <div className="w-10 h-10 rounded-2xl bg-amber-50 border border-amber-200 text-amber-800 flex items-center justify-center shrink-0">
             <Clock size={20} />
           </div>
           <div>
-            <div className="text-xl font-black text-white">{stats.pending}</div>
-            <div className="text-[11px] font-semibold text-slate-400">Menunggu Verifikasi CS</div>
+            <div className={`text-2xl font-black font-['Barlow_Condensed'] ${isLogistics ? "text-slate-900" : "text-white"}`}>
+              {stats.pending}
+            </div>
+            <div className={`text-[11px] font-semibold ${isLogistics ? "text-stone-500" : "text-slate-400"}`}>
+              Menunggu Verifikasi CS
+            </div>
           </div>
         </div>
 
-        <div className="p-4 rounded-2xl bg-[#14141E] border border-white/5 flex items-center gap-3.5">
-          <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
+        <div className={`p-5 rounded-3xl border flex items-center gap-3.5 shadow-sm ${
+          isLogistics ? "bg-white border-stone-200/80" : "bg-[#14141E] border-white/5"
+        }`}>
+          <div className="w-10 h-10 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 flex items-center justify-center shrink-0">
             <CheckCircle2 size={20} />
           </div>
           <div>
-            <div className="text-xl font-black text-white">{stats.approved}</div>
-            <div className="text-[11px] font-semibold text-slate-400">Disetujui / Siap Kirim</div>
+            <div className={`text-2xl font-black font-['Barlow_Condensed'] ${isLogistics ? "text-slate-900" : "text-white"}`}>
+              {stats.approved}
+            </div>
+            <div className={`text-[11px] font-semibold ${isLogistics ? "text-stone-500" : "text-slate-400"}`}>
+              Disetujui / Siap Kirim
+            </div>
           </div>
         </div>
 
-        <div className="p-4 rounded-2xl bg-[#14141E] border border-white/5 flex items-center gap-3.5">
-          <div className="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-400 flex items-center justify-center shrink-0">
+        <div className={`p-5 rounded-3xl border flex items-center gap-3.5 shadow-sm ${
+          isLogistics ? "bg-white border-stone-200/80" : "bg-[#14141E] border-white/5"
+        }`}>
+          <div className="w-10 h-10 rounded-2xl bg-stone-100 border border-stone-200 text-stone-800 flex items-center justify-center shrink-0">
             <Layers size={20} />
           </div>
           <div>
-            <div className="text-xl font-black text-white">{stats.processing}</div>
-            <div className="text-[11px] font-semibold text-slate-400">Diproses di Gudang</div>
+            <div className={`text-2xl font-black font-['Barlow_Condensed'] ${isLogistics ? "text-slate-900" : "text-white"}`}>
+              {stats.processing}
+            </div>
+            <div className={`text-[11px] font-semibold ${isLogistics ? "text-stone-500" : "text-slate-400"}`}>
+              Diproses di Gudang
+            </div>
           </div>
         </div>
 
-        <div className="p-4 rounded-2xl bg-[#14141E] border border-white/5 flex items-center gap-3.5">
-          <div className="w-10 h-10 rounded-xl bg-teal-500/10 border border-teal-500/20 text-teal-300 flex items-center justify-center shrink-0">
+        <div className={`p-5 rounded-3xl border flex items-center gap-3.5 shadow-sm ${
+          isLogistics ? "bg-white border-stone-200/80" : "bg-[#14141E] border-white/5"
+        }`}>
+          <div className="w-10 h-10 rounded-2xl bg-stone-100 border border-stone-200 text-stone-800 flex items-center justify-center shrink-0">
             <Truck size={20} />
           </div>
           <div>
-            <div className="text-xl font-black text-white">{stats.resolved}</div>
-            <div className="text-[11px] font-semibold text-slate-400">Pengganti Terkirim / Selesai</div>
+            <div className={`text-2xl font-black font-['Barlow_Condensed'] ${isLogistics ? "text-slate-900" : "text-white"}`}>
+              {stats.resolved}
+            </div>
+            <div className={`text-[11px] font-semibold ${isLogistics ? "text-stone-500" : "text-slate-400"}`}>
+              Pengganti Terkirim / Selesai
+            </div>
           </div>
         </div>
       </div>
@@ -316,6 +347,31 @@ export default function WarrantyClaims() {
               { label: "Ditolak", value: "REJECTED" },
             ].map((tab) => {
               const isActive = (statusFilter || "").toUpperCase() === tab.value;
+              if (isLogistics) {
+                return (
+                  <button
+                    key={tab.value}
+                    onClick={() => {
+                      setPage(1);
+                      setStatusFilter(tab.value);
+                    }}
+                    className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${
+                      isActive
+                        ? "bg-[#111613] text-white shadow-md"
+                        : "bg-white text-stone-600 hover:text-black hover:bg-stone-100 border border-stone-200"
+                    }`}
+                  >
+                    <span>{tab.label}</span>
+                    {tab.badge && (
+                      <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${
+                        isActive ? "bg-white/20 text-white" : "bg-amber-50 text-amber-800 border border-amber-200"
+                      }`}>
+                        {tab.badge}
+                      </span>
+                    )}
+                  </button>
+                );
+              }
               return (
                 <button
                   key={tab.value}
@@ -346,30 +402,36 @@ export default function WarrantyClaims() {
 
           {/* Search Box */}
           <div className="relative w-full lg:w-72 shrink-0">
-            <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500" />
+            <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400" />
             <input
               type="text"
               placeholder="Cari Tiket, Order, Produk..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 bg-[#14141E] border border-white/10 focus:border-[#00BFA5] rounded-xl text-xs text-white placeholder-slate-500 outline-none transition"
+              className={`w-full pl-10 pr-4 py-2.5 rounded-full text-xs outline-none transition font-mono ${
+                isLogistics
+                  ? "bg-white border border-stone-200 text-slate-900 placeholder:text-stone-400 focus:border-[#162018]"
+                  : "bg-[#14141E] border border-white/10 text-white placeholder-slate-500 focus:border-[#00BFA5]"
+              }`}
             />
           </div>
         </div>
       </div>
 
       {/* Main Table */}
-      <div className="bg-[#14141E] border border-white/10 rounded-2xl overflow-hidden shadow-xl">
+      <div className={`rounded-3xl overflow-hidden shadow-sm ${
+        isLogistics ? "bg-white border border-stone-200/80" : "bg-[#14141E] border border-white/10 shadow-xl"
+      }`}>
         {loading ? (
           <div className="py-20 flex flex-col items-center justify-center text-center">
-            <RefreshCw size={32} className="text-[#00BFA5] animate-spin mb-3" />
-            <p className="text-slate-400 text-sm">Memuat data klaim garansi...</p>
+            <RefreshCw size={32} className={`animate-spin mb-3 ${isLogistics ? "text-slate-800" : "text-[#00BFA5]"}`} />
+            <p className={`text-sm ${isLogistics ? "text-stone-500" : "text-slate-400"}`}>Memuat data klaim garansi...</p>
           </div>
         ) : filteredClaims.length === 0 ? (
           <div className="py-20 px-4 text-center">
-            <ShieldCheck size={48} className="text-slate-600 mx-auto mb-3" />
-            <h3 className="text-base font-bold text-white mb-1">Tidak Ada Tiket Klaim</h3>
-            <p className="text-xs text-slate-400 max-w-sm mx-auto">
+            <ShieldCheck size={48} className="text-stone-400 mx-auto mb-3" />
+            <h3 className={`text-base font-bold mb-1 ${isLogistics ? "text-slate-900" : "text-white"}`}>Tidak Ada Tiket Klaim</h3>
+            <p className="text-xs text-stone-500 max-w-sm mx-auto">
               {statusFilter
                 ? `Tidak ditemukan tiket klaim dengan status "${statusFilter}".`
                 : "Belum ada pengajuan klaim garansi atau kendala pesanan dari pelanggan."}
@@ -379,17 +441,19 @@ export default function WarrantyClaims() {
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse text-xs">
               <thead>
-                <tr className="border-b border-white/10 bg-white/[0.02] text-slate-400 font-bold uppercase tracking-wider text-[11px]">
-                  <th className="py-4 px-5">Tiket Klaim & Tanggal</th>
-                  <th className="py-4 px-5">No. Pesanan & Pemesan</th>
-                  <th className="py-4 px-5">Produk & Solusi</th>
+                <tr className={`border-b font-bold uppercase tracking-wider text-[11px] ${
+                  isLogistics ? "bg-stone-50 border-stone-200 text-stone-600" : "border-white/10 bg-white/[0.02] text-slate-400"
+                }`}>
+                  <th className="py-4 px-5">Tiket Klaim &amp; Tanggal</th>
+                  <th className="py-4 px-5">No. Pesanan &amp; Pemesan</th>
+                  <th className="py-4 px-5">Produk &amp; Solusi</th>
                   <th className="py-4 px-5">Bukti Foto</th>
                   <th className="py-4 px-5">Status</th>
                   <th className="py-4 px-5">Resi Pengganti</th>
                   <th className="py-4 px-5 text-right">Aksi</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-white/5">
+              <tbody className={`divide-y ${isLogistics ? "divide-stone-100" : "divide-white/5"}`}>
                 {filteredClaims.map((claim) => {
                   const statusInfo = statusConfig[claim.status] || statusConfig.PENDING;
                   const StatusIcon = statusInfo.icon;

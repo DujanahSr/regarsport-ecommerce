@@ -46,18 +46,29 @@ export default function Sidebar() {
 
   const menuItems = isLogistics ? logisticsMenuItems : adminMenuItems;
 
-  const menuClass = ({ isActive }) =>
-    `flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${isActive
-      ? "bg-[#00BFA5]/10 text-[#00BFA5] shadow-[inset_0_0_0_1px_#00BFA5/20]"
-      : "text-slate-400 hover:text-white hover:bg-white/5"
+  const menuClass = ({ isActive }) => {
+    if (isLogistics) {
+      return `flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 text-sm font-medium ${
+        isActive
+          ? "bg-white/15 text-white font-bold border-l-2 border-emerald-400 shadow-xs"
+          : "text-slate-300 hover:text-white hover:bg-white/5"
+      }`;
+    }
+    return `flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
+      isActive
+        ? "bg-[#00BFA5]/10 text-[#00BFA5] shadow-[inset_0_0_0_1px_#00BFA5/20]"
+        : "text-slate-400 hover:text-white hover:bg-white/5"
     }`;
+  };
 
   return (
     <>
       {/* Mobile toggle button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="lg:hidden fixed top-4 left-4 z-50 p-2 rounded-lg bg-[#14141E] border border-white/10 text-white"
+        className={`lg:hidden fixed top-4 left-4 z-50 p-2 rounded-xl border text-white ${
+          isLogistics ? "bg-[#162018] border-white/10" : "bg-[#14141E] border-white/10"
+        }`}
       >
         {isOpen ? <X size={20} /> : <Menu size={20} />}
       </button>
@@ -65,31 +76,45 @@ export default function Sidebar() {
       {/* Overlay for mobile */}
       {isOpen && (
         <div
-          className="lg:hidden fixed inset-0 z-40 bg-black/50 backdrop-blur-sm"
+          className="lg:hidden fixed inset-0 z-40 bg-black/60 backdrop-blur-sm"
           onClick={() => setIsOpen(false)}
         />
       )}
 
       {/* Sidebar */}
       <aside
-        className={`fixed lg:sticky top-0 z-40 w-72 h-screen bg-[#0D0D0D] border-r border-white/5 flex flex-col transition-transform duration-300 ${isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
-          }`}
+        className={`fixed lg:sticky top-0 z-40 w-72 h-screen flex flex-col transition-transform duration-300 ${
+          isLogistics
+            ? "bg-[#162018] text-[#FAF8F4] border-r border-white/10"
+            : "bg-[#0D0D0D] text-white border-r border-white/5"
+        } ${isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`}
       >
         {/* Logo */}
-        <div className="shrink-0 flex items-center gap-2 px-6 h-16 border-b border-white/5">
-          <div className="bg-[#00BFA5] p-1.5 rounded-md">
-            <Zap size={16} className="text-black" strokeWidth={3} />
+        <div className="shrink-0 flex items-center gap-3 px-6 h-18 border-b border-white/10">
+          <div className={`p-2 rounded-xl ${isLogistics ? "bg-white text-[#111613] shadow-sm" : "bg-[#00BFA5] text-black"}`}>
+            <Zap size={16} strokeWidth={3} />
           </div>
-          <span className="text-white font-black tracking-[3px] text-sm uppercase">RegarSport</span>
-          <span className={`ml-auto text-[9px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-md ${
-            isLogistics ? "bg-purple-500/20 text-purple-400 border border-purple-500/30" : "text-[#00BFA5]/60"
-          }`}>
+          <div className="flex flex-col">
+            <span className="text-white font-black tracking-[2px] text-sm uppercase font-['Barlow_Condensed']">
+              REGARSPORT
+            </span>
+            <span className="text-[10px] font-mono tracking-widest text-slate-400">
+              ATELIER // CICENDO
+            </span>
+          </div>
+          <span
+            className={`ml-auto text-[9px] font-mono font-bold uppercase tracking-widest px-2 py-0.5 rounded-md ${
+              isLogistics
+                ? "bg-white/10 text-emerald-300 border border-emerald-500/30"
+                : "text-[#00BFA5]/60"
+            }`}
+          >
             {isLogistics ? "Gudang" : "Admin"}
           </span>
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 overflow-y-auto p-4 space-y-1">
+        <nav className="flex-1 overflow-y-auto p-4 space-y-1.5">
           {menuItems.map((item) => (
             <NavLink
               key={item.to}
@@ -98,17 +123,17 @@ export default function Sidebar() {
               className={menuClass}
               onClick={() => setIsOpen(false)}
             >
-              <item.icon size={18} strokeWidth={1.5} />
-              <span className="text-sm font-medium">{item.label}</span>
+              <item.icon size={18} strokeWidth={1.75} />
+              <span>{item.label}</span>
             </NavLink>
           ))}
         </nav>
 
         {/* Footer */}
-        <div className="shrink-0 px-6 py-4 border-t border-white/5">
-          <div className="flex items-center gap-2 text-[10px] text-slate-500">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#00BFA5]" />
-            <span>System Online</span>
+        <div className="shrink-0 px-6 py-4 border-t border-white/10">
+          <div className="flex items-center gap-2 text-[11px] font-mono text-slate-400">
+            <span className="w-2 h-2 rounded-full bg-emerald-400" />
+            <span>SISTEM DISPATCH AKTIF</span>
           </div>
         </div>
       </aside>

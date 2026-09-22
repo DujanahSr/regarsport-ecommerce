@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useRef } from "react";
+import React, { useRef, useEffect } from "react";
 import { Printer, X, Truck, Layers, CheckCircle2 } from "lucide-react";
 
 // Helper to generate realistic SVG barcode patterns from string
@@ -300,13 +300,27 @@ export default function BulkShippingLabelModal({ isOpen, onClose, orders = [] })
     }, 300);
   };
 
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "p") {
+        e.preventDefault();
+        handlePrint();
+      } else if (e.key === "Escape") {
+        onClose();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isOpen, orders]);
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm overflow-y-auto animate-in fade-in duration-200">
       <div className="relative w-full max-w-2xl bg-[#14141E] border border-white/10 rounded-3xl p-6 shadow-2xl my-8 max-h-[90vh] flex flex-col">
         {/* Modal Header */}
         <div className="flex items-center justify-between pb-4 mb-4 border-b border-white/10 shrink-0">
           <div className="flex items-center gap-2.5">
-            <div className="p-2 rounded-xl bg-purple-500/10 text-purple-400 border border-purple-500/20">
+            <div className="p-2 rounded-xl bg-white/10 text-white border border-white/10">
               <Layers size={20} />
             </div>
             <div>
@@ -322,14 +336,14 @@ export default function BulkShippingLabelModal({ isOpen, onClose, orders = [] })
           <div className="flex items-center gap-2">
             <button
               onClick={handlePrint}
-              className="flex items-center gap-2 px-4 py-2 bg-[#00BFA5] hover:bg-[#00BFA5]/90 text-black font-bold text-xs rounded-xl shadow-lg shadow-[#00BFA5]/20 transition active:scale-95 cursor-pointer"
+              className="flex items-center gap-2 px-4 py-2 bg-[#162018] hover:bg-black text-white font-bold text-xs rounded-xl shadow-md border border-white/20 transition active:scale-95 cursor-pointer"
             >
               <Printer size={15} /> Cetak Semua ({orders.length}) Label
             </button>
             <button
               onClick={onClose}
-              className="p-2 text-white/50 hover:text-white rounded-xl hover:bg-white/5 transition"
-              title="Tutup"
+              className="p-2 text-white/50 hover:text-white rounded-xl hover:bg-white/5 transition cursor-pointer"
+              title="Tutup [Esc]"
             >
               <X size={18} />
             </button>
@@ -355,20 +369,20 @@ export default function BulkShippingLabelModal({ isOpen, onClose, orders = [] })
         </div>
 
         {/* Modal Footer Controls */}
-        <div className="flex items-center justify-between gap-3 mt-4 pt-3 border-t border-white/10 shrink-0">
-          <span className="text-xs text-slate-400">
-            Terpilih <strong className="text-white">{orders.length}</strong> pesanan siap kirim
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 mt-4 pt-3 border-t border-white/10 shrink-0">
+          <span className="text-[11px] font-mono text-slate-400">
+            Terpilih <strong className="text-white">{orders.length}</strong> pesanan • Pintasan: <kbd className="px-1.5 py-0.5 rounded bg-white/10 text-white font-bold">Ctrl + P</kbd>
           </span>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
             <button
               onClick={onClose}
-              className="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-white/70 hover:text-white text-xs font-semibold transition"
+              className="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-white/70 hover:text-white text-xs font-semibold transition cursor-pointer"
             >
-              Tutup
+              Tutup [Esc]
             </button>
             <button
               onClick={handlePrint}
-              className="flex items-center gap-2 px-5 py-2 rounded-xl bg-[#00BFA5] hover:bg-[#00BFA5]/90 text-black text-xs font-bold transition shadow-lg shadow-[#00BFA5]/20 active:scale-95 cursor-pointer"
+              className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#162018] hover:bg-black text-white text-xs font-bold transition shadow-lg border border-white/20 active:scale-95 cursor-pointer"
             >
               <Printer size={16} /> Cetak {orders.length} Label Sekarang
             </button>
