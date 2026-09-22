@@ -136,11 +136,11 @@ export default function Dashboard() {
           setStatusDistribution(dashData.statusDistribution);
         } else {
           setStatusDistribution([
-            { name: 'Lunas / Diproses', value: (dashData.paidOrders || 0) + (dashData.processingOrders || 0), color: '#00BFA5' },
-            { name: 'Sedang Dikirim', value: dashData.shippedOrders || 0, color: '#8B5CF6' },
+            { name: 'Lunas / Diproses', value: (dashData.paidOrders || 0) + (dashData.processingOrders || 0), color: '#B9382B' },
+            { name: 'Sedang Dikirim', value: dashData.shippedOrders || 0, color: '#2563EB' },
             { name: 'Selesai', value: dashData.completedOrders || 0, color: '#10B981' },
             { name: 'Menunggu Bayar', value: dashData.pendingOrders || 0, color: '#F59E0B' },
-            { name: 'Dibatalkan', value: dashData.cancelledOrders || 0, color: '#EF4444' },
+            { name: 'Dibatalkan', value: dashData.cancelledOrders || 0, color: '#94A3B8' },
           ]);
         }
 
@@ -196,24 +196,24 @@ export default function Dashboard() {
       const contentWidth = rightMargin - leftMargin;
 
       // Header PT RegarSport Indonesia
-      doc.setFillColor(0, 191, 165);
+      doc.setFillColor(185, 56, 43); // #B9382B Brand Terracotta
       doc.roundedRect(leftMargin, 15, 10, 10, 2, 2, 'F');
-      doc.setTextColor(0, 0, 0);
+      doc.setTextColor(255, 255, 255);
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(10);
-      doc.text('RS', leftMargin + 2.2, 21.5);
+      doc.text('R', leftMargin + 3.2, 21.5);
 
-      doc.setTextColor(15, 23, 42);
+      doc.setTextColor(22, 32, 24);
       doc.setFontSize(13);
       doc.text('PT REGARSPORT INDONESIA', leftMargin + 13, 20);
-      doc.setTextColor(4, 120, 87);
+      doc.setTextColor(185, 56, 43);
       doc.setFontSize(7.5);
-      doc.text('EXECUTIVE FINANCIAL & OPERATIONAL REPORT', leftMargin + 13, 24);
+      doc.text('EXECUTIVE FINANCIAL & OPERATIONAL REPORT • ATELIER CICENDO BANDUNG', leftMargin + 13, 24);
 
       doc.setTextColor(100, 116, 139);
       doc.setFontSize(7);
       doc.setFont('helvetica', 'normal');
-      doc.text('Pusat Manufaktur Apparel Olahraga • Wonogiri, Jawa Tengah 57612', leftMargin, 29);
+      doc.text('Pusat Apparel Atletik & Manufaktur Sublimasi • Cicendo, Kota Bandung 40171', leftMargin, 29);
       doc.text('NPWP: 01.345.678.9-521.000 | finance@regarsport.com', leftMargin, 33);
 
       const todayStr = new Date().toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' });
@@ -375,207 +375,276 @@ export default function Dashboard() {
 
   const mainKpiCards = [
     {
-      label: 'Total Revenue',
+      label: 'Total Omzet Penjualan',
+      tag: 'REVENUE RIIL',
       value: `Rp ${Number(stats.revenue).toLocaleString('id-ID')}`,
       icon: TrendingUp,
-      color: 'text-[#00BFA5]',
-      bg: 'from-[#00BFA5]/10 to-transparent',
-      note: 'Total omzet riil terverifikasi'
+      color: 'text-[#B9382B]',
+      badgeColor: 'bg-[#FAF0ED] text-[#B9382B] border-[#B9382B]/20',
+      note: `Dari ${stats.orders} transaksi riil`,
     },
     {
-      label: 'Average Order Value (AOV)',
+      label: 'Rata-rata Order (AOV)',
+      tag: 'AOV',
       value: `Rp ${Number(stats.aov).toLocaleString('id-ID')}`,
       icon: DollarSign,
-      color: 'text-emerald-400',
-      bg: 'from-emerald-500/10 to-transparent',
-      note: 'Rata-rata nominal per order lunas'
+      color: 'text-emerald-700',
+      badgeColor: 'bg-emerald-50 text-emerald-800 border-emerald-200',
+      note: 'Rata-rata nominal per order lunas',
     },
     {
-      label: 'Total Orders',
-      value: stats.orders.toLocaleString('id-ID'),
+      label: 'Total Volume Pesanan',
+      tag: 'ORDER',
+      value: `${stats.orders.toLocaleString('id-ID')}`,
       icon: ShoppingCart,
-      color: 'text-purple-400',
-      bg: 'from-purple-500/10 to-transparent',
-      note: `${stats.completedOrders} selesai (${stats.completionRate}% rasio)`
+      color: 'text-stone-800',
+      badgeColor: 'bg-stone-100 text-stone-700 border-stone-200',
+      note: `${stats.completedOrders} selesai (${stats.completionRate}% rasio)`,
     },
     {
       label: 'Omzet Hari Ini',
+      tag: 'HARI INI',
       value: `Rp ${Number(stats.todayRevenue).toLocaleString('id-ID')}`,
       icon: Zap,
-      color: 'text-cyan-400',
-      bg: 'from-cyan-500/10 to-transparent',
-      note: `${stats.todayOrders} pesanan masuk hari ini`
+      color: 'text-amber-700',
+      badgeColor: 'bg-amber-50 text-amber-800 border-amber-200',
+      note: `${stats.todayOrders} pesanan masuk hari ini`,
     },
     {
-      label: 'Total Products',
-      value: stats.products.toLocaleString('id-ID'),
+      label: 'Katalog Produk Aktif',
+      tag: 'MODEL',
+      value: `${stats.products.toLocaleString('id-ID')}`,
       icon: Package,
-      color: 'text-blue-400',
-      bg: 'from-blue-500/10 to-transparent',
-      note: `${stats.categories} kategori aktif`
+      color: 'text-blue-700',
+      badgeColor: 'bg-blue-50 text-blue-800 border-blue-200',
+      note: `${stats.categories} kategori aktif`,
     },
     {
-      label: 'Total Users',
-      value: stats.users.toLocaleString('id-ID'),
+      label: 'Pelanggan Terdaftar',
+      tag: 'MEMBER',
+      value: `${stats.users.toLocaleString('id-ID')}`,
       icon: Users,
-      color: 'text-amber-400',
-      bg: 'from-amber-500/10 to-transparent',
-      note: 'Member & pelanggan terdaftar'
+      color: 'text-indigo-700',
+      badgeColor: 'bg-indigo-50 text-indigo-800 border-indigo-200',
+      note: 'Member & pelanggan atelier',
     },
   ];
 
   return (
-    <div className="min-h-screen bg-[#0D0D0D] pb-12">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
-        <div className="flex items-center gap-4">
-          <div className="relative">
-            <div className="absolute inset-0 bg-[#00BFA5]/20 blur-xl rounded-2xl" />
-            <div className="relative bg-[#00BFA5]/10 border border-[#00BFA5]/30 p-3 rounded-2xl">
-              <LayoutDashboard size={28} className="text-[#00BFA5]" />
-            </div>
-          </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <h1 className="text-3xl sm:text-4xl font-black text-white tracking-[-1px]">EXECUTIVE DASHBOARD</h1>
-              <span className="hidden sm:inline-block px-2.5 py-0.5 rounded-full text-[10px] font-black tracking-wider uppercase bg-[#00BFA5]/20 text-[#00BFA5] border border-[#00BFA5]/30">
-                ENTERPRISE
-              </span>
-            </div>
-            <p className="text-[#7A8A8A] text-sm">
-              Analisis performa finansial, volume penjualan, dan inventaris toko real-time.
-            </p>
-          </div>
+    <div className="space-y-8 animate-in fade-in duration-300">
+      {/* 1. ATELIER EXECUTIVE COMMAND HERO BANNER (With 1 Generated Image & Topography) */}
+      <div className="relative overflow-hidden rounded-3xl border border-black/10 shadow-xl bg-[#162018]">
+        {/* Background Image with Deep Gradient & Topography */}
+        <div className="absolute inset-0 z-0">
+          <img
+            src="/images/admin_hero_bg.jpg"
+            alt="RegarSport Executive Atelier"
+            className="w-full h-full object-cover object-center filter brightness-[0.38] contrast-125"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#162018] via-[#162018]/85 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#162018] via-transparent to-black/30" />
+          <div className="absolute inset-0 bg-topography opacity-15 mix-blend-overlay pointer-events-none" />
         </div>
 
-        <div className="flex flex-wrap items-center gap-3">
-          {/* PDF Executive Report Action */}
-          <button
-            onClick={handleExportPdf}
-            className="flex items-center gap-2 bg-[#00BFA5] text-black px-5 py-3 rounded-2xl text-sm font-black uppercase tracking-wider transition-all duration-300 hover:shadow-[0_0_25px_rgba(0,191,165,0.4)] active:scale-95 cursor-pointer"
-          >
-            <FileText size={18} strokeWidth={2.5} />
-            <span>Unduh Laporan PDF</span>
-          </button>
+        {/* Content Inside Hero */}
+        <div className="relative z-10 p-6 sm:p-8 lg:p-10 flex flex-col justify-between min-h-[220px]">
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div className="flex items-center gap-2">
+              <span className="px-2.5 py-0.5 rounded-md bg-white/15 text-[#FAF8F4] font-mono text-[10px] font-black tracking-widest border border-white/20">
+                RS // 2026
+              </span>
+              <span className="text-[11px] font-mono uppercase tracking-widest text-slate-300">
+                ATELIER CICENDO BANDUNG • EXECUTIVE COMMAND CENTER
+              </span>
+            </div>
 
-          {/* CSV Export Action */}
-          <button
-            onClick={handleExportCsv}
-            disabled={exporting}
-            className="flex items-center gap-2 bg-[#14141E] border border-white/10 hover:border-[#00BFA5]/40 text-white hover:text-[#00BFA5] px-5 py-3 rounded-2xl text-sm font-semibold transition-all duration-300 hover:shadow-[0_0_25px_rgba(0,191,165,0.15)] active:scale-95 disabled:opacity-50 cursor-pointer"
-          >
-            <Download size={18} className={exporting ? "animate-bounce text-[#00BFA5]" : "text-[#00BFA5]"} />
-            <span>{exporting ? "Mengunduh CSV..." : "Export CSV"}</span>
-          </button>
+            <div className="flex flex-wrap items-center gap-2.5">
+              <button
+                onClick={handleExportPdf}
+                className="flex items-center gap-2 bg-[#B9382B] hover:bg-[#9E2D22] text-white px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all shadow-md active:scale-95 cursor-pointer"
+                title="Cetak & Unduh Laporan Keuangan PDF Resmi"
+              >
+                <FileText size={15} />
+                <span>Unduh Laporan PDF</span>
+              </button>
+
+              <button
+                onClick={handleExportCsv}
+                disabled={exporting}
+                className="flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white border border-white/20 px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all disabled:opacity-50 cursor-pointer backdrop-blur-md"
+                title="Export Database Pesanan ke CSV"
+              >
+                <Download size={15} className={exporting ? "animate-bounce text-emerald-400" : ""} />
+                <span>{exporting ? "Mengekspor..." : "Export CSV"}</span>
+              </button>
+            </div>
+          </div>
+
+          <div className="mt-6 max-w-3xl">
+            <h1 className="font-['Barlow_Condensed'] font-black text-3xl sm:text-5xl uppercase tracking-tight text-white leading-none">
+              PUSAT KOMANDO EKSEKUTIF <br />
+              <span className="text-[#FAF8F4] opacity-90">&amp; KINERJA BISNIS ATELIER</span>
+            </h1>
+            <p className="text-slate-300 text-xs sm:text-sm mt-2.5 max-w-2xl leading-relaxed">
+              Analisis performa finansial riil, volume konversi pesanan, monitoring perputaran katalog garmen olahraga, dan pemantauan menyeluruh toko PT RegarSport Indonesia.
+            </p>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-4 mt-6 pt-4 border-t border-white/15 text-[11px] font-mono text-slate-300">
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              <span>TRANSAKSI MIDTRANS: ONLINE</span>
+            </div>
+            <span className="text-white/30">•</span>
+            <div className="flex items-center gap-1.5">
+              <Zap size={13} className="text-amber-400" />
+              <span>KOMPUTASI ANALITIK: REAL-TIME</span>
+            </div>
+            <span className="text-white/30">•</span>
+            <div className="flex items-center gap-1.5">
+              <CheckCircle2 size={13} className="text-emerald-400" />
+              <span>STANDAR PELAPORAN: PSAK RESMI</span>
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* KPI Cards Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 mb-8">
+      {/* 2. 6 EXECUTIVE KPI CARDS */}
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
         {mainKpiCards.map((card, i) => (
           <div
             key={i}
-            className="group relative bg-[#14141E] border border-white/5 rounded-2xl p-5 overflow-hidden hover:border-[#00BFA5]/30 transition-all duration-300 hover:-translate-y-1"
+            className="p-5 sm:p-6 rounded-3xl bg-white border border-stone-200/80 shadow-xs hover:shadow-md transition-all duration-200 group flex flex-col justify-between"
           >
-            <div className={`absolute inset-0 bg-linear-to-br ${card.bg} opacity-0 group-hover:opacity-100 transition-opacity duration-300`} />
-
-            <div className="flex justify-between items-start mb-4">
-              <div className="p-2.5 rounded-xl bg-white/5 border border-white/10 group-hover:border-[#00BFA5]/30 transition-colors">
-                <card.icon size={22} className={card.color} />
+            <div>
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-[10px] font-mono font-bold text-stone-500 uppercase tracking-wider truncate">
+                  {card.label}
+                </span>
+                <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold uppercase border ${card.badgeColor}`}>
+                  {card.tag}
+                </span>
               </div>
-              <span className="text-[10px] font-black tracking-[1.5px] uppercase text-white/40">{card.label.split('(')[0]}</span>
+              <div className="text-2xl sm:text-3xl font-black text-slate-900 font-['Barlow_Condensed'] tracking-tight truncate">
+                {card.value}
+              </div>
             </div>
 
-            <p className="text-2xl font-black text-white tracking-tight mb-1 truncate">
-              {card.value}
-            </p>
-            <p className="text-[11px] text-[#00BFA5]/70 font-medium truncate">{card.note}</p>
-
-            <div className="absolute bottom-0 left-4 right-4 h-px bg-linear-to-r from-transparent via-[#00BFA5]/30 to-transparent" />
+            <div className="text-[11px] text-stone-500 mt-3 pt-2.5 border-t border-stone-100 flex items-center justify-between">
+              <span className="truncate">{card.note}</span>
+              <card.icon size={14} className={`${card.color} shrink-0 ml-1`} />
+            </div>
           </div>
         ))}
       </div>
 
-      {/* Order Status Breakdown Bar */}
-      <div className="bg-[#14141E] border border-white/5 rounded-3xl p-6 mb-8">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xs font-bold uppercase tracking-widest text-slate-400">
-            Status Pipeline Pesanan Pelanggan
-          </h2>
-          <span className="text-xs text-[#00BFA5] font-semibold">
-            {stats.orders} Total Transaksi
-          </span>
-        </div>
-        <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
-          <div className="bg-white/3 border border-white/5 rounded-2xl p-4 flex items-center gap-3">
-            <div className="p-2.5 rounded-xl bg-amber-500/10 text-amber-400">
-              <Clock size={18} />
-            </div>
+      {/* 3. ORDER PIPELINE BREAKDOWN (Tactical Topography Theme matching image 1) */}
+      <div className="relative bg-[#162018] border border-white/10 rounded-3xl p-6 sm:p-8 text-white shadow-xl overflow-hidden">
+        {/* Topographic pattern overlay exactly like image 1 */}
+        <div className="absolute inset-0 bg-topography opacity-15 pointer-events-none" />
+
+        <div className="relative z-10">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
             <div>
-              <p className="text-lg font-black text-white">{stats.pendingOrders}</p>
-              <p className="text-[11px] text-slate-400 font-medium">Menunggu Bayar</p>
+              <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-white/10 border border-white/15 text-[10px] font-mono uppercase tracking-wider text-emerald-300 mb-2">
+                <span>PIPELINE LOGISTIK &amp; FULFILLMENT</span>
+              </div>
+              <h2 className="font-['Barlow_Condensed'] text-2xl sm:text-3xl font-black uppercase tracking-tight text-white leading-none">
+                STATUS TAHAPAN TRANSAKSI PESANAN
+              </h2>
+              <p className="text-xs text-slate-300 mt-1">
+                Distribusi seluruh pesanan pelanggan berdasarkan alur kerja operasional atelier Cicendo Bandung.
+              </p>
+            </div>
+            <div className="flex items-center gap-2 self-start sm:self-auto px-3.5 py-1.5 rounded-xl bg-white/5 border border-white/10 text-xs font-mono">
+              <span className="text-slate-400">Total Transaksi:</span>
+              <span className="font-bold text-white text-sm">{stats.orders} Order</span>
             </div>
           </div>
 
-          <div className="bg-white/3 border border-white/5 rounded-2xl p-4 flex items-center gap-3">
-            <div className="p-2.5 rounded-xl bg-blue-500/10 text-blue-400">
-              <CreditCard size={18} />
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+            {/* Pending */}
+            <div className="bg-white/5 hover:bg-white/10 border border-white/10 rounded-2xl p-4 transition-all">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-[10px] font-mono uppercase tracking-wider text-amber-300 font-bold">Menunggu Bayar</span>
+                <Clock size={15} className="text-amber-400" />
+              </div>
+              <div className="font-['Barlow_Condensed'] text-3xl font-black text-white">{stats.pendingOrders}</div>
+              <p className="text-[11px] text-slate-400 mt-1">Menunggu settlement</p>
             </div>
-            <div>
-              <p className="text-lg font-black text-white">{stats.paidOrders + stats.processingOrders}</p>
-              <p className="text-[11px] text-slate-400 font-medium">Dibayar / Diproses</p>
-            </div>
-          </div>
 
-          <div className="bg-white/3 border border-white/5 rounded-2xl p-4 flex items-center gap-3">
-            <div className="p-2.5 rounded-xl bg-purple-500/10 text-purple-400">
-              <Truck size={18} />
+            {/* Paid */}
+            <div className="bg-[#FAF0ED]/10 hover:bg-[#FAF0ED]/15 border border-[#B9382B]/40 rounded-2xl p-4 transition-all">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-[10px] font-mono uppercase tracking-wider text-[#E57368] font-bold">Siap Dikemas</span>
+                <span className="px-1.5 py-0.5 rounded text-[9px] font-black uppercase bg-[#B9382B] text-white">Lunas</span>
+              </div>
+              <div className="font-['Barlow_Condensed'] text-3xl font-black text-white">{stats.paidOrders}</div>
+              <p className="text-[11px] text-slate-300 mt-1">Siap cetak thermal A6</p>
             </div>
-            <div>
-              <p className="text-lg font-black text-white">{stats.shippedOrders}</p>
-              <p className="text-[11px] text-slate-400 font-medium">Sedang Dikirim</p>
-            </div>
-          </div>
 
-          <div className="bg-white/3 border border-white/5 rounded-2xl p-4 flex items-center gap-3">
-            <div className="p-2.5 rounded-xl bg-[#00BFA5]/10 text-[#00BFA5]">
-              <CheckCircle2 size={18} />
+            {/* Processing */}
+            <div className="bg-white/5 hover:bg-white/10 border border-white/10 rounded-2xl p-4 transition-all">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-[10px] font-mono uppercase tracking-wider text-blue-300 font-bold">Diproses</span>
+                <CreditCard size={15} className="text-blue-400" />
+              </div>
+              <div className="font-['Barlow_Condensed'] text-3xl font-black text-white">{stats.processingOrders}</div>
+              <p className="text-[11px] text-slate-400 mt-1">Pengepakan konveksi</p>
             </div>
-            <div>
-              <p className="text-lg font-black text-white">{stats.completedOrders}</p>
-              <p className="text-[11px] text-slate-400 font-medium">Pesanan Selesai</p>
-            </div>
-          </div>
 
-          <div className="bg-white/3 border border-white/5 rounded-2xl p-4 flex items-center gap-3">
-            <div className="p-2.5 rounded-xl bg-rose-500/10 text-rose-400">
-              <TrendingUp size={18} className="rotate-180" />
+            {/* Shipped */}
+            <div className="bg-white/5 hover:bg-white/10 border border-white/10 rounded-2xl p-4 transition-all">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-[10px] font-mono uppercase tracking-wider text-purple-300 font-bold">Dikirim</span>
+                <Truck size={15} className="text-purple-400" />
+              </div>
+              <div className="font-['Barlow_Condensed'] text-3xl font-black text-white">{stats.shippedOrders}</div>
+              <p className="text-[11px] text-slate-400 mt-1">Diserahkan ke kurir</p>
             </div>
-            <div>
-              <p className="text-lg font-black text-white">{stats.cancelledOrders}</p>
-              <p className="text-[11px] text-slate-400 font-medium">Dibatalkan</p>
+
+            {/* Completed */}
+            <div className="bg-emerald-500/10 hover:bg-emerald-500/15 border border-emerald-500/30 rounded-2xl p-4 transition-all">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-[10px] font-mono uppercase tracking-wider text-emerald-300 font-bold">Selesai</span>
+                <CheckCircle2 size={15} className="text-emerald-400" />
+              </div>
+              <div className="font-['Barlow_Condensed'] text-3xl font-black text-white">{stats.completedOrders}</div>
+              <p className="text-[11px] text-emerald-300/80 mt-1">Paket diterima pembeli</p>
+            </div>
+
+            {/* Cancelled */}
+            <div className="bg-white/5 hover:bg-white/10 border border-white/10 rounded-2xl p-4 transition-all">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-[10px] font-mono uppercase tracking-wider text-slate-400 font-bold">Dibatalkan</span>
+                <span className="text-slate-500 text-xs">✕</span>
+              </div>
+              <div className="font-['Barlow_Condensed'] text-3xl font-black text-slate-300">{stats.cancelledOrders}</div>
+              <p className="text-[11px] text-slate-400 mt-1">Batal / kedaluwarsa</p>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Main Charts: Sales Trend & Donut Status Distribution */}
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-8">
+      {/* 4. MAIN ANALYTICS: SALES TREND & STATUS RATIO */}
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
         {/* Sales Trend Line Chart (Span 2) */}
-        <div className="xl:col-span-2 bg-[#14141E] border border-white/5 rounded-3xl p-6 xl:p-8">
+        <div className="xl:col-span-2 bg-white border border-stone-200/80 rounded-3xl p-6 sm:p-7 shadow-xs">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
             <div className="flex items-center gap-3">
-              <div className="bg-[#00BFA5]/10 p-2.5 rounded-xl">
-                <TrendingUp size={22} className="text-[#00BFA5]" />
+              <div className="bg-stone-100 p-2.5 rounded-2xl text-[#162018]">
+                <TrendingUp size={20} />
               </div>
               <div>
-                <h2 className="text-lg font-bold text-white">Tren Pertumbuhan Omzet Penjualan</h2>
-                <p className="text-xs text-[#7A8A8A]">Grafik pendapatan riil pesanan terbayar</p>
+                <h2 className="text-base sm:text-lg font-bold text-slate-900 font-['Barlow_Condensed'] uppercase tracking-wide">
+                  Tren Pertumbuhan Omzet Penjualan
+                </h2>
+                <p className="text-xs text-stone-500">Grafik pergerakan pendapatan riil pesanan terbayar</p>
               </div>
             </div>
 
             {/* Period Filter Tabs */}
-            <div className="flex items-center bg-black/40 border border-white/10 p-1 rounded-xl gap-1">
+            <div className="flex items-center bg-stone-100 border border-stone-200/80 p-1 rounded-2xl gap-1">
               {[
                 { key: '7d', label: '7 Hari' },
                 { key: '30d', label: '30 Hari' },
@@ -585,10 +654,10 @@ export default function Dashboard() {
                 <button
                   key={tab.key}
                   onClick={() => setSalesPeriod(tab.key)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                     salesPeriod === tab.key
-                      ? 'bg-[#00BFA5] text-black shadow-[0_0_15px_rgba(0,191,165,0.4)]'
-                      : 'text-slate-400 hover:text-white hover:bg-white/5'
+                      ? 'bg-[#162018] text-white shadow-xs'
+                      : 'text-stone-500 hover:text-stone-900 hover:bg-stone-200/60'
                   }`}
                 >
                   {tab.label}
@@ -599,15 +668,15 @@ export default function Dashboard() {
 
           <ResponsiveContainer width="100%" height={320}>
             <LineChart data={activeSalesData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#ffffff08" />
+              <CartesianGrid strokeDasharray="3 3" stroke="#0000000a" />
               <XAxis
                 dataKey="period"
-                stroke="#ffffff30"
+                stroke="#64748B"
                 fontSize={11}
                 tickLine={false}
               />
               <YAxis
-                stroke="#ffffff30"
+                stroke="#64748B"
                 fontSize={11}
                 tickFormatter={(v) => `Rp ${(v / 1000000).toFixed(1)}M`}
                 tickLine={false}
@@ -615,38 +684,41 @@ export default function Dashboard() {
               <Tooltip
                 formatter={(value) => [`Rp ${Number(value).toLocaleString('id-ID')}`, 'Omzet']}
                 contentStyle={{
-                  backgroundColor: '#1a1a24',
-                  border: '1px solid rgba(0, 191, 165, 0.2)',
-                  borderRadius: '12px',
-                  boxShadow: '0 10px 30px rgba(0, 191, 165, 0.15)'
+                  backgroundColor: '#162018',
+                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  borderRadius: '16px',
+                  color: '#FAF8F4',
+                  boxShadow: '0 10px 25px rgba(0, 0, 0, 0.2)'
                 }}
               />
               <Line
                 type="monotone"
                 dataKey="sales"
-                stroke="#00BFA5"
+                stroke="#162018"
                 strokeWidth={3}
-                dot={{ fill: '#00BFA5', r: 4 }}
-                activeDot={{ r: 6, fill: '#00BFA5' }}
+                dot={{ fill: '#B9382B', r: 4 }}
+                activeDot={{ r: 6, fill: '#10B981' }}
               />
             </LineChart>
           </ResponsiveContainer>
         </div>
 
         {/* Donut Chart: Order Status Distribution (Span 1) */}
-        <div className="bg-[#14141E] border border-white/5 rounded-3xl p-6 xl:p-8 flex flex-col justify-between">
+        <div className="bg-white border border-stone-200/80 rounded-3xl p-6 sm:p-7 shadow-xs flex flex-col justify-between">
           <div>
             <div className="flex items-center gap-3 mb-6">
-              <div className="bg-purple-500/10 p-2.5 rounded-xl">
-                <PieChartIcon size={22} className="text-purple-400" />
+              <div className="bg-stone-100 p-2.5 rounded-2xl text-[#162018]">
+                <PieChartIcon size={20} />
               </div>
               <div>
-                <h2 className="text-lg font-bold text-white">Rasio Status Pesanan</h2>
-                <p className="text-xs text-[#7A8A8A]">Komposisi pesanan & tingkat konversi</p>
+                <h2 className="text-base sm:text-lg font-bold text-slate-900 font-['Barlow_Condensed'] uppercase tracking-wide">
+                  Rasio Status Pesanan
+                </h2>
+                <p className="text-xs text-stone-500">Komposisi pesanan &amp; tingkat konversi</p>
               </div>
             </div>
 
-            <ResponsiveContainer width="100%" height={240}>
+            <ResponsiveContainer width="100%" height={230}>
               <PieChart>
                 <Pie
                   data={statusDistribution}
@@ -658,15 +730,16 @@ export default function Dashboard() {
                   dataKey="value"
                 >
                   {statusDistribution.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color || '#00BFA5'} />
+                    <Cell key={`cell-${index}`} fill={entry.color || '#162018'} />
                   ))}
                 </Pie>
                 <Tooltip
                   formatter={(value, name) => [`${value} pesanan`, name]}
                   contentStyle={{
-                    backgroundColor: '#1a1a24',
+                    backgroundColor: '#162018',
                     border: '1px solid rgba(255, 255, 255, 0.1)',
-                    borderRadius: '12px'
+                    borderRadius: '16px',
+                    color: '#FAF8F4'
                   }}
                 />
               </PieChart>
@@ -674,15 +747,15 @@ export default function Dashboard() {
           </div>
 
           {/* Status Legend Badges */}
-          <div className="space-y-2 mt-4 pt-4 border-t border-white/5">
+          <div className="space-y-2 mt-4 pt-4 border-t border-stone-100">
             {statusDistribution.map((item, idx) => (
               <div key={idx} className="flex items-center justify-between text-xs">
                 <div className="flex items-center gap-2">
                   <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: item.color }} />
-                  <span className="text-slate-300 font-medium">{item.name}</span>
+                  <span className="text-stone-600 font-medium">{item.name}</span>
                 </div>
-                <span className="font-bold text-white">
-                  {item.value} <span className="text-slate-500 font-normal">({stats.orders > 0 ? Math.round((item.value / stats.orders) * 100) : 0}%)</span>
+                <span className="font-bold text-stone-900">
+                  {item.value} <span className="text-stone-400 font-normal">({stats.orders > 0 ? Math.round((item.value / stats.orders) * 100) : 0}%)</span>
                 </span>
               </div>
             ))}
@@ -690,39 +763,41 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Bottom Section: Top 5 Products & Live Recent Orders */}
+      {/* 5. BOTTOM SECTION: TOP 5 PRODUCTS & RECENT TRANSACTIONS */}
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
         {/* Top 5 Products Bar Chart */}
-        <div className="bg-[#14141E] border border-white/5 rounded-3xl p-6 xl:p-8">
+        <div className="bg-white border border-stone-200/80 rounded-3xl p-6 sm:p-7 shadow-xs">
           <div className="flex items-center gap-3 mb-6">
-            <div className="bg-[#00BFA5]/10 p-2.5 rounded-xl">
-              <Package size={22} className="text-[#00BFA5]" />
+            <div className="bg-stone-100 p-2.5 rounded-2xl text-[#162018]">
+              <Package size={20} />
             </div>
             <div>
-              <h2 className="text-lg font-bold text-white">Top 5 Produk Terlaris</h2>
-              <p className="text-xs text-[#7A8A8A]">Volume penjualan tertinggi (pcs terbayar)</p>
+              <h2 className="text-base sm:text-lg font-bold text-slate-900 font-['Barlow_Condensed'] uppercase tracking-wide">
+                Top 5 Produk Terlaris
+              </h2>
+              <p className="text-xs text-stone-500">Volume penjualan tertinggi (pcs terbayar)</p>
             </div>
           </div>
 
           {topProducts.length === 0 ? (
-            <div className="h-64 flex flex-col items-center justify-center text-slate-500 text-sm">
-              <Package size={36} className="mb-2 opacity-30 text-white" />
+            <div className="h-64 flex flex-col items-center justify-center text-stone-400 text-sm">
+              <Package size={36} className="mb-2 opacity-30 text-stone-300" />
               <p>Belum ada produk yang terjual</p>
             </div>
           ) : (
             <ResponsiveContainer width="100%" height={280}>
               <BarChart data={topProducts} layout="vertical" margin={{ left: 20, right: 20 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#ffffff08" />
+                <CartesianGrid strokeDasharray="3 3" stroke="#0000000a" />
                 <XAxis
                   type="number"
-                  stroke="#ffffff30"
+                  stroke="#64748B"
                   fontSize={11}
                   tickFormatter={(v) => `${v} pcs`}
                 />
                 <YAxis
                   type="category"
                   dataKey="name"
-                  stroke="#ffffff30"
+                  stroke="#64748B"
                   fontSize={11}
                   width={140}
                   tickLine={false}
@@ -730,15 +805,16 @@ export default function Dashboard() {
                 <Tooltip
                   formatter={(value) => [`${value} pcs`, 'Terjual']}
                   contentStyle={{
-                    backgroundColor: '#1a1a24',
-                    border: '1px solid rgba(0, 191, 165, 0.2)',
-                    borderRadius: '12px'
+                    backgroundColor: '#162018',
+                    border: '1px solid rgba(255, 255, 255, 0.1)',
+                    borderRadius: '16px',
+                    color: '#FAF8F4'
                   }}
                 />
                 <Bar
                   dataKey="sales"
-                  fill="#00BFA5"
-                  radius={[0, 6, 6, 0]}
+                  fill="#162018"
+                  radius={[0, 8, 8, 0]}
                 />
               </BarChart>
             </ResponsiveContainer>
@@ -746,21 +822,23 @@ export default function Dashboard() {
         </div>
 
         {/* Live Recent Transactions Feed */}
-        <div className="bg-[#14141E] border border-white/5 rounded-3xl p-6 xl:p-8 flex flex-col justify-between">
+        <div className="bg-white border border-stone-200/80 rounded-3xl p-6 sm:p-7 shadow-xs flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-3">
-                <div className="bg-blue-500/10 p-2.5 rounded-xl">
-                  <CreditCard size={22} className="text-blue-400" />
+                <div className="bg-stone-100 p-2.5 rounded-2xl text-[#162018]">
+                  <CreditCard size={20} />
                 </div>
                 <div>
-                  <h2 className="text-lg font-bold text-white">Transaksi Pesanan Terbaru</h2>
-                  <p className="text-xs text-[#7A8A8A]">Aktivitas pesanan live yang masuk ke sistem</p>
+                  <h2 className="text-base sm:text-lg font-bold text-slate-900 font-['Barlow_Condensed'] uppercase tracking-wide">
+                    Transaksi Pesanan Terbaru
+                  </h2>
+                  <p className="text-xs text-stone-500">Aktivitas pesanan live yang masuk ke sistem</p>
                 </div>
               </div>
               <button
                 onClick={() => navigate('/admin/orders')}
-                className="flex items-center gap-1.5 text-xs text-[#00BFA5] hover:underline font-semibold cursor-pointer"
+                className="flex items-center gap-1.5 text-xs text-[#B9382B] hover:underline font-bold uppercase tracking-wider cursor-pointer"
               >
                 <span>Lihat Semua</span>
                 <ExternalLink size={13} />
@@ -768,51 +846,51 @@ export default function Dashboard() {
             </div>
 
             {recentOrders.length === 0 ? (
-              <div className="h-64 flex flex-col items-center justify-center text-slate-500 text-sm">
-                <ShoppingCart size={36} className="mb-2 opacity-30 text-white" />
+              <div className="h-64 flex flex-col items-center justify-center text-stone-400 text-sm">
+                <ShoppingCart size={36} className="mb-2 opacity-30 text-stone-300" />
                 <p>Belum ada transaksi</p>
               </div>
             ) : (
               <div className="space-y-3">
                 {recentOrders.map((order) => {
                   const statusColors = {
-                    PAID: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30',
-                    PROCESSING: 'bg-blue-500/10 text-blue-400 border-blue-500/30',
-                    SHIPPED: 'bg-purple-500/10 text-purple-400 border-purple-500/30',
-                    COMPLETED: 'bg-[#00BFA5]/10 text-[#00BFA5] border-[#00BFA5]/30',
-                    PENDING: 'bg-amber-500/10 text-amber-400 border-amber-500/30',
-                    CANCELLED: 'bg-rose-500/10 text-rose-400 border-rose-500/30',
+                    PAID: 'bg-[#FAF0ED] text-[#B9382B] border-[#B9382B]/30',
+                    PROCESSING: 'bg-blue-50 text-blue-800 border-blue-200',
+                    SHIPPED: 'bg-purple-50 text-purple-800 border-purple-200',
+                    COMPLETED: 'bg-emerald-50 text-emerald-800 border-emerald-200',
+                    PENDING: 'bg-amber-50 text-amber-800 border-amber-200',
+                    CANCELLED: 'bg-stone-100 text-stone-600 border-stone-200',
                   };
                   return (
                     <div
                       key={order.id}
                       onClick={() => navigate('/admin/orders')}
-                      className="group flex items-center justify-between p-3.5 rounded-2xl bg-white/3 border border-white/5 hover:border-[#00BFA5]/30 hover:bg-white/5 transition-all cursor-pointer"
+                      className="group flex items-center justify-between p-3.5 rounded-2xl bg-stone-50/70 border border-stone-200/80 hover:border-stone-400 hover:bg-stone-50 transition-all cursor-pointer"
                     >
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center font-bold text-white text-xs group-hover:bg-[#00BFA5]/20 group-hover:text-[#00BFA5] transition-colors">
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className="w-10 h-10 rounded-xl bg-stone-200 flex items-center justify-center font-bold text-stone-800 text-xs shrink-0 group-hover:bg-[#162018] group-hover:text-white transition-colors">
                           {order.customerName ? order.customerName.charAt(0).toUpperCase() : 'U'}
                         </div>
-                        <div>
+                        <div className="min-w-0">
                           <div className="flex items-center gap-2">
-                            <span className="font-bold text-white text-sm group-hover:text-[#00BFA5] transition-colors">
+                            <span className="font-bold text-slate-900 text-xs sm:text-sm group-hover:text-[#B9382B] transition-colors truncate">
                               {order.orderNumber}
                             </span>
-                            <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-white/5 text-slate-400">
+                            <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-stone-200 text-stone-700 shrink-0">
                               {order.shippingCourier || 'JNE'}
                             </span>
                           </div>
-                          <p className="text-xs text-slate-400">
+                          <p className="text-xs text-stone-500 truncate">
                             {order.customerName} • {order.createdAt ? new Date(order.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : '-'}
                           </p>
                         </div>
                       </div>
 
-                      <div className="text-right">
-                        <p className="font-black text-white text-sm">
+                      <div className="text-right shrink-0 ml-3">
+                        <p className="font-black text-slate-900 text-xs sm:text-sm font-['Barlow_Condensed']">
                           Rp {Number(order.totalAmount).toLocaleString('id-ID')}
                         </p>
-                        <span className={`inline-block px-2 py-0.5 rounded-full text-[10px] font-bold border ${statusColors[order.status] || 'bg-white/5 text-white'}`}>
+                        <span className={`inline-block px-2 py-0.5 rounded-full text-[10px] font-bold border ${statusColors[order.status] || 'bg-stone-100 text-stone-700'}`}>
                           {order.status}
                         </span>
                       </div>
@@ -824,15 +902,6 @@ export default function Dashboard() {
           </div>
         </div>
       </div>
-
-      {/* Decorative subtle grid background */}
-      <div
-        className="fixed inset-0 pointer-events-none opacity-[0.02] z-[-1]"
-        style={{
-          backgroundImage: `linear-gradient(#00BFA5 1px, transparent 1px), linear-gradient(90deg, #00BFA5 1px, transparent 1px)`,
-          backgroundSize: '80px 80px'
-        }}
-      />
     </div>
   );
 }

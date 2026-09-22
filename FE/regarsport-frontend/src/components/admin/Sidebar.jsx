@@ -47,17 +47,10 @@ export default function Sidebar() {
   const menuItems = isLogistics ? logisticsMenuItems : adminMenuItems;
 
   const menuClass = ({ isActive }) => {
-    if (isLogistics) {
-      return `flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 text-sm font-medium ${
-        isActive
-          ? "bg-white/15 text-white font-bold border-l-2 border-emerald-400 shadow-xs"
-          : "text-slate-300 hover:text-white hover:bg-white/5"
-      }`;
-    }
-    return `flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
+    return `flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 text-sm font-medium ${
       isActive
-        ? "bg-[#00BFA5]/10 text-[#00BFA5] shadow-[inset_0_0_0_1px_#00BFA5/20]"
-        : "text-slate-400 hover:text-white hover:bg-white/5"
+        ? "bg-white/15 text-white font-bold border-l-2 border-emerald-400 shadow-xs"
+        : "text-slate-300 hover:text-white hover:bg-white/5"
     }`;
   };
 
@@ -66,9 +59,7 @@ export default function Sidebar() {
       {/* Mobile toggle button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className={`lg:hidden fixed top-4 left-4 z-50 p-2 rounded-xl border text-white ${
-          isLogistics ? "bg-[#162018] border-white/10" : "bg-[#14141E] border-white/10"
-        }`}
+        className="lg:hidden fixed top-4 left-4 z-50 p-2 rounded-xl border border-white/10 bg-[#162018] text-white shadow-lg cursor-pointer"
       >
         {isOpen ? <X size={20} /> : <Menu size={20} />}
       </button>
@@ -83,32 +74,24 @@ export default function Sidebar() {
 
       {/* Sidebar */}
       <aside
-        className={`fixed lg:sticky top-0 z-40 w-72 h-screen flex flex-col transition-transform duration-300 ${
-          isLogistics
-            ? "bg-[#162018] text-[#FAF8F4] border-r border-white/10"
-            : "bg-[#0D0D0D] text-white border-r border-white/5"
-        } ${isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`}
+        className={`fixed lg:sticky top-0 z-40 w-72 h-screen flex flex-col transition-transform duration-300 bg-[#162018] text-[#FAF8F4] border-r border-white/10 ${
+          isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
+        }`}
       >
         {/* Logo */}
         <div className="shrink-0 flex items-center gap-3 px-6 h-18 border-b border-white/10">
-          <div className={`p-2 rounded-xl ${isLogistics ? "bg-white text-[#111613] shadow-sm" : "bg-[#00BFA5] text-black"}`}>
-            <Zap size={16} strokeWidth={3} />
+          <div className="w-8 h-8 rounded-lg bg-[#B9382B] flex items-center justify-center text-white shadow-sm shrink-0">
+            <span className="font-black text-xs font-mono">R</span>
           </div>
           <div className="flex flex-col">
-            <span className="text-white font-black tracking-[2px] text-sm uppercase font-['Barlow_Condensed']">
+            <span className="text-white font-black tracking-[2px] text-sm uppercase font-['Barlow_Condensed'] leading-none">
               REGARSPORT
             </span>
-            <span className="text-[10px] font-mono tracking-widest text-slate-400">
+            <span className="text-[9px] font-mono tracking-widest text-emerald-400/90 mt-1 uppercase">
               ATELIER // CICENDO
             </span>
           </div>
-          <span
-            className={`ml-auto text-[9px] font-mono font-bold uppercase tracking-widest px-2 py-0.5 rounded-md ${
-              isLogistics
-                ? "bg-white/10 text-emerald-300 border border-emerald-500/30"
-                : "text-[#00BFA5]/60"
-            }`}
-          >
+          <span className="ml-auto text-[9px] font-mono font-bold uppercase tracking-widest px-2 py-0.5 rounded-md bg-white/10 text-emerald-300 border border-emerald-500/30">
             {isLogistics ? "Gudang" : "Admin"}
           </span>
         </div>
@@ -133,7 +116,7 @@ export default function Sidebar() {
         <div className="shrink-0 px-6 py-4 border-t border-white/10">
           <div className="flex items-center gap-2 text-[11px] font-mono text-slate-400">
             <span className="w-2 h-2 rounded-full bg-emerald-400" />
-            <span>SISTEM DISPATCH AKTIF</span>
+            <span>SISTEM {isLogistics ? "DISPATCH" : "ADMINISTRASI"} AKTIF</span>
           </div>
         </div>
       </aside>
