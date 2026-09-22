@@ -223,40 +223,52 @@ export default function WarrantyClaims() {
 
   return (
     <div className="space-y-8 animate-in fade-in duration-300 pb-12">
-      {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div className="flex items-center gap-4">
-          <div className="p-3.5 rounded-2xl bg-[#162018] text-white shadow-sm shrink-0">
-            <ShieldCheck size={32} />
-          </div>
-          <div>
-            <div className="flex items-center gap-2 mb-1">
-              <span className="px-2.5 py-0.5 rounded-md font-mono text-[10px] font-black tracking-widest bg-[#162018] text-[#FAF8F4]">
+      {/* Header Banner Tactical Forest */}
+      <div className="relative overflow-hidden rounded-3xl border border-black/15 shadow-xl bg-[#162018] text-white p-6 sm:p-8">
+        <div className="absolute inset-0 bg-topography opacity-15 pointer-events-none" />
+
+        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div className="max-w-2xl">
+            <div className="flex items-center gap-2 mb-2">
+              <span className="px-2.5 py-0.5 rounded-full bg-white/10 text-emerald-400 font-mono text-[10px] font-black tracking-widest border border-white/10 uppercase">
                 {isLogistics ? "RS // WARRANTY DISPATCH" : "RS // WARRANTY CENTER"}
               </span>
-              <span className="text-[11px] font-mono uppercase tracking-widest text-stone-500">
+              <span className="text-[11px] font-mono uppercase tracking-widest text-stone-300">
                 {isLogistics ? "INSPEKSI FISIK & PENGGANTIAN RESMI" : "VERIFIKASI KLAIM PELANGGAN"}
               </span>
             </div>
-            <h1 className="font-['Barlow_Condensed'] font-black text-3xl sm:text-4xl uppercase tracking-tight leading-none text-slate-900">
+            <h1 className="font-['Barlow_Condensed'] font-black uppercase tracking-tight text-3xl sm:text-5xl text-white leading-none">
               {isLogistics ? "RETUR & PENGGANTIAN GARANSI" : "KLAIM GARANSI & RETUR"}
             </h1>
-            <p className="text-xs sm:text-sm mt-1.5 text-stone-500">
+            <p className="text-stone-300 text-xs sm:text-sm mt-2 leading-relaxed">
               {isLogistics
-                ? "Pemeriksaan paket retur masuk, pengepakan tukar ukuran, dan pengiriman resi pengganti"
-                : "Verifikasi tiket kendala pelanggan, validasi bukti foto, dan persetujuan klaim garansi"}
+                ? "Pemeriksaan paket retur masuk, pengepakan tukar ukuran, dan pengiriman resi produk pengganti."
+                : "Verifikasi tiket kendala pelanggan, validasi bukti foto/video apparel, dan persetujuan klaim garansi atelier."}
             </p>
+
+            <div className="flex flex-wrap items-center gap-4 mt-4 pt-3 border-t border-white/10 text-xs font-mono text-stone-300">
+              <div className="flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-amber-400" />
+                <span>MENUNGGU VERIFIKASI: {stats.pending}</span>
+              </div>
+              <span className="text-white/20">•</span>
+              <div className="flex items-center gap-1.5 text-emerald-400">
+                <span>DISETUJUI / SELESAI: {stats.approved + stats.resolved}</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3 shrink-0">
+            <button
+              onClick={fetchClaims}
+              disabled={loading}
+              className="flex items-center gap-2 px-5 py-3 rounded-2xl bg-white/10 hover:bg-white/20 border border-white/15 text-white text-xs font-bold transition active:scale-95 cursor-pointer shadow-sm"
+            >
+              <RefreshCw size={14} className={loading ? "animate-spin" : ""} />
+              <span>Segarkan Data</span>
+            </button>
           </div>
         </div>
-
-        <button
-          onClick={fetchClaims}
-          disabled={loading}
-          className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition active:scale-95 cursor-pointer self-start md:self-auto bg-white hover:bg-stone-100 text-stone-700 border border-stone-200 shadow-xs"
-        >
-          <RefreshCw size={14} className={loading ? "animate-spin" : ""} />
-          <span>Segarkan Data</span>
-        </button>
       </div>
 
       {/* KPI Stats Bar */}

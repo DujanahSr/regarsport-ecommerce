@@ -282,29 +282,46 @@ export default function Reviews() {
 
   return (
     <div className="space-y-8 pb-12">
-      {/* ======================== HEADER ======================== */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-stone-100 border border-stone-200 text-stone-700 text-[10px] font-bold tracking-widest uppercase mb-2">
-            <MessageSquareText size={12} className="text-[#B9382B]" />
-            <span>RS // CUSTOMER FEEDBACK</span>
-          </div>
-          <h1 className="font-['Barlow_Condensed'] font-black uppercase tracking-tight text-3xl sm:text-4xl text-slate-900 leading-none">
-            ULASAN & RATING PRODUK
-          </h1>
-          <p className="text-stone-500 text-xs sm:text-sm mt-1">
-            Total <span className="text-slate-900 font-bold">{total}</span> ulasan · Rata‑rata{" "}
-            <span className="text-[#B9382B] font-bold">{averageRating.toFixed(1)}</span>/5 ·{" "}
-            {activeFilterLabel}
-          </p>
-        </div>
+      {/* Header Banner Tactical Forest */}
+      <div className="relative overflow-hidden rounded-3xl border border-black/15 shadow-xl bg-[#162018] text-white p-6 sm:p-8">
+        <div className="absolute inset-0 bg-topography opacity-15 pointer-events-none" />
 
-        <div className="flex items-center gap-3">
-          <div className="bg-white border border-stone-200/80 px-4 py-2 rounded-2xl shadow-xs text-right">
-            <p className="text-[10px] font-bold text-stone-400 uppercase tracking-widest">Kepuasan Pembeli</p>
-            <p className="font-['Barlow_Condensed'] font-black text-xl text-amber-500 leading-tight flex items-center justify-end gap-1">
-              ★ {averageRating.toFixed(1)} <span className="text-xs text-stone-400 font-normal">/ 5.0</span>
+        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div className="max-w-2xl">
+            <div className="flex items-center gap-2 mb-2">
+              <span className="px-2.5 py-0.5 rounded-full bg-white/10 text-emerald-400 font-mono text-[10px] font-black tracking-widest border border-white/10 uppercase">
+                RS // CUSTOMER SATISFACTION
+              </span>
+              <span className="text-[11px] font-mono uppercase tracking-widest text-stone-300">
+                PRODUCT REVIEWS & RATINGS
+              </span>
+            </div>
+            <h1 className="font-['Barlow_Condensed'] font-black uppercase tracking-tight text-3xl sm:text-5xl text-white leading-none">
+              ULASAN & RATING PRODUK
+            </h1>
+            <p className="text-stone-300 text-xs sm:text-sm mt-2 leading-relaxed">
+              Pantau testimoni pembeli apparel, rating kualitas bahan jersey olahraga, dokumentasi foto pembeli, dan moderasi tanggapan resmi toko.
             </p>
+
+            <div className="flex flex-wrap items-center gap-4 mt-4 pt-3 border-t border-white/10 text-xs font-mono text-stone-300">
+              <div className="flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-emerald-400" />
+                <span>TOTAL ULASAN: {total} ULASAN</span>
+              </div>
+              <span className="text-white/20">•</span>
+              <div className="flex items-center gap-1.5 text-amber-400">
+                <span>★ SKOR KEPUASAN: {averageRating.toFixed(1)} / 5.0</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3 shrink-0">
+            <div className="bg-white/10 border border-white/15 px-5 py-4 rounded-2xl backdrop-blur-xs text-right">
+              <p className="text-[10px] font-bold text-stone-300 uppercase tracking-widest">Rata-Rata Rating</p>
+              <p className="font-['Barlow_Condensed'] font-black text-3xl text-amber-400 leading-tight flex items-center justify-end gap-1.5 mt-0.5">
+                ★ {averageRating.toFixed(1)} <span className="text-xs text-stone-300 font-normal">/ 5.0</span>
+              </p>
+            </div>
           </div>
         </div>
       </div>

@@ -226,26 +226,47 @@ export default function Users() {
   return (
     <div className="space-y-8 pb-12">
       {/* ======================== HEADER ======================== */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-stone-100 border border-stone-200 text-stone-700 text-[10px] font-bold tracking-widest uppercase mb-2">
-            <UsersIcon size={12} className="text-[#B9382B]" />
-            <span>RS // USER MANAGEMENT</span>
-          </div>
-          <h1 className="font-['Barlow_Condensed'] font-black uppercase tracking-tight text-3xl sm:text-4xl text-slate-900 leading-none">
-            MANAJEMEN PENGGUNA
-          </h1>
-          <p className="text-stone-500 text-xs sm:text-sm mt-1">
-            Pantau akun terdaftar, kelola hak akses role admin/logistik, dan kontrol status moderasi.
-          </p>
-        </div>
+      {/* Header Banner Tactical Forest */}
+      <div className="relative overflow-hidden rounded-3xl border border-black/15 shadow-xl bg-[#162018] text-white p-6 sm:p-8">
+        <div className="absolute inset-0 bg-topography opacity-15 pointer-events-none" />
 
-        <div className="flex items-center gap-3">
-          <div className="bg-white border border-stone-200/80 px-4 py-2 rounded-2xl shadow-xs text-right">
-            <p className="text-[10px] font-bold text-stone-400 uppercase tracking-widest">Total Pengguna</p>
-            <p className="font-['Barlow_Condensed'] font-black text-xl text-slate-900 leading-tight">
-              {total} Akun Terdaftar
+        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div className="max-w-2xl">
+            <div className="flex items-center gap-2 mb-2">
+              <span className="px-2.5 py-0.5 rounded-full bg-white/10 text-emerald-400 font-mono text-[10px] font-black tracking-widest border border-white/10 uppercase">
+                RS // ACCESS DIRECTORY
+              </span>
+              <span className="text-[11px] font-mono uppercase tracking-widest text-stone-300">
+                USER ROLES & AUTH
+              </span>
+            </div>
+            <h1 className="font-['Barlow_Condensed'] font-black uppercase tracking-tight text-3xl sm:text-5xl text-white leading-none">
+              MANAJEMEN PENGGUNA
+            </h1>
+            <p className="text-stone-300 text-xs sm:text-sm mt-2 leading-relaxed">
+              Pantau direktori akun terdaftar, kelola hak akses role Administrator / Staf Gudang, dan kontrol status moderasi akun pengguna.
             </p>
+
+            <div className="flex flex-wrap items-center gap-4 mt-4 pt-3 border-t border-white/10 text-xs font-mono text-stone-300">
+              <div className="flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-emerald-400" />
+                <span>TOTAL AKUN: {total} PENGGUNA</span>
+              </div>
+              <span className="text-white/20">•</span>
+              <div className="flex items-center gap-1.5">
+                <UsersIcon size={13} className="text-amber-400" />
+                <span>AKTIF: {users.filter((u) => u.isActive ?? u.is_active).length} PADA HALAMAN INI</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3 shrink-0">
+            <div className="bg-white/10 border border-white/15 px-5 py-3 rounded-2xl backdrop-blur-xs text-right">
+              <p className="text-[10px] font-bold text-stone-300 uppercase tracking-widest">Total Akun</p>
+              <p className="font-['Barlow_Condensed'] font-black text-2xl text-white leading-tight">
+                {total} Terdaftar
+              </p>
+            </div>
           </div>
         </div>
       </div>

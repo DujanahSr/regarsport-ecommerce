@@ -300,27 +300,48 @@ export default function Orders() {
           </div>
         </div>
       ) : (
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-          <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-stone-100 border border-stone-200 text-stone-700 text-[10px] font-bold tracking-widest uppercase mb-2">
-              <ShoppingCart size={12} className="text-[#B9382B]" />
-              <span>RS // ORDER CENTER</span>
+        <div className="relative overflow-hidden rounded-3xl border border-black/15 shadow-xl bg-[#162018] text-white p-6 sm:p-8 mb-6">
+          <div className="absolute inset-0 bg-topography opacity-15 pointer-events-none" />
+
+          <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div className="max-w-2xl">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="px-2.5 py-0.5 rounded-full bg-white/10 text-emerald-400 font-mono text-[10px] font-black tracking-widest border border-white/10 uppercase">
+                  RS // ORDER COMMAND CENTER
+                </span>
+                <span className="text-[11px] font-mono uppercase tracking-widest text-stone-300">
+                  ATELIER TRANSACTION DESK
+                </span>
+              </div>
+              <h1 className="font-['Barlow_Condensed'] font-black uppercase tracking-tight text-3xl sm:text-5xl text-white leading-none">
+                MANAJEMEN PESANAN
+              </h1>
+              <p className="text-stone-300 text-xs sm:text-sm mt-2 leading-relaxed">
+                Pantau antrean pesanan pelanggan, validasi pembayaran Midtrans, jadwal produksi kustom jersey, dan koordinasi pengiriman ekspedisi.
+              </p>
+
+              <div className="flex flex-wrap items-center gap-4 mt-4 pt-3 border-t border-white/10 text-xs font-mono text-stone-300">
+                <div className="flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400" />
+                  <span>TOTAL ANTREAN: {filteredOrders.length} PESANAN</span>
+                </div>
+                <span className="text-white/20">•</span>
+                <div className="flex items-center gap-1.5">
+                  <ShoppingCart size={13} className="text-amber-400" />
+                  <span>SINKRONISASI: REALTIME MIDTRANS</span>
+                </div>
+              </div>
             </div>
-            <h1 className="font-['Barlow_Condensed'] font-black text-3xl sm:text-4xl uppercase tracking-tight leading-none text-slate-900">
-              MANAJEMEN PESANAN
-            </h1>
-            <p className="text-xs sm:text-sm mt-1 text-stone-500">
-              Pantau antrean pesanan pelanggan, status pembayaran, produksi atelier, dan koordinasi pengiriman.
-            </p>
-          </div>
-          <div className="flex items-center gap-3">
-            <button
-              onClick={getOrders}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white hover:bg-stone-50 text-stone-700 text-xs font-bold transition-all border border-stone-200/80 shadow-xs cursor-pointer active:scale-95"
-            >
-              <RefreshCw size={13} className={loading ? "animate-spin" : ""} />
-              <span>Refresh Antrean</span>
-            </button>
+
+            <div className="flex items-center gap-3 shrink-0">
+              <button
+                onClick={getOrders}
+                className="flex items-center gap-2 px-5 py-3 rounded-2xl bg-white/10 hover:bg-white/20 border border-white/15 text-white text-xs font-bold transition-all active:scale-95 cursor-pointer shadow-sm"
+              >
+                <RefreshCw size={14} className={loading ? "animate-spin" : ""} />
+                <span>Refresh Antrean</span>
+              </button>
+            </div>
           </div>
         </div>
       )}

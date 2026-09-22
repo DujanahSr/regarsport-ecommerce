@@ -301,198 +301,235 @@ export default function Products() {
         </div>
       </div>
 
-      {/* Form Card */}
-      <div className="bg-white border border-stone-200/80 rounded-3xl p-6 sm:p-8 shadow-xs">
-        <div className="flex items-center justify-between pb-5 mb-6 border-b border-stone-100">
-          <div className="flex items-center gap-3">
-            <div className={`p-2.5 rounded-2xl ${editingId ? "bg-amber-50 text-amber-800 border border-amber-200" : "bg-[#FAF0ED] text-[#B9382B] border border-[#B9382B]/20"}`}>
-              {editingId ? <Pencil size={20} /> : <Plus size={20} />}
-            </div>
-            <div>
-              <h2 className="font-['Barlow_Condensed'] font-black uppercase tracking-wide text-2xl text-slate-900 leading-none">
-                {editingId ? "Edit Rincian Produk" : "Tambah Produk Baru"}
-              </h2>
-              <p className="text-xs text-stone-500 mt-0.5">
-                {editingId ? "Perbarui informasi spesifikasi atau foto produk" : "Daftarkan jersey atau apparel baru ke etalase toko"}
-              </p>
-            </div>
-          </div>
-          {editingId && (
-            <span className="font-mono text-xs font-bold px-3 py-1.5 rounded-xl bg-stone-100 border border-stone-200 text-stone-700">
-              ID: #{editingId}
-            </span>
-          )}
-        </div>
+      {/* Form Card with Tactical Forest & Topographic Texture */}
+      <div className="relative overflow-hidden rounded-3xl border border-black/15 shadow-xl bg-[#162018] text-white p-6 sm:p-8">
+        <div className="absolute inset-0 bg-topography opacity-15 pointer-events-none" />
 
-        <form onSubmit={handleCreate} className="space-y-6">
-          {/* Baris 1: Nama, Kategori, Harga, Stok */}
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
-            {/* Nama Produk */}
-            <div className="md:col-span-5">
-              <label className="block text-[11px] font-bold uppercase tracking-wider text-stone-700 mb-2">
-                Nama Produk *
-              </label>
-              <input
-                type="text"
-                placeholder="Contoh: Jersey Timnas Home Pro 2026"
-                value={form.name}
-                onChange={(e) => setForm({ ...form, name: e.target.value })}
-                className="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-3 text-slate-900 text-sm placeholder:text-stone-400 focus:bg-white focus:border-[#B9382B] focus:ring-1 focus:ring-[#B9382B] outline-hidden transition-all"
-              />
+        <div className="relative z-10">
+          <div className="flex items-center justify-between pb-5 mb-6 border-b border-white/10">
+            <div className="flex items-center gap-3">
+              <div className={`p-2.5 rounded-2xl shadow-sm ${editingId ? "bg-amber-500/20 text-amber-300 border border-amber-400/30" : "bg-[#B9382B] text-white"}`}>
+                {editingId ? <Pencil size={20} /> : <Plus size={20} />}
+              </div>
+              <div>
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="px-2.5 py-0.5 rounded-full bg-white/10 text-emerald-400 font-mono text-[10px] font-black tracking-widest border border-white/10 uppercase">
+                    RS // WORKSHOP PRODUK
+                  </span>
+                </div>
+                <h2 className="font-['Barlow_Condensed'] font-black uppercase tracking-wide text-2xl text-white leading-none">
+                  {editingId ? "Edit Rincian Produk" : "Tambah Produk Baru"}
+                </h2>
+                <p className="text-xs text-stone-300 mt-1">
+                  {editingId ? "Perbarui informasi spesifikasi atau foto produk" : "Daftarkan jersey atau apparel baru ke etalase toko"}
+                </p>
+              </div>
             </div>
-
-            {/* Kategori */}
-            <div className="md:col-span-3">
-              <label className="block text-[11px] font-bold uppercase tracking-wider text-stone-700 mb-2">
-                Kategori *
-              </label>
-              <select
-                value={form.category_id}
-                onChange={(e) => setForm({ ...form, category_id: e.target.value })}
-                className="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-3 text-slate-900 text-sm focus:bg-white focus:border-[#B9382B] focus:ring-1 focus:ring-[#B9382B] outline-hidden transition-all cursor-pointer font-medium"
-              >
-                <option value="">Pilih Kategori</option>
-                {categories.map((cat) => (
-                  <option key={cat.id} value={cat.id}>
-                    {cat.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* Harga */}
-            <div className="md:col-span-2">
-              <label className="block text-[11px] font-bold uppercase tracking-wider text-stone-700 mb-2">
-                Harga (Rp) *
-              </label>
-              <input
-                type="number"
-                placeholder="0"
-                value={form.price}
-                onChange={(e) => setForm({ ...form, price: e.target.value })}
-                className="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-3 text-slate-900 text-sm placeholder:text-stone-400 focus:bg-white focus:border-[#B9382B] focus:ring-1 focus:ring-[#B9382B] outline-hidden transition-all font-mono font-bold"
-              />
-            </div>
-
-            {/* Stok */}
-            <div className="md:col-span-2">
-              <label className="block text-[11px] font-bold uppercase tracking-wider text-stone-700 mb-2">
-                Total Stok
-              </label>
-              <input
-                type="number"
-                placeholder="0"
-                value={form.stock}
-                onChange={(e) => setForm({ ...form, stock: e.target.value })}
-                className="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-3 text-slate-900 text-sm placeholder:text-stone-400 focus:bg-white focus:border-[#B9382B] focus:ring-1 focus:ring-[#B9382B] outline-hidden transition-all font-mono font-bold"
-              />
-            </div>
+            {editingId && (
+              <span className="font-mono text-xs font-bold px-3 py-1.5 rounded-xl bg-white/10 border border-white/15 text-stone-200">
+                ID: #{editingId}
+              </span>
+            )}
           </div>
 
-          {/* Baris 2: Deskripsi & Upload Gambar */}
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
-            {/* Deskripsi */}
-            <div className="md:col-span-7">
-              <label className="block text-[11px] font-bold uppercase tracking-wider text-stone-700 mb-2">
-                Deskripsi Produk & Spesifikasi Bahan
-              </label>
-              <textarea
-                placeholder="Jelaskan bahan kain (misal Dry-Fit Milano, Anti-Bakteri), teknologi sablon, dan instruksi perawatan..."
-                value={form.description}
-                onChange={(e) => setForm({ ...form, description: e.target.value })}
-                rows={3}
-                className="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-3 text-slate-900 text-sm placeholder:text-stone-400 focus:bg-white focus:border-[#B9382B] focus:ring-1 focus:ring-[#B9382B] outline-hidden transition-all resize-none leading-relaxed"
-              />
-            </div>
-
-            {/* Upload / Ganti Gambar */}
-            <div className="md:col-span-5">
-              <div className="flex items-center justify-between mb-2">
-                <label className="block text-[11px] font-bold uppercase tracking-wider text-stone-700">
-                  {editingId ? "Ganti Foto Produk" : "Foto Utama Produk"}
+          <form onSubmit={editingId ? (e) => { e.preventDefault(); handleUpdate(); } : handleCreate} className="space-y-6">
+            {/* Baris 1: Nama, Kategori, Harga, Stok */}
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
+              {/* Nama Produk */}
+              <div className="md:col-span-5">
+                <label className="block text-[11px] font-bold uppercase tracking-wider text-stone-300 mb-2">
+                  Nama Produk *
                 </label>
-                {imagePreview && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setImage(null);
-                      setCurrentImageUrl("");
-                      setImagePreview("");
-                      if (fileInputRef.current) fileInputRef.current.value = "";
-                    }}
-                    className="text-[11px] text-rose-600 hover:text-rose-700 font-bold transition cursor-pointer"
-                  >
-                    Hapus Foto
-                  </button>
-                )}
+                <input
+                  type="text"
+                  placeholder="Contoh: Jersey Timnas Home Pro 2026"
+                  value={form.name}
+                  onChange={(e) => setForm({ ...form, name: e.target.value })}
+                  className="w-full bg-black/35 border border-white/20 rounded-xl px-4 py-3 text-white text-sm placeholder:text-stone-400 focus:bg-black/50 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-400 outline-hidden transition-all font-medium"
+                />
               </div>
 
-              {imagePreview ? (
-                <div className="relative border border-stone-200 rounded-2xl p-2.5 bg-stone-50 flex items-center gap-4 h-28">
-                  <div className="w-24 h-full rounded-xl overflow-hidden bg-white shrink-0 border border-stone-200 flex items-center justify-center">
-                    <img
-                      src={imagePreview}
-                      alt="Preview"
-                      className="w-full h-full object-cover"
-                      onError={(e) => {
-                        e.currentTarget.onerror = null;
-                        e.currentTarget.src = "https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=400&q=80";
-                      }}
-                    />
-                  </div>
-                  <div className="flex-1 flex flex-col justify-center gap-1.5 pr-2">
-                    <p className="text-xs text-slate-800 font-semibold truncate max-w-48">
-                      {image ? image.name : "Foto produk aktif"}
-                    </p>
+              {/* Kategori */}
+              <div className="md:col-span-3">
+                <label className="block text-[11px] font-bold uppercase tracking-wider text-stone-300 mb-2">
+                  Kategori *
+                </label>
+                <select
+                  value={form.category_id}
+                  onChange={(e) => setForm({ ...form, category_id: e.target.value })}
+                  className="w-full bg-[#1b271d] border border-white/20 rounded-xl px-4 py-3 text-white text-sm focus:border-emerald-400 focus:ring-1 focus:ring-emerald-400 outline-hidden transition-all cursor-pointer font-medium"
+                >
+                  <option value="" className="bg-[#162018] text-white">Pilih Kategori</option>
+                  {categories.map((cat) => (
+                    <option key={cat.id} value={cat.id} className="bg-[#162018] text-white">
+                      {cat.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Harga */}
+              <div className="md:col-span-2">
+                <label className="block text-[11px] font-bold uppercase tracking-wider text-stone-300 mb-2">
+                  Harga (Rp) *
+                </label>
+                <input
+                  type="number"
+                  placeholder="0"
+                  value={form.price}
+                  onChange={(e) => setForm({ ...form, price: e.target.value })}
+                  className="w-full bg-black/35 border border-white/20 rounded-xl px-4 py-3 text-white text-sm placeholder:text-stone-400 focus:bg-black/50 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-400 outline-hidden transition-all font-mono font-bold"
+                />
+              </div>
+
+              {/* Stok */}
+              <div className="md:col-span-2">
+                <label className="block text-[11px] font-bold uppercase tracking-wider text-stone-300 mb-2">
+                  Total Stok
+                </label>
+                <input
+                  type="number"
+                  placeholder="0"
+                  value={form.stock}
+                  onChange={(e) => setForm({ ...form, stock: e.target.value })}
+                  className="w-full bg-black/35 border border-white/20 rounded-xl px-4 py-3 text-white text-sm placeholder:text-stone-400 focus:bg-black/50 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-400 outline-hidden transition-all font-mono font-bold"
+                />
+              </div>
+            </div>
+
+            {/* Baris 2: Deskripsi & Upload Gambar */}
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
+              {/* Deskripsi */}
+              <div className="md:col-span-7">
+                <label className="block text-[11px] font-bold uppercase tracking-wider text-stone-300 mb-2">
+                  Deskripsi Produk & Spesifikasi Bahan
+                </label>
+                <textarea
+                  placeholder="Jelaskan bahan kain (misal Dry-Fit Milano, Anti-Bakteri), teknologi sablon, dan instruksi perawatan..."
+                  value={form.description}
+                  onChange={(e) => setForm({ ...form, description: e.target.value })}
+                  rows={3}
+                  className="w-full bg-black/35 border border-white/20 rounded-xl px-4 py-3 text-white text-sm placeholder:text-stone-400 focus:bg-black/50 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-400 outline-hidden transition-all resize-none leading-relaxed"
+                />
+              </div>
+
+              {/* Upload / Ganti Gambar */}
+              <div className="md:col-span-5">
+                <div className="flex items-center justify-between mb-2">
+                  <label className="block text-[11px] font-bold uppercase tracking-wider text-stone-300">
+                    {editingId ? "Ganti Foto Produk" : "Foto Utama Produk"}
+                  </label>
+                  {imagePreview && (
                     <button
                       type="button"
-                      onClick={() => fileInputRef.current?.click()}
-                      className="w-fit flex items-center gap-1.5 bg-white hover:bg-stone-100 border border-stone-200 px-3 py-1.5 rounded-xl text-xs text-stone-700 font-bold transition active:scale-95 cursor-pointer shadow-xs"
+                      onClick={() => {
+                        setImage(null);
+                        setCurrentImageUrl("");
+                        setImagePreview("");
+                        if (fileInputRef.current) fileInputRef.current.value = "";
+                      }}
+                      className="text-[11px] text-rose-400 hover:text-rose-300 font-bold transition cursor-pointer"
                     >
-                      <Upload size={13} />
-                      Ganti Berkas
+                      Hapus Foto
                     </button>
-                  </div>
+                  )}
                 </div>
-              ) : (
-                <div
-                  onClick={() => fileInputRef.current?.click()}
-                  className="flex flex-col items-center justify-center border-2 border-dashed border-stone-200 hover:border-[#B9382B]/60 rounded-2xl h-28 cursor-pointer transition-all group bg-stone-50/60 hover:bg-white"
-                >
-                  <div className="w-9 h-9 rounded-xl bg-white border border-stone-200 flex items-center justify-center mb-1 group-hover:scale-105 transition-all shadow-xs">
-                    <Upload size={18} className="text-stone-500 group-hover:text-[#B9382B] transition-colors" />
-                  </div>
-                  <span className="text-xs text-stone-700 font-semibold group-hover:text-slate-900 transition-colors">
-                    Klik untuk unggah foto jersey
-                  </span>
-                  <span className="text-[10px] text-stone-400">
-                    JPG, PNG, WEBP (Maksimal 10MB)
-                  </span>
-                </div>
-              )}
 
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  if (file) setImage(file);
-                }}
-                className="hidden"
-              />
+                {imagePreview ? (
+                  <div className="relative border border-white/20 rounded-2xl p-2.5 bg-black/30 flex items-center gap-4 h-28">
+                    <div className="w-24 h-full rounded-xl overflow-hidden bg-black/40 shrink-0 border border-white/20 flex items-center justify-center">
+                      <img
+                        src={imagePreview}
+                        alt="Preview"
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          e.currentTarget.onerror = null;
+                          e.currentTarget.src = "https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=400&q=80";
+                        }}
+                      />
+                    </div>
+                    <div className="flex-1 flex flex-col justify-center gap-1.5 pr-2">
+                      <p className="text-xs text-stone-200 font-semibold truncate max-w-48">
+                        {image ? image.name : "Foto produk aktif"}
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => fileInputRef.current?.click()}
+                        className="w-fit flex items-center gap-1.5 bg-white/10 hover:bg-white/20 border border-white/20 px-3 py-1.5 rounded-xl text-xs text-white font-bold transition active:scale-95 cursor-pointer shadow-sm"
+                      >
+                        <Upload size={13} />
+                        Ganti Berkas
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div
+                    onClick={() => fileInputRef.current?.click()}
+                    className="flex flex-col items-center justify-center border-2 border-dashed border-white/25 hover:border-emerald-400 rounded-2xl h-28 cursor-pointer transition-all group bg-white/5 hover:bg-white/10"
+                  >
+                    <div className="w-9 h-9 rounded-xl bg-white/10 border border-white/15 flex items-center justify-center mb-1 group-hover:scale-105 group-hover:bg-emerald-500/20 group-hover:border-emerald-400 transition-all shadow-sm">
+                      <Upload size={18} className="text-stone-300 group-hover:text-emerald-300 transition-colors" />
+                    </div>
+                    <span className="text-xs text-stone-200 font-semibold group-hover:text-white transition-colors">
+                      Klik untuk unggah foto jersey
+                    </span>
+                    <span className="text-[10px] text-stone-400">
+                      JPG, PNG, WEBP (Maksimal 10MB)
+                    </span>
+                  </div>
+                )}
+
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) setImage(file);
+                  }}
+                  className="hidden"
+                />
+              </div>
             </div>
-          </div>
 
-          {/* Action Buttons */}
-          <div className="flex items-center gap-3 pt-4 border-t border-stone-100">
-            {editingId ? (
-              <>
+            {/* Action Buttons */}
+            <div className="flex items-center gap-3 pt-4 border-t border-white/10">
+              {editingId ? (
+                <>
+                  <button
+                    type="button"
+                    onClick={handleUpdate}
+                    disabled={submitting}
+                    className="flex-1 bg-[#B9382B] hover:bg-[#9E2D22] disabled:opacity-70 text-white font-bold py-3.5 px-6 rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg shadow-[#B9382B]/20 active:scale-[0.98] cursor-pointer"
+                  >
+                    {submitting ? (
+                      <>
+                        <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                        </svg>
+                        Menyimpan Perubahan...
+                      </>
+                    ) : (
+                      <>
+                        <Pencil size={18} />
+                        Simpan Perubahan Produk
+                      </>
+                    )}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={resetForm}
+                    className="px-6 py-3.5 bg-white/10 hover:bg-white/20 border border-white/15 rounded-xl transition text-stone-200 font-bold text-sm cursor-pointer"
+                  >
+                    Batal
+                  </button>
+                </>
+              ) : (
                 <button
-                  type="button"
-                  onClick={handleUpdate}
-                  disabled={submitting}
-                  className="flex-1 bg-[#B9382B] hover:bg-[#9E2D22] disabled:opacity-70 text-white font-bold py-3.5 px-6 rounded-xl transition-all flex items-center justify-center gap-2 shadow-md active:scale-[0.98] cursor-pointer"
+                  type="submit"
+                  disabled={submitting || !form.name.trim() || !form.price}
+                  className="flex-1 bg-[#B9382B] hover:bg-[#9E2D22] disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-3.5 px-6 rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg shadow-[#B9382B]/20 active:scale-[0.98] cursor-pointer"
                 >
                   {submitting ? (
                     <>
@@ -500,47 +537,19 @@ export default function Products() {
                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                       </svg>
-                      Menyimpan Perubahan...
+                      Menambahkan ke Database...
                     </>
                   ) : (
                     <>
-                      <Pencil size={18} />
-                      Simpan Perubahan Produk
+                      <Plus size={20} />
+                      Terbitkan Produk Baru
                     </>
                   )}
                 </button>
-                <button
-                  type="button"
-                  onClick={resetForm}
-                  className="px-6 py-3.5 bg-stone-100 hover:bg-stone-200 rounded-xl transition text-stone-700 font-bold text-sm cursor-pointer"
-                >
-                  Batal
-                </button>
-              </>
-            ) : (
-              <button
-                type="submit"
-                disabled={submitting || !form.name.trim() || !form.price}
-                className="flex-1 bg-[#B9382B] hover:bg-[#9E2D22] disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-3.5 px-6 rounded-xl transition-all flex items-center justify-center gap-2 shadow-md active:scale-[0.98] cursor-pointer"
-              >
-                {submitting ? (
-                  <>
-                    <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                    </svg>
-                    Menambahkan ke Database...
-                  </>
-                ) : (
-                  <>
-                    <Plus size={20} />
-                    Terbitkan Produk Baru
-                  </>
-                )}
-              </button>
-            )}
-          </div>
-        </form>
+              )}
+            </div>
+          </form>
+        </div>
       </div>
 
       {/* Product Grid */}

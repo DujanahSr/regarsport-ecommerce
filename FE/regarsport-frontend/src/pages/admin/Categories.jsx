@@ -152,117 +152,126 @@ export default function Categories() {
         </div>
       </div>
 
-      {/* Form Card */}
-      <div className="bg-white border border-stone-200/80 rounded-3xl p-6 sm:p-8 shadow-xs">
-        <div className="flex items-center justify-between mb-6 pb-4 border-b border-stone-100">
-          <div>
-            <h2 className="text-base sm:text-lg font-bold text-slate-900 font-['Barlow_Condensed'] uppercase tracking-wide">
-              {editingId ? "Edit Kategori Produk" : "Tambah Kategori Baru"}
-            </h2>
-            <p className="text-xs text-stone-500">
-              {editingId ? `Memperbarui data kategori ID #${editingId}` : "Masukkan nama kategori dan unggah ikon atau foto representatif"}
-            </p>
-          </div>
-          {editingId && (
-            <span className="px-2.5 py-1 rounded-full text-[10px] font-mono font-bold bg-[#FAF0ED] text-[#B9382B] border border-[#B9382B]/20">
-              MODE EDIT
-            </span>
-          )}
-        </div>
-
-        <form onSubmit={editingId ? handleUpdate : handleCreate} className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-            {/* Name Input */}
-            <div className="md:col-span-7 space-y-2">
-              <label className="block text-xs font-bold uppercase tracking-widest text-stone-600">
-                NAMA KATEGORI
-              </label>
-              <input
-                type="text"
-                placeholder="Contoh: Jersey Futsal, Sepatu Running, Aksesori"
-                value={form.name}
-                onChange={(e) => setForm({ ...form, name: e.target.value })}
-                className="w-full bg-stone-50 border border-stone-200 rounded-2xl px-4 py-3.5 text-stone-900 placeholder:text-stone-400 focus:outline-none focus:border-[#162018] focus:bg-white transition-all text-sm font-medium"
-              />
-              <p className="text-[11px] text-stone-400">
-                Nama kategori akan ditampilkan di navbar katalog toko dan filter produk pelanggan.
+      {/* Form Card with Tactical Forest & Topographic Texture */}
+      <div className="relative overflow-hidden rounded-3xl border border-black/15 shadow-xl bg-[#162018] text-white p-6 sm:p-8">
+        <div className="absolute inset-0 bg-topography opacity-15 pointer-events-none" />
+        
+        <div className="relative z-10">
+          <div className="flex items-center justify-between mb-6 pb-4 border-b border-white/10">
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <span className="px-2.5 py-0.5 rounded-full bg-white/10 text-emerald-400 font-mono text-[10px] font-black tracking-widest border border-white/10 uppercase">
+                  RS // WORKSHOP KATEGORI
+                </span>
+              </div>
+              <h2 className="text-xl sm:text-2xl font-black text-white font-['Barlow_Condensed'] uppercase tracking-wide leading-none">
+                {editingId ? "Edit Kategori Produk" : "Tambah Kategori Baru"}
+              </h2>
+              <p className="text-xs text-stone-300 mt-1">
+                {editingId ? `Memperbarui data kategori ID #${editingId}` : "Masukkan nama kategori dan unggah ikon atau foto representatif"}
               </p>
             </div>
-
-            {/* Image Upload */}
-            <div className="md:col-span-5 space-y-2">
-              <label className="block text-xs font-bold uppercase tracking-widest text-stone-600">
-                FOTO / IKON KATEGORI
-              </label>
-              <label className="flex flex-col items-center justify-center border border-dashed border-stone-300 hover:border-[#162018] bg-stone-50/60 rounded-2xl h-36 cursor-pointer transition-colors group">
-                {imagePreview ? (
-                  <div className="relative w-full h-full flex items-center justify-center p-2">
-                    <img
-                      src={imagePreview}
-                      alt="Preview"
-                      className="max-h-30 rounded-xl object-cover border border-stone-200 shadow-xs"
-                    />
-                    <button
-                      type="button"
-                      onClick={(e) => { e.preventDefault(); setImage(null); setCurrentImageUrl(""); setImagePreview(""); }}
-                      className="absolute top-2 right-2 bg-rose-600 text-white p-1.5 rounded-full hover:bg-rose-700 shadow-sm cursor-pointer"
-                      title="Hapus Foto"
-                    >
-                      <X size={13} />
-                    </button>
-                  </div>
-                ) : (
-                  <div className="flex flex-col items-center p-4 text-center">
-                    <div className="w-10 h-10 rounded-xl bg-white border border-stone-200 flex items-center justify-center mb-2 group-hover:bg-[#162018] group-hover:text-white transition-colors text-stone-500">
-                      <Upload size={18} />
-                    </div>
-                    <span className="text-xs font-bold text-stone-700">Pilih Foto Kategori</span>
-                    <span className="text-[10px] text-stone-400 mt-0.5">JPG, PNG atau WebP (Maks. 2MB)</span>
-                  </div>
-                )}
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => setImage(e.target.files?.[0] || null)}
-                  className="hidden"
-                />
-              </label>
-            </div>
-          </div>
-
-          {/* Action Buttons */}
-          <div className="flex gap-3 pt-2">
-            {editingId ? (
-              <>
-                <button
-                  type="button"
-                  onClick={handleUpdate}
-                  disabled={loading}
-                  className="flex-1 bg-[#162018] hover:bg-black text-white font-bold py-3.5 px-6 rounded-2xl text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 shadow-md cursor-pointer active:scale-95 disabled:opacity-50"
-                >
-                  {loading ? "Menyimpan Perubahan..." : "Simpan Perubahan Kategori"}
-                </button>
-                <button
-                  type="button"
-                  onClick={resetForm}
-                  className="px-6 py-3.5 border border-stone-200 hover:bg-stone-100 rounded-2xl text-xs font-bold text-stone-600 transition-all cursor-pointer"
-                  title="Batalkan Edit"
-                >
-                  Batal
-                </button>
-              </>
-            ) : (
-              <button
-                type="submit"
-                disabled={loading || !form.name.trim()}
-                className="bg-[#B9382B] hover:bg-[#9E2D22] text-white font-bold py-3.5 px-8 rounded-2xl text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 shadow-md cursor-pointer active:scale-95 disabled:opacity-50"
-              >
-                <Plus size={16} />
-                <span>{loading ? "Menambahkan..." : "Tambah Kategori Baru"}</span>
-              </button>
+            {editingId && (
+              <span className="px-3 py-1 rounded-full text-[10px] font-mono font-bold bg-[#B9382B]/20 text-rose-300 border border-[#B9382B]/30">
+                MODE EDIT
+              </span>
             )}
           </div>
-        </form>
+
+          <form onSubmit={editingId ? handleUpdate : handleCreate} className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+              {/* Name Input */}
+              <div className="md:col-span-7 space-y-2">
+                <label className="block text-xs font-bold uppercase tracking-widest text-stone-300">
+                  NAMA KATEGORI *
+                </label>
+                <input
+                  type="text"
+                  placeholder="Contoh: Jersey Futsal, Sepatu Running, Aksesori"
+                  value={form.name}
+                  onChange={(e) => setForm({ ...form, name: e.target.value })}
+                  className="w-full bg-black/35 border border-white/20 rounded-2xl px-4 py-3.5 text-white placeholder:text-stone-400 focus:outline-none focus:border-emerald-400 focus:bg-black/50 transition-all text-sm font-medium"
+                />
+                <p className="text-[11px] text-stone-400">
+                  Nama kategori akan ditampilkan di navbar katalog toko dan filter produk pelanggan.
+                </p>
+              </div>
+
+              {/* Image Upload */}
+              <div className="md:col-span-5 space-y-2">
+                <label className="block text-xs font-bold uppercase tracking-widest text-stone-300">
+                  FOTO / IKON KATEGORI
+                </label>
+                <label className="flex flex-col items-center justify-center border border-dashed border-white/25 hover:border-emerald-400 bg-white/5 hover:bg-white/10 rounded-2xl h-36 cursor-pointer transition-colors group">
+                  {imagePreview ? (
+                    <div className="relative w-full h-full flex items-center justify-center p-2">
+                      <img
+                        src={imagePreview}
+                        alt="Preview"
+                        className="max-h-30 rounded-xl object-cover border border-white/20 shadow-md"
+                      />
+                      <button
+                        type="button"
+                        onClick={(e) => { e.preventDefault(); setImage(null); setCurrentImageUrl(""); setImagePreview(""); }}
+                        className="absolute top-2 right-2 bg-rose-600 text-white p-1.5 rounded-full hover:bg-rose-700 shadow-sm cursor-pointer"
+                        title="Hapus Foto"
+                      >
+                        <X size={13} />
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center p-4 text-center">
+                      <div className="w-10 h-10 rounded-xl bg-white/10 border border-white/15 flex items-center justify-center mb-2 group-hover:bg-emerald-500/20 group-hover:border-emerald-400 transition-colors text-stone-300 group-hover:text-emerald-300">
+                        <Upload size={18} />
+                      </div>
+                      <span className="text-xs font-bold text-white">Pilih Foto Kategori</span>
+                      <span className="text-[10px] text-stone-400 mt-0.5">JPG, PNG atau WebP (Maks. 2MB)</span>
+                    </div>
+                  )}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => setImage(e.target.files?.[0] || null)}
+                    className="hidden"
+                  />
+                </label>
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex gap-3 pt-2 border-t border-white/10">
+              {editingId ? (
+                <>
+                  <button
+                    type="button"
+                    onClick={handleUpdate}
+                    disabled={loading}
+                    className="flex-1 bg-[#B9382B] hover:bg-[#9E2D22] text-white font-bold py-3.5 px-6 rounded-2xl text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 shadow-lg shadow-[#B9382B]/20 cursor-pointer active:scale-95 disabled:opacity-50"
+                  >
+                    {loading ? "Menyimpan Perubahan..." : "Simpan Perubahan Kategori"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={resetForm}
+                    className="px-6 py-3.5 border border-white/20 hover:bg-white/10 rounded-2xl text-xs font-bold text-stone-200 transition-all cursor-pointer"
+                    title="Batalkan Edit"
+                  >
+                    Batal
+                  </button>
+                </>
+              ) : (
+                <button
+                  type="submit"
+                  disabled={loading || !form.name.trim()}
+                  className="bg-[#B9382B] hover:bg-[#9E2D22] text-white font-bold py-3.5 px-8 rounded-2xl text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 shadow-lg shadow-[#B9382B]/20 cursor-pointer active:scale-95 disabled:opacity-50"
+                >
+                  <Plus size={16} />
+                  <span>{loading ? "Menambahkan..." : "Tambah Kategori Baru"}</span>
+                </button>
+              )}
+            </div>
+          </form>
+        </div>
       </div>
 
       {/* Categories Table */}

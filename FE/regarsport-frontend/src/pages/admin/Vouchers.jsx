@@ -131,29 +131,49 @@ export default function Vouchers() {
 
   return (
     <div className="space-y-8 pb-12">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-stone-100 border border-stone-200 text-stone-700 text-[10px] font-bold tracking-widest uppercase mb-2">
-            <Tag size={12} className="text-[#B9382B]" />
-            <span>RS // DISCOUNTS & PROMOTIONS</span>
-          </div>
-          <h1 className="font-['Barlow_Condensed'] font-black uppercase tracking-tight text-3xl sm:text-4xl text-slate-900 leading-none">
-            KUPON & VOUCHER PROMO
-          </h1>
-          <p className="text-stone-500 text-xs sm:text-sm mt-1">
-            Kelola diskon promosi, potongan harga pesanan tim, dan kuota kupon checkout Midtrans.
-          </p>
-        </div>
+      {/* Header Banner Tactical Forest */}
+      <div className="relative overflow-hidden rounded-3xl border border-black/15 shadow-xl bg-[#162018] text-white p-6 sm:p-8">
+        <div className="absolute inset-0 bg-topography opacity-15 pointer-events-none" />
 
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => setShowAddModal(true)}
-            className="flex items-center gap-2 px-5 py-3 rounded-xl bg-[#B9382B] hover:bg-[#9E2D22] text-white font-bold text-xs uppercase tracking-wider shadow-md hover:shadow-lg transition-all active:scale-95 cursor-pointer"
-          >
-            <Plus size={16} strokeWidth={3} />
-            <span>Buat Kupon Baru</span>
-          </button>
+        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div className="max-w-2xl">
+            <div className="flex items-center gap-2 mb-2">
+              <span className="px-2.5 py-0.5 rounded-full bg-white/10 text-emerald-400 font-mono text-[10px] font-black tracking-widest border border-white/10 uppercase">
+                RS // CAMPAIGN & PROMOTIONS
+              </span>
+              <span className="text-[11px] font-mono uppercase tracking-widest text-stone-300">
+                ATELIER REWARD SYSTEM
+              </span>
+            </div>
+            <h1 className="font-['Barlow_Condensed'] font-black uppercase tracking-tight text-3xl sm:text-5xl text-white leading-none">
+              KUPON & VOUCHER PROMO
+            </h1>
+            <p className="text-stone-300 text-xs sm:text-sm mt-2 leading-relaxed">
+              Kelola diskon promosi apparel olahraga, subsidi ongkir, kupon loyalitas pesanan tim, dan kuota potongan harga checkout Midtrans.
+            </p>
+
+            <div className="flex flex-wrap items-center gap-4 mt-4 pt-3 border-t border-white/10 text-xs font-mono text-stone-300">
+              <div className="flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-emerald-400" />
+                <span>KUPON AKTIF: {vouchers.filter((v) => v.isActive).length}</span>
+              </div>
+              <span className="text-white/20">•</span>
+              <div className="flex items-center gap-1.5">
+                <Tag size={13} className="text-amber-400" />
+                <span>TOTAL TERDAFTAR: {vouchers.length} KODE</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3 shrink-0">
+            <button
+              onClick={() => setShowAddModal(true)}
+              className="flex items-center gap-2 px-6 py-3.5 rounded-2xl bg-[#B9382B] hover:bg-[#9E2D22] text-white font-bold text-xs uppercase tracking-wider shadow-lg shadow-[#B9382B]/30 transition-all active:scale-95 cursor-pointer"
+            >
+              <Plus size={16} strokeWidth={3} />
+              <span>Buat Kupon Baru</span>
+            </button>
+          </div>
         </div>
       </div>
 
