@@ -1,4 +1,4 @@
-﻿# ==========================================
+# ==========================================
 # RegarSport - Root .gitignore
 # ==========================================
 
@@ -46,9 +46,13 @@ pnpm-debug.log*
 
 # --- Logs & Crash Dumps ---
 *.log
+**/*.log
 logs/
+**/logs/
 hs_err_pid*.log
+**/hs_err_pid*.log
 replay_pid*.log
+**/replay_pid*.log
 
 # --- OS System Files ---
 .DS_Store
