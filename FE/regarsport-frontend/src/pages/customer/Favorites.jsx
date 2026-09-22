@@ -6,7 +6,6 @@ import {
   Heart,
   ShoppingCart,
   Trash2,
-  Sparkles,
   ChevronLeft,
   ShieldCheck,
 } from "lucide-react";
@@ -65,9 +64,11 @@ export default function Favorites() {
               <span>Kembali ke Katalog Toko</span>
             </Link>
 
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-[#162018] px-3.5 py-1 text-[11px] font-bold tracking-wider text-emerald-400 uppercase font-mono shadow-xs">
-              <Sparkles size={12} className="text-amber-400" />
-              Atelier Cicendo Bandung // Koleksi Favorit
+            <span className="inline-flex items-center gap-2 rounded-full bg-[#162018] px-3.5 py-1.5 text-[11px] font-bold tracking-wider text-emerald-400 uppercase font-mono shadow-xs border border-white/10">
+              <span className="px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 text-[9px] font-black border border-emerald-500/40">
+                WISHLIST
+              </span>
+              <span>Atelier Cicendo Bandung</span>
             </span>
           </div>
 
@@ -109,26 +110,31 @@ export default function Favorites() {
         {loading ? (
           <CardSkeletonList count={4} />
         ) : wishlistItems.length === 0 ? (
-          <div className="rounded-3xl border border-[#162018]/10 bg-white p-8 sm:p-14 text-center shadow-xs">
-            <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-2xl bg-rose-50 text-rose-500 ring-8 ring-rose-50/50 mb-4">
-              <Heart size={36} className="fill-rose-500/20 stroke-rose-500 stroke-2" />
-            </div>
+          <div className="relative overflow-hidden rounded-3xl border border-[#162018]/10 bg-white p-8 sm:p-14 text-center shadow-xs">
+            {/* Topographic Corak Overlay */}
+            <div className="absolute inset-0 bg-topography opacity-20 pointer-events-none" />
 
-            <h2 className="font-condensed text-2xl sm:text-3xl font-black uppercase tracking-tight text-[#162018]">
-              Wishlist Anda Masih Kosong
-            </h2>
-            <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-slate-500">
-              Belum ada jersey atau perlengkapan yang disimpan. Jelajahi katalog resmi kami untuk menandai produk pilihan Anda!
-            </p>
+            <div className="relative z-10">
+              <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-2xl bg-rose-50 text-rose-500 ring-8 ring-rose-50/50 mb-4 shadow-sm">
+                <Heart size={36} className="fill-rose-500/20 stroke-rose-500 stroke-2" />
+              </div>
 
-            <div className="mt-6">
-              <Link
-                to="/dashboard"
-                className="inline-flex items-center gap-2 rounded-2xl bg-[#B9382B] hover:bg-[#982D22] px-6 py-3.5 text-xs font-black font-condensed tracking-wider uppercase text-white shadow-md shadow-[#B9382B]/20 transition active:scale-95"
-              >
-                <span>Buka Katalog Toko Sekarang</span>
-                <ArrowRight size={15} />
-              </Link>
+              <h2 className="font-condensed text-2xl sm:text-3xl font-black uppercase tracking-tight text-[#162018]">
+                Wishlist Anda Masih Kosong
+              </h2>
+              <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-slate-500 font-sans">
+                Belum ada jersey atau perlengkapan yang disimpan. Jelajahi katalog resmi kami untuk menandai produk pilihan Anda!
+              </p>
+
+              <div className="mt-6">
+                <Link
+                  to="/dashboard"
+                  className="inline-flex items-center gap-2 rounded-2xl bg-[#B9382B] hover:bg-[#982D22] px-6 py-3.5 text-xs font-black font-condensed tracking-wider uppercase text-white shadow-md shadow-[#B9382B]/20 transition active:scale-95"
+                >
+                  <span>Buka Katalog Toko Sekarang</span>
+                  <ArrowRight size={15} />
+                </Link>
+              </div>
             </div>
           </div>
         ) : (

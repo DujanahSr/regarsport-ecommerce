@@ -1,11 +1,13 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import {
-  Heart,
+  Home,
+  Bookmark,
   LogOut,
   Menu,
   Package,
   ShoppingCart,
+  ShoppingBag,
   User,
   X,
   Info,
@@ -23,6 +25,7 @@ export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const { cartItems } = useCart();
   const { wishlistItems } = useWishlist();
 
@@ -39,33 +42,37 @@ export default function Header() {
     setIsMenuOpen(false);
   };
 
+  const isActive = (path) => {
+    if (path === "/") return location.pathname === "/";
+    if (path === "/dashboard") return location.pathname === "/dashboard";
+    return location.pathname.startsWith(path);
+  };
+
   const navLinks = user
     ? [
-        { to: "/dashboard", label: "Katalog", icon: ShoppingCart },
-        { to: "/dashboard/favorites", label: "Wishlist", icon: Heart, badge: totalWishlist },
+        { to: "/", label: "Beranda", icon: Home },
+        { to: "/dashboard", label: "Katalog", icon: ShoppingBag },
+        { to: "/dashboard/favorites", label: "Tersimpan", icon: Bookmark, badge: totalWishlist },
         { to: "/dashboard/cart", label: "Keranjang", icon: ShoppingCart, badge: totalItems },
         { to: "/dashboard/my-orders", label: "Pesanan Saya", icon: Package },
         { to: "/dashboard/about", label: "Tentang", icon: Info },
       ]
     : [
-        { to: "/dashboard", label: "Katalog Toko", icon: ShoppingCart },
+        { to: "/", label: "Beranda", icon: Home },
+        { to: "/dashboard", label: "Katalog Toko", icon: ShoppingBag },
         { to: "/dashboard/about", label: "Tentang Kami", icon: Info },
       ];
 
   return (
     <header className="sticky top-0 z-50 bg-[#162018] text-white shadow-lg border-b border-white/10">
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
-        <div className="flex items-center gap-3 sm:gap-4">
+        <div className="flex items-center">
           <Link
             to="/"
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/5 hover:bg-white/15 text-xs font-mono tracking-wider uppercase text-slate-300 hover:text-white transition-colors border border-white/10"
+            className="flex shrink-0 items-center gap-2.5 group"
             title="Kembali ke Beranda Utama"
           >
-            <span>← Beranda</span>
-          </Link>
-
-          <Link to="/dashboard" className="flex shrink-0 items-center gap-2.5">
-            <div className="w-8 h-8 bg-[#B9382B] rounded-lg flex items-center justify-center shadow-md">
+            <div className="w-8 h-8 bg-[#B9382B] rounded-lg flex items-center justify-center shadow-md group-hover:scale-105 transition-transform">
               <span className="text-white font-black text-xs">R</span>
             </div>
             <div>
@@ -80,22 +87,29 @@ export default function Header() {
         </div>
 
         {/* Desktop nav */}
-        <nav className="hidden items-center gap-2 lg:flex">
-          {navLinks.map(({ to, label, icon: Icon, badge }) => (
-            <Link
-              key={to}
-              to={to}
-              className="relative flex items-center gap-2 rounded-lg px-3.5 py-2 text-sm font-medium text-emerald-50/90 transition hover:bg-white/10"
-            >
-              <Icon size={17} />
-              <span>{label}</span>
-              {typeof badge === "number" && badge > 0 ? (
-                <span className="absolute -top-1.5 -right-1.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-emerald-500 px-1 text-[11px] font-bold text-emerald-950">
-                  {badge}
-                </span>
-              ) : null}
-            </Link>
-          ))}
+        <nav className="hidden items-center gap-1.5 lg:flex">
+          {navLinks.map(({ to, label, icon: Icon, badge }) => {
+            const active = isActive(to);
+            return (
+              <Link
+                key={to}
+                to={to}
+                className={`relative flex items-center gap-2 rounded-lg px-3.5 py-2 text-sm font-medium transition ${
+                  active
+                    ? "bg-white/10 text-white font-semibold shadow-inner"
+                    : "text-emerald-50/80 hover:text-white hover:bg-white/5"
+                }`}
+              >
+                <Icon size={17} className={active ? "text-emerald-400" : "text-emerald-300/70"} />
+                <span>{label}</span>
+                {typeof badge === "number" && badge > 0 ? (
+                  <span className="absolute -top-1.5 -right-1.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-emerald-500 px-1 text-[11px] font-bold text-emerald-950 shadow">
+                    {badge}
+                  </span>
+                ) : null}
+              </Link>
+            );
+          })}
         </nav>
 
         {/* Desktop User Status / Auth Actions */}
@@ -105,7 +119,7 @@ export default function Header() {
               {user.role === "logistics" && (
                 <Link
                   to="/admin/orders"
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs shadow-md shadow-purple-900/30 transition animate-pulse"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs shadow-md shadow-purple-900/30 transition"
                 >
                   <Truck size={15} />
                   <span>Panel Gudang</span>
@@ -262,24 +276,31 @@ export default function Header() {
               </Link>
             )}
 
-            {navLinks.map(({ to, label, icon: Icon, badge }) => (
-              <Link
-                key={to}
-                to={to}
-                onClick={() => setIsMenuOpen(false)}
-                className="flex items-center justify-between rounded-lg px-3 py-2.5 text-sm font-medium transition hover:bg-white/10"
-              >
-                <span className="flex items-center gap-2.5">
-                  <Icon size={18} />
-                  {label}
-                </span>
-                {typeof badge === "number" && badge > 0 ? (
-                  <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-emerald-500 px-1 text-[11px] font-bold text-emerald-950">
-                    {badge}
+            {navLinks.map(({ to, label, icon: Icon, badge }) => {
+              const active = isActive(to);
+              return (
+                <Link
+                  key={to}
+                  to={to}
+                  onClick={() => setIsMenuOpen(false)}
+                  className={`flex items-center justify-between rounded-lg px-3 py-2.5 text-sm font-medium transition ${
+                    active
+                      ? "bg-white/10 text-white font-semibold"
+                      : "text-emerald-50/80 hover:bg-white/10 hover:text-white"
+                  }`}
+                >
+                  <span className="flex items-center gap-2.5">
+                    <Icon size={18} className={active ? "text-emerald-400" : "text-emerald-300/70"} />
+                    {label}
                   </span>
-                ) : null}
-              </Link>
-            ))}
+                  {typeof badge === "number" && badge > 0 ? (
+                    <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-emerald-500 px-1 text-[11px] font-bold text-emerald-950">
+                      {badge}
+                    </span>
+                  ) : null}
+                </Link>
+              );
+            })}
 
             {user && (
               <button

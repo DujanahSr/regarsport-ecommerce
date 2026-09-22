@@ -1,34 +1,7 @@
 import { useEffect, useRef } from "react";
 import toast from "react-hot-toast";
 import api from "../../services/api";
-
-const MIDTRANS_CLIENT_KEY = "Mid-client-k96CUmHtMPzra5IO";
-const MIDTRANS_SNAP_URL = "https://app.sandbox.midtrans.com/snap/snap.js";
-
-// Fungsi untuk memastikan script Midtrans Snap termuat di header dokumen
-function ensureSnapScriptLoaded() {
-  return new Promise((resolve, reject) => {
-    if (typeof window !== "undefined" && window.snap && typeof window.snap.pay === "function") {
-      return resolve(window.snap);
-    }
-
-    const existingScript = document.querySelector(`script[src="${MIDTRANS_SNAP_URL}"]`);
-    if (existingScript) {
-      if (window.snap) return resolve(window.snap);
-      existingScript.addEventListener("load", () => resolve(window.snap));
-      existingScript.addEventListener("error", (e) => reject(e));
-      return;
-    }
-
-    const script = document.createElement("script");
-    script.src = MIDTRANS_SNAP_URL;
-    script.setAttribute("data-client-key", MIDTRANS_CLIENT_KEY);
-    script.async = true;
-    script.onload = () => resolve(window.snap);
-    script.onerror = (e) => reject(e);
-    document.head.appendChild(script);
-  });
-}
+import { loadMidtransSnap } from "../../utils/loadMidtrans";
 
 export default function MidtransModal({
   isOpen,
@@ -55,11 +28,26 @@ export default function MidtransModal({
 
     const launchSnap = async () => {
       try {
-        await ensureSnapScriptLoaded();
+        const createdAtDate = new Date(order?.createdAt || order?.created_at);
+        const isOrderExpired =
+          (order?.status || "").toUpperCase() === "CANCELLED" ||
+          (!isNaN(createdAtDate.getTime()) && Date.now() - createdAtDate.getTime() > 24 * 60 * 60 * 1000);
+
+        if (isOrderExpired) {
+          toast.dismiss("midtrans-snap-loader");
+          toast.error("Batas waktu pembayaran pesanan ini telah kedaluwarsa. Silakan lakukan pemesanan ulang.");
+          onClose();
+          return;
+        }
+
+        const snap = await loadMidtransSnap();
+        if (!snap || typeof snap.pay !== "function") {
+          throw new Error("Pustaka Midtrans Snap belum siap dimuat di browser.");
+        }
 
         let token = initialSnapToken;
 
-        // Ambil atau buat token resmi Midtrans jika belum ada
+        // Ambil token tersimpan atau buat baru via API
         if (!token || token.startsWith("SNAP-TOKEN-")) {
           try {
             const res = await api.get(`/payments/order/${order.id}`);
@@ -68,13 +56,13 @@ export default function MidtransModal({
               token = fetchedToken;
             }
           } catch (fetchErr) {
-            console.warn("Belum ada payment record tersimpan, mencoba create-token:", fetchErr);
+            console.warn("Belum ada payment record tersimpan, membuat token baru:", fetchErr);
           }
 
           if (!token || token.startsWith("SNAP-TOKEN-")) {
             const createRes = await api.post("/payments/create-token", {
               orderId: Number(order.id),
-              orderNumber: order.orderNumber,
+              orderNumber: order.orderNumber || orderNumber,
               customerEmail: order.customerEmail || "customer@regarsport.com",
               customerName: order.customerName || "Customer",
               amount: Number(order.totalAmount || order.total_amount || 0),
@@ -86,50 +74,54 @@ export default function MidtransModal({
         if (!isMounted) return;
 
         if (!token || token.startsWith("SNAP-TOKEN-")) {
-          throw new Error("Gagal memperoleh Snap Token resmi dari Midtrans.");
+          throw new Error("Gagal memperoleh Snap Token resmi dari Midtrans Sandbox.");
         }
 
-        // Hilangkan loading toast tepat sebelum pop-up resmi Midtrans muncul
+        // Hilangkan loading toast tepat sebelum pop-up resmi Midtrans muncul di layar
         toast.dismiss("midtrans-snap-loader");
 
-        if (window.snap && typeof window.snap.pay === "function") {
-          window.snap.pay(token, {
-            onSuccess: async function (result) {
-              toast.success("Pembayaran Berhasil! Pesanan Anda telah lunas.");
-              try {
-                await api.get(`/payments/sync/${orderNumber}`);
-              } catch (e) {
-                console.warn("Sync error after success:", e);
-              }
-              if (onSuccess) onSuccess(order);
-              onClose();
-            },
-            onPending: async function () {
-              toast("Menunggu pembayaran diselesaikan...", { icon: "⏳" });
-              try {
-                await api.get(`/payments/sync/${orderNumber}`);
-              } catch (e) {
-                console.warn("Sync error on pending:", e);
-              }
-              onClose();
-            },
-            onError: function () {
-              toast.error("Pembayaran dibatalkan atau gagal via Midtrans");
-              onClose();
-            },
-            onClose: async function () {
-              // Pengguna menutup pop-up Midtrans
-              try {
-                await api.get(`/payments/sync/${orderNumber}`);
-              } catch (e) {
-                console.warn("Sync error on close:", e);
-              }
-              onClose();
-            },
-          });
-        } else {
-          throw new Error("Pustaka Midtrans Snap gagal dimuat di browser.");
-        }
+        snap.pay(token, {
+          onSuccess: async function (result) {
+            toast.success("Pembayaran Berhasil! Pesanan Anda telah lunas.");
+            try {
+              await api.get(`/payments/sync/${orderNumber}`);
+            } catch (e) {
+              console.warn("Sync error after success:", e);
+            }
+            if (onSuccess) onSuccess(order);
+            onClose();
+          },
+          onPending: async function () {
+            toast("Menunggu pembayaran diselesaikan...", { icon: "⏳" });
+            try {
+              await api.get(`/payments/sync/${orderNumber}`);
+            } catch (e) {
+              console.warn("Sync error on pending:", e);
+            }
+            if (onSuccess) onSuccess(order);
+            onClose();
+          },
+          onError: async function (result) {
+            console.warn("Midtrans onError callback:", result);
+            toast.error("Pembayaran dibatalkan atau waktu transaksi telah kedaluwarsa.");
+            try {
+              await api.get(`/payments/sync/${orderNumber}`);
+            } catch (e) {
+              console.warn("Sync error on error:", e);
+            }
+            if (onSuccess) onSuccess(order);
+            onClose();
+          },
+          onClose: async function () {
+            try {
+              await api.get(`/payments/sync/${orderNumber}`);
+            } catch (e) {
+              console.warn("Sync error on close:", e);
+            }
+            if (onSuccess) onSuccess(order);
+            onClose();
+          },
+        });
       } catch (err) {
         if (!isMounted) return;
         toast.dismiss("midtrans-snap-loader");
@@ -147,6 +139,7 @@ export default function MidtransModal({
 
     return () => {
       isMounted = false;
+      isLaunchingRef.current = false;
       toast.dismiss("midtrans-snap-loader");
     };
   }, [isOpen, order, initialSnapToken, orderNumber, onClose, onSuccess]);

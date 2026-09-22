@@ -45,13 +45,18 @@ export default function Checkout() {
   const [validationError, setValidationError] = useState("");
   const [createdOrder, setCreatedOrder] = useState(null);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [confirmedItems, setConfirmedItems] = useState(null);
 
   const directItem = location.state?.directItem;
   const selectedIds = location.state?.selectedItems || [];
 
-  const checkoutItems = directItem
+  const rawCheckoutItems = directItem
     ? [directItem]
-    : cartItems.filter((item) => selectedIds.includes(item.id));
+    : selectedIds.length > 0
+    ? cartItems.filter((item) => selectedIds.includes(item.id))
+    : cartItems;
+
+  const checkoutItems = confirmedItems || rawCheckoutItems;
 
   const total = checkoutItems.reduce(
     (acc, item) =>
@@ -173,6 +178,9 @@ export default function Checkout() {
         }
       }
 
+      // Snapshot checkout items so unmount doesn't occur during cart refresh
+      setConfirmedItems(checkoutItems);
+
       // Refresh cart and clear selected items
       await loadCart();
       setSelectedItems([]);
@@ -198,7 +206,7 @@ export default function Checkout() {
   const handlePaymentClose = () => {
     setShowPaymentModal(false);
     if (createdOrder?.id) {
-      toast("Pesanan disimpan. Anda dapat membayar nanti di Detail Pesanan.", {
+      toast("Pesanan disimpan. Anda dapat menyelesaikan pembayaran kapan saja di Rincian Pesanan.", {
         icon: "ℹ️",
       });
       navigate(`/dashboard/orders/${createdOrder.id}`);
@@ -209,21 +217,30 @@ export default function Checkout() {
     return <ScreenLoader label="Menyiapkan checkout..." />;
   }
 
-  if (checkoutItems.length === 0) {
+  if (!createdOrder && !showPaymentModal && checkoutItems.length === 0) {
     return (
-      <EmptyState
-        title="Belum ada produk yang dipilih"
-        description="Pilih item dari keranjang atau gunakan fitur 'Beli Sekarang' pada produk."
-        action={
-          <Link
-            to="/dashboard/cart"
-            className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-emerald-600/20 transition hover:bg-emerald-700"
-          >
-            <ShoppingBag size={18} />
-            Buka Keranjang
-          </Link>
-        }
-      />
+      <div className="bg-[#FAF8F4] min-h-screen py-16 text-[#111613] font-sans-body">
+        <div className="mx-auto max-w-lg px-4 text-center">
+          <div className="mb-4 inline-flex p-4 rounded-3xl bg-white border border-[#162018]/10 shadow-sm text-slate-400">
+            <ShoppingBag size={36} />
+          </div>
+          <h1 className="font-condensed text-3xl font-black uppercase text-[#162018]">
+            Belum Ada Produk yang Dipilih
+          </h1>
+          <p className="mt-2 text-xs font-mono text-slate-500 leading-relaxed">
+            Pilih item dari keranjang belanja atau gunakan tombol &apos;Beli Sekarang&apos; pada katalog produk olahraga.
+          </p>
+          <div className="mt-6 flex justify-center">
+            <Link
+              to="/dashboard/cart"
+              className="inline-flex items-center gap-2 rounded-xl bg-[#162018] px-6 py-3 text-xs font-mono font-bold text-white uppercase hover:bg-black transition shadow-xs"
+            >
+              <ShoppingBag size={15} />
+              <span>Buka Keranjang Belanja</span>
+            </Link>
+          </div>
+        </div>
+      </div>
     );
   }
 

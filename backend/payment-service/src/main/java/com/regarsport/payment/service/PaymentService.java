@@ -131,7 +131,11 @@ public class PaymentService {
 
             log.info("Midtrans live status for {}: txStatus={}, fraudStatus={}", orderNumber, txStatus, fraudStatus);
 
-            if ("settlement".equalsIgnoreCase(txStatus) || ("capture".equalsIgnoreCase(txStatus) && "accept".equalsIgnoreCase(fraudStatus))) {
+            if ("settlement".equalsIgnoreCase(txStatus)
+                    || ("capture".equalsIgnoreCase(txStatus) && "accept".equalsIgnoreCase(fraudStatus))
+                    || "expire".equalsIgnoreCase(txStatus)
+                    || "cancel".equalsIgnoreCase(txStatus)
+                    || "deny".equalsIgnoreCase(txStatus)) {
                 MidtransWebhookPayload payload = new MidtransWebhookPayload(
                         orderNumber,
                         transactionId,

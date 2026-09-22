@@ -54,6 +54,10 @@ public class WebhookService {
         webhookLogRepository.save(logEntry);
 
         Optional<PaymentTransaction> txOpt = paymentTransactionRepository.findByOrderNumber(payload.orderId());
+        if (txOpt.isEmpty() && payload.orderId() != null && payload.orderId().contains("-R")) {
+            String baseOrderNumber = payload.orderId().substring(0, payload.orderId().lastIndexOf("-R"));
+            txOpt = paymentTransactionRepository.findByOrderNumber(baseOrderNumber);
+        }
         if (txOpt.isEmpty()) {
             log.warn("PaymentTransaction not found for orderNumber: {}", payload.orderId());
             return "Order transaction record not found";

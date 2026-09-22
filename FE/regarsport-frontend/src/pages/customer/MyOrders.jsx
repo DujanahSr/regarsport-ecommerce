@@ -19,7 +19,6 @@ import {
   Truck,
   Box,
   XCircle,
-  Sparkles,
 } from "lucide-react";
 import toast from "react-hot-toast";
 
@@ -218,9 +217,11 @@ export default function MyOrders() {
               <span>Kembali ke Katalog Toko</span>
             </Link>
 
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-[#162018] px-3.5 py-1 text-[11px] font-bold tracking-wider text-emerald-400 uppercase font-mono shadow-xs">
-              <Sparkles size={12} className="text-amber-400" />
-              Atelier Cicendo Bandung // Production Tracker
+            <span className="inline-flex items-center gap-2 rounded-full bg-[#162018] px-3.5 py-1.5 text-[11px] font-bold tracking-wider text-emerald-400 uppercase font-mono shadow-xs border border-white/10">
+              <span className="px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 text-[9px] font-black border border-emerald-500/40">
+                LIVE TRACKER
+              </span>
+              <span>Atelier Cicendo Bandung</span>
             </span>
           </div>
 
@@ -327,13 +328,16 @@ export default function MyOrders() {
                   (order.status || "").toUpperCase() === "COMPLETED";
                 const isPaid =
                   (order.status || "").toUpperCase() === "PAID";
+                const isCancelled =
+                  (order.status || "").toUpperCase() === "CANCELLED";
                 const createdAtDate = new Date(
                   order.createdAt || order.created_at
                 );
                 const isExpired =
-                  isPending &&
-                  !isNaN(createdAtDate.getTime()) &&
-                  Date.now() - createdAtDate.getTime() > 24 * 60 * 60 * 1000;
+                  (order.cancellationReason && order.cancellationReason.toLowerCase().includes("kedaluwarsa")) ||
+                  (isPending &&
+                    !isNaN(createdAtDate.getTime()) &&
+                    Date.now() - createdAtDate.getTime() > 24 * 60 * 60 * 1000);
                 const isReordering = reorderingId === order.id;
 
                 return (
@@ -416,8 +420,8 @@ export default function MyOrders() {
                           </button>
                         )}
 
-                        {/* Beli Lagi (Reorder) untuk status Completed / Paid */}
-                        {(isCompleted || isPaid) && (
+                        {/* Beli Lagi (Reorder) untuk status Completed / Paid / Expired / Cancelled */}
+                        {(isCompleted || isPaid || isExpired || isCancelled) && (
                           <button
                             type="button"
                             onClick={() => handleReorder(order)}

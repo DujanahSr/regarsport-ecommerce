@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useEffect, useState, Component } from "react";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import {
   Calendar,
   CreditCard,
@@ -29,6 +29,7 @@ import {
   Phone,
   HelpCircle,
   ShieldCheck,
+  Tag,
 } from "lucide-react";
 import toast from "react-hot-toast";
 
@@ -38,6 +39,7 @@ import MidtransModal from "../../components/common/MidtransModal";
 import InvoiceModal from "../../components/customer/InvoiceModal";
 import WarrantyClaimModal from "../../components/customer/WarrantyClaimModal";
 import { useAuth } from "../../context/AuthContext";
+import { useCart } from "../../context/CartContext";
 
 const ORDER_STEPS = [
   { key: "PENDING", label: "Pesanan Dibuat", icon: Clock },
@@ -56,9 +58,11 @@ const STATUS_RANK = {
   CANCELLED: -1,
 };
 
-export default function OrderDetail() {
+function OrderDetailContent() {
   const { id } = useParams();
   const { user } = useAuth();
+  const navigate = useNavigate();
+  const { addToCart } = useCart();
 
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -67,6 +71,7 @@ export default function OrderDetail() {
   const [showInvoiceModal, setShowInvoiceModal] = useState(false);
   const [copiedResi, setCopiedResi] = useState(false);
   const [completing, setCompleting] = useState(false);
+  const [reordering, setReordering] = useState(false);
 
   // Review Modal State
   const [reviewItem, setReviewItem] = useState(null);
@@ -84,6 +89,42 @@ export default function OrderDetail() {
   // Official Warranty Claim States
   const [claims, setClaims] = useState([]);
   const [showWarrantyModal, setShowWarrantyModal] = useState(false);
+
+  const handleReorder = async () => {
+    try {
+      setReordering(true);
+      const items = order?.items || order?.order_items || [];
+      if (!items.length) {
+        toast.error("Rincian produk tidak dapat dimuat untuk pesan ulang");
+        return;
+      }
+      for (const it of items) {
+        await addToCart(
+          {
+            id: it.productId || it.products?.id,
+            name: it.productName || it.products?.name,
+            price: it.price || it.products?.price,
+            imageUrl: it.productImage || it.products?.image_url,
+          },
+          it.quantity || 1,
+          it.size || "L",
+          {
+            customName: it.customName || null,
+            customNumber: it.customNumber || null,
+            customCollar: it.customCollar || null,
+            customTeam: it.customTeam || null,
+          }
+        );
+      }
+      toast.success(`${items.length} item berhasil dimasukkan kembali ke keranjang!`);
+      navigate("/dashboard/cart");
+    } catch (err) {
+      console.error(err);
+      toast.error("Gagal melakukan pemesanan ulang");
+    } finally {
+      setReordering(false);
+    }
+  };
 
   const handleCopyResi = (resi) => {
     if (!resi) return;
@@ -317,19 +358,45 @@ export default function OrderDetail() {
   }, [id]);
 
   if (loading) {
-    return <ScreenLoader label="Memuat detail pesanan..." />;
-  }
-
-  if (error) {
-    return <EmptyState title="Detail order gagal dimuat" description={error} />;
-  }
-
-  if (!order) {
     return (
-      <EmptyState
-        title="Order tidak ditemukan"
-        description="Pesanan yang Anda cari tidak tersedia atau Anda tidak memiliki akses."
-      />
+      <div className="bg-[#FAF8F4] min-h-screen py-16 flex items-center justify-center">
+        <ScreenLoader label="Memuat detail pesanan & paspor QC..." />
+      </div>
+    );
+  }
+
+  if (error || !order) {
+    return (
+      <div className="bg-[#FAF8F4] min-h-screen py-16 text-[#111613] font-sans-body">
+        <div className="mx-auto max-w-xl px-4 text-center">
+          <div className="mb-4 inline-flex p-4 rounded-3xl bg-white border border-[#162018]/10 shadow-sm text-slate-400">
+            <Package size={36} />
+          </div>
+          <h1 className="font-condensed text-3xl font-black uppercase text-[#162018]">
+            {error ? "Detail Pesanan Gagal Dimuat" : "Pesanan Tidak Ditemukan"}
+          </h1>
+          <p className="mt-2 text-xs font-mono text-slate-500 leading-relaxed">
+            {error || "Nomor pesanan yang Anda tuju tidak tersedia atau Anda tidak memiliki hak akses ke pesanan ini."}
+          </p>
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+            <Link
+              to="/dashboard/my-orders"
+              className="inline-flex items-center gap-2 rounded-xl bg-[#162018] px-5 py-2.5 text-xs font-mono font-bold text-white uppercase hover:bg-black transition shadow-xs"
+            >
+              <ArrowLeft size={14} />
+              <span>Kembali ke Pesanan Saya</span>
+            </Link>
+            <button
+              type="button"
+              onClick={() => getOrder()}
+              className="inline-flex items-center gap-1.5 rounded-xl border border-[#162018]/20 bg-white px-4 py-2.5 text-xs font-mono font-bold text-slate-800 hover:bg-slate-50 transition cursor-pointer"
+            >
+              <RotateCcw size={14} />
+              <span>Coba Lagi</span>
+            </button>
+          </div>
+        </div>
+      </div>
     );
   }
 
@@ -337,11 +404,11 @@ export default function OrderDetail() {
   const currentRank = STATUS_RANK[rawStatus] || 1;
   const isCancelled = rawStatus === "CANCELLED";
   const isPending = rawStatus === "PENDING";
-  const createdAtDate = new Date(order.createdAt || order.created_at);
   const isExpired =
-    isPending &&
-    !isNaN(createdAtDate.getTime()) &&
-    Date.now() - createdAtDate.getTime() > 24 * 60 * 60 * 1000;
+    (order.cancellationReason && order.cancellationReason.toLowerCase().includes("kedaluwarsa")) ||
+    (isPending &&
+      !isNaN(createdAtDate.getTime()) &&
+      Date.now() - createdAtDate.getTime() > 24 * 60 * 60 * 1000);
   const isPaid = ["PAID", "PROCESSING", "SHIPPED", "COMPLETED"].includes(rawStatus);
   const orderItems = order.items || order.order_items || [];
   const totalAmount = Number(order.totalAmount || order.total_amount || 0);
@@ -359,9 +426,11 @@ export default function OrderDetail() {
             <span>Kembali ke Pesanan Saya</span>
           </Link>
 
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-[#162018] px-3.5 py-1 text-[11px] font-bold tracking-wider text-emerald-400 uppercase font-mono shadow-xs">
-            <Sparkles size={12} className="text-amber-400" />
-            Atelier Cicendo Bandung // Order Detail &amp; QC Passport
+          <span className="inline-flex items-center gap-2 rounded-full bg-[#162018] px-3.5 py-1.5 text-[11px] font-bold tracking-wider text-emerald-400 uppercase font-mono shadow-xs border border-white/10">
+            <span className="px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 text-[9px] font-black border border-emerald-500/40">
+              QC PASSPORT
+            </span>
+            <span>Atelier Cicendo Bandung</span>
           </span>
         </div>
 
@@ -419,13 +488,15 @@ export default function OrderDetail() {
                   <span className="rounded-full bg-rose-50 px-3.5 py-1 text-xs font-mono font-bold uppercase tracking-wider text-rose-700 border border-rose-200">
                     Kedaluwarsa
                   </span>
-                  <Link
-                    to="/dashboard"
-                    className="inline-flex items-center gap-1.5 rounded-xl bg-[#162018] hover:bg-black px-4 py-2 text-xs font-mono font-bold text-white shadow-xs transition"
+                  <button
+                    type="button"
+                    onClick={handleReorder}
+                    disabled={reordering}
+                    className="inline-flex items-center gap-1.5 rounded-xl bg-[#162018] hover:bg-black px-4 py-2 text-xs font-mono font-bold text-white shadow-xs transition cursor-pointer disabled:opacity-50"
                   >
-                    <RotateCcw size={13} />
-                    <span>Pesan Ulang</span>
-                  </Link>
+                    <RotateCcw size={13} className={reordering ? "animate-spin" : ""} />
+                    <span>{reordering ? "Memproses..." : "Pesan Ulang"}</span>
+                  </button>
                 </div>
               ) : isPending ? (
                 <div className="flex items-center gap-2">
@@ -722,35 +793,35 @@ export default function OrderDetail() {
           });
 
           return (
-            <div className="rounded-2xl border border-emerald-200/80 bg-gradient-to-br from-emerald-50/70 via-teal-50/40 to-slate-50 p-5 sm:p-6 shadow-sm space-y-4">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="rounded-3xl border border-white/15 bg-[#162018] text-white p-6 sm:p-7 shadow-sm space-y-5 relative overflow-hidden">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 relative z-10">
                 <div className="flex items-start sm:items-center gap-3.5">
-                  <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-emerald-600 to-teal-700 text-white flex items-center justify-center shrink-0 shadow-md shadow-emerald-600/20">
+                  <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center shrink-0 shadow-xs">
                     <ShieldCheck size={24} />
                   </div>
                   <div>
                     <div className="flex flex-wrap items-center gap-2">
-                      <h4 className="text-sm sm:text-base font-bold text-slate-900">
+                      <h4 className="font-condensed text-lg sm:text-xl font-black uppercase tracking-wider text-white">
                         Garansi Resmi RegarSport 100% Bebas Cemas
                       </h4>
                       {isCompleted ? (
                         isWarrantyActive ? (
-                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300 animate-pulse">
+                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-mono font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
                             <Clock size={11} />
                             Garansi Aktif: Sisa {daysRemaining} Hari
                           </span>
                         ) : (
-                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-slate-200 text-slate-700">
+                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-mono font-semibold bg-white/10 text-slate-400 border border-white/10">
                             Garansi 7 Hari Berakhir
                           </span>
                         )
                       ) : (
-                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-teal-100 text-teal-800 border border-teal-200">
+                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-mono font-medium bg-emerald-500/15 text-emerald-300 border border-emerald-500/20">
                           Aktif Setelah Paket Diterima
                         </span>
                       )}
                     </div>
-                    <p className="text-xs text-slate-600 mt-1 leading-relaxed">
+                    <p className="text-xs text-slate-300 mt-1 font-mono leading-relaxed">
                       {isCompleted
                         ? isWarrantyActive
                           ? `Proteksi tukar ukuran (size exchange) dan ganti baru cacat produksi aktif sampai ${expiryFormatted}.`
@@ -760,12 +831,12 @@ export default function OrderDetail() {
                   </div>
                 </div>
 
-                <div className="flex flex-wrap items-center gap-2.5 self-start sm:self-center shrink-0">
+                <div className="flex flex-wrap items-center gap-2.5 self-start sm:self-center shrink-0 relative z-10">
                   {isCompleted && (
                     <button
                       type="button"
                       onClick={() => setShowWarrantyModal(true)}
-                      className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white text-xs font-bold px-4 py-2.5 shadow-md shadow-emerald-600/20 transition active:scale-95 cursor-pointer"
+                      className="flex items-center gap-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-condensed font-black uppercase tracking-wider px-4 py-2.5 shadow-md shadow-emerald-600/20 transition active:scale-95 cursor-pointer"
                     >
                       <ShieldCheck size={15} />
                       <span>Ajukan Klaim Garansi</span>
@@ -774,75 +845,75 @@ export default function OrderDetail() {
                   <button
                     type="button"
                     onClick={handleWhatsAppSupport}
-                    className="flex items-center gap-2 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold px-3.5 py-2.5 shadow-sm transition active:scale-95 cursor-pointer"
+                    className="flex items-center gap-2 rounded-xl border border-white/15 bg-white/5 hover:bg-white/10 text-white text-xs font-mono font-bold uppercase tracking-wider px-3.5 py-2.5 shadow-xs transition active:scale-95 cursor-pointer"
                   >
-                    <Phone size={14} className="text-emerald-600" />
+                    <Phone size={14} className="text-emerald-400" />
                     <span>WhatsApp CS</span>
                   </button>
                 </div>
               </div>
 
               {/* 3 Pillars Quick Badges */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-3 border-t border-emerald-100/80">
-                <div className="flex items-center gap-2 bg-white/80 backdrop-blur-sm rounded-xl px-3 py-2 border border-emerald-100/60 text-[11px] text-slate-700">
-                  <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
-                  <span className="font-semibold text-slate-900">100% Cacat Sablon</span>
-                  <span className="text-slate-500">diganti baru</span>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-4 border-t border-white/10 relative z-10">
+                <div className="flex items-center gap-2 bg-white/5 rounded-xl px-3.5 py-2 border border-white/10 text-xs font-mono text-slate-300">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 shrink-0" />
+                  <span className="font-bold text-white">100% Cacat Sablon</span>
+                  <span className="text-slate-400">diganti baru</span>
                 </div>
-                <div className="flex items-center gap-2 bg-white/80 backdrop-blur-sm rounded-xl px-3 py-2 border border-emerald-100/60 text-[11px] text-slate-700">
-                  <span className="w-2 h-2 rounded-full bg-teal-500 shrink-0" />
-                  <span className="font-semibold text-slate-900">7 Hari Tukar Ukuran</span>
-                  <span className="text-slate-500">jika kurang pas</span>
+                <div className="flex items-center gap-2 bg-white/5 rounded-xl px-3.5 py-2 border border-white/10 text-xs font-mono text-slate-300">
+                  <span className="w-2 h-2 rounded-full bg-amber-400 shrink-0" />
+                  <span className="font-bold text-white">7 Hari Tukar Ukuran</span>
+                  <span className="text-slate-400">jika kurang pas</span>
                 </div>
-                <div className="flex items-center gap-2 bg-white/80 backdrop-blur-sm rounded-xl px-3 py-2 border border-emerald-100/60 text-[11px] text-slate-700">
-                  <span className="w-2 h-2 rounded-full bg-cyan-500 shrink-0" />
-                  <span className="font-semibold text-slate-900">Jahitan Atletik Kuat</span>
-                  <span className="text-slate-500">garansi perbaikan</span>
+                <div className="flex items-center gap-2 bg-white/5 rounded-xl px-3.5 py-2 border border-white/10 text-xs font-mono text-slate-300">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 shrink-0" />
+                  <span className="font-bold text-white">Jahitan Atletik Kuat</span>
+                  <span className="text-slate-400">garansi perbaikan</span>
                 </div>
               </div>
 
               {/* Existing Claim Tickets List */}
               {claims && claims.length > 0 && (
-                <div className="mt-3 pt-3 border-t border-emerald-100/80 space-y-2">
-                  <h5 className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-                    <FileText size={14} className="text-teal-600" />
+                <div className="mt-4 pt-4 border-t border-white/10 space-y-2 relative z-10">
+                  <h5 className="text-xs font-condensed font-black uppercase tracking-wider text-white flex items-center gap-1.5">
+                    <FileText size={14} className="text-emerald-400" />
                     Tiket Klaim Garansi Anda ({claims.length})
                   </h5>
-                  <div className="grid gap-2">
+                  <div className="grid gap-2.5">
                     {claims.map((c) => {
                       const statusUpper = (c.status || "PENDING").toUpperCase();
-                      let statusBadge = "bg-amber-100 text-amber-800 border-amber-300";
+                      let statusBadge = "bg-amber-500/20 text-amber-300 border-amber-500/30";
                       let statusText = "Menunggu Verifikasi CS";
                       if (statusUpper === "APPROVED") {
-                        statusBadge = "bg-emerald-100 text-emerald-800 border-emerald-300";
+                        statusBadge = "bg-emerald-500/20 text-emerald-300 border-emerald-500/30";
                         statusText = "Disetujui CS";
                       } else if (statusUpper === "PROCESSING") {
-                        statusBadge = "bg-blue-100 text-blue-800 border-blue-300";
+                        statusBadge = "bg-blue-500/20 text-blue-300 border-blue-500/30";
                         statusText = "Sedang Diproses";
                       } else if (statusUpper === "RESOLVED") {
-                        statusBadge = "bg-teal-100 text-teal-800 border-teal-300";
+                        statusBadge = "bg-emerald-500/20 text-emerald-300 border-emerald-500/30";
                         statusText = "Klaim Selesai";
                       } else if (statusUpper === "REJECTED") {
-                        statusBadge = "bg-rose-100 text-rose-800 border-rose-300";
+                        statusBadge = "bg-rose-500/20 text-rose-300 border-rose-500/30";
                         statusText = "Ditolak";
                       }
 
                       return (
                         <div
                           key={c.id || c.claimNumber}
-                          className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-3 rounded-xl border border-slate-200 text-xs"
+                          className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-black/40 p-3.5 rounded-2xl border border-white/10 text-xs font-mono"
                         >
-                          <div className="space-y-0.5">
+                          <div className="space-y-1">
                             <div className="flex items-center gap-2">
-                              <span className="font-mono font-bold text-slate-900 bg-slate-100 px-2 py-0.5 rounded">
+                              <span className="font-mono font-bold text-white bg-white/10 px-2.5 py-0.5 rounded">
                                 #{c.claimNumber}
                               </span>
-                              <span className={`px-2 py-0.5 rounded-md font-bold text-[10px] border ${statusBadge}`}>
+                              <span className={`px-2.5 py-0.5 rounded-md font-bold text-[10px] border ${statusBadge}`}>
                                 {statusText}
                               </span>
                             </div>
-                            <p className="text-slate-600 text-[11px] pt-1">
-                              <span className="font-medium text-slate-800">Solusi: </span>
+                            <p className="text-slate-300 text-xs pt-1">
+                              <span className="font-bold text-white">Solusi: </span>
                               {c.solution === "EXCHANGE_SIZE"
                                 ? `Tukar Ukuran Baru (${c.requestedSize || "Varian Baru"})`
                                 : c.solution === "REPLACEMENT"
@@ -850,25 +921,25 @@ export default function OrderDetail() {
                                 : "Perbaikan Produk"}
                             </p>
                             {c.description && (
-                              <p className="text-slate-500 text-[11px] italic line-clamp-1">
+                              <p className="text-slate-400 text-xs italic line-clamp-1">
                                 &ldquo;{c.description}&rdquo;
                               </p>
                             )}
                             {c.adminNotes && (
-                              <div className="mt-1 p-2 rounded-lg bg-emerald-50/80 border border-emerald-200/60 text-[11px] text-emerald-900">
+                              <div className="mt-1.5 p-2 rounded-xl bg-emerald-950/60 border border-emerald-500/30 text-xs text-emerald-200">
                                 <span className="font-bold">Catatan CS / Gudang: </span>
                                 <span>{c.adminNotes}</span>
                               </div>
                             )}
                             {c.replacementTrackingNumber && (
-                              <div className="mt-1 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-teal-50 border border-teal-200 text-teal-900 text-[11px] font-bold">
-                                <Truck size={12} className="text-teal-700" />
+                              <div className="mt-1.5 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-white/5 border border-white/10 text-emerald-300 text-xs font-bold">
+                                <Truck size={12} className="text-emerald-400" />
                                 <span>Resi Pengganti:</span>
-                                <span className="font-mono text-teal-800">{c.replacementTrackingNumber}</span>
+                                <span className="font-mono text-white">{c.replacementTrackingNumber}</span>
                                 <button
                                   type="button"
                                   onClick={() => handleCopyResi(c.replacementTrackingNumber)}
-                                  className="p-0.5 text-teal-600 hover:text-teal-900 rounded cursor-pointer"
+                                  className="p-0.5 text-emerald-400 hover:text-white rounded cursor-pointer"
                                   title="Salin Resi Pengganti"
                                 >
                                   <Copy size={11} />
@@ -885,7 +956,7 @@ export default function OrderDetail() {
                               );
                               window.open(`https://wa.me/6281234567890?text=${text}`, "_blank");
                             }}
-                            className="flex items-center gap-1.5 self-start sm:self-center px-3 py-1.5 rounded-lg border border-emerald-200 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-[11px] font-bold transition"
+                            className="flex items-center gap-1.5 self-start sm:self-center px-3 py-1.5 rounded-xl border border-white/15 bg-white/5 hover:bg-white/10 text-emerald-400 text-xs font-mono font-bold uppercase tracking-wider transition"
                           >
                             <Phone size={12} />
                             <span>Follow Up WA CS</span>
@@ -901,18 +972,18 @@ export default function OrderDetail() {
         })()}
 
         {/* Info Grid: Customer & Shipping */}
-        <div className="grid gap-6 md:grid-cols-2 pt-4 border-t border-slate-100">
+        <div className="grid gap-6 md:grid-cols-2 pt-4 border-t border-[#162018]/10">
           {/* Shipping Address */}
-          <div className="rounded-2xl border border-slate-100 bg-slate-50/60 p-5">
-            <h3 className="flex items-center gap-2 text-sm font-bold text-slate-900 mb-2">
-              <MapPin size={16} className="text-emerald-600" />
+          <div className="rounded-2xl border border-[#162018]/10 bg-[#FAF8F4] p-5 shadow-2xs space-y-3">
+            <h3 className="flex items-center gap-2 font-condensed font-black text-sm uppercase tracking-wider text-[#162018]">
+              <MapPin size={16} className="text-emerald-700" />
               Alamat Pengiriman
             </h3>
-            <div className="text-sm text-slate-600 leading-relaxed space-y-1">
-              <p className="font-bold text-slate-900">
+            <div className="text-xs font-mono text-slate-700 leading-relaxed space-y-1">
+              <p className="font-bold text-[#162018]">
                 {order.recipientName || order.customerName || "Penerima"}
                 {(order.customerPhone || order.shippingPhone) && (
-                  <span className="font-normal text-slate-500 font-mono text-xs ml-2">
+                  <span className="font-normal text-slate-500 ml-2">
                     ({order.customerPhone || order.shippingPhone})
                   </span>
                 )}
@@ -923,28 +994,28 @@ export default function OrderDetail() {
                   "Alamat tidak tercantum"}
               </p>
               {(order.shippingCity || order.shippingPostalCode) && (
-                <p className="text-slate-500 text-xs">
+                <p className="text-slate-500">
                   {[order.shippingCity, order.shippingPostalCode].filter(Boolean).join(", ")}
                 </p>
               )}
               {order.shippingNotes && (
-                <div className="mt-2.5 p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-xs text-amber-700">
-                  <span className="font-bold">Catatan Kurir:</span> {order.shippingNotes}
+                <div className="mt-2.5 p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-800 font-sans-body">
+                  <span className="font-bold font-mono">Catatan Kurir:</span> {order.shippingNotes}
                 </div>
               )}
             </div>
           </div>
 
           {/* Payment Summary */}
-          <div className="rounded-2xl border border-slate-100 bg-slate-50/60 p-5">
-            <h3 className="flex items-center gap-2 text-sm font-bold text-slate-900 mb-2">
-              <Wallet size={16} className="text-emerald-600" />
+          <div className="rounded-2xl border border-[#162018]/10 bg-[#FAF8F4] p-5 shadow-2xs space-y-3">
+            <h3 className="flex items-center gap-2 font-condensed font-black text-sm uppercase tracking-wider text-[#162018]">
+              <Wallet size={16} className="text-emerald-700" />
               Rincian Pembayaran
             </h3>
-            <div className="space-y-1.5 text-sm">
+            <div className="space-y-2 text-xs font-mono">
               <div className="flex justify-between text-slate-600">
                 <span>Metode Pembayaran</span>
-                <span className="font-semibold text-slate-800">
+                <span className="font-bold text-[#162018]">
                   Midtrans Payment Gateway
                 </span>
               </div>
@@ -952,21 +1023,21 @@ export default function OrderDetail() {
                 <span>Status Transaksi</span>
                 <span
                   className={`font-bold ${
-                    isPending ? "text-amber-600" : "text-emerald-600"
+                    isPending ? "text-amber-700" : "text-emerald-700"
                   }`}
                 >
                   {isPending ? "Menunggu Pembayaran" : "Lunas (Settlement)"}
                 </span>
               </div>
               {Number(order.discountAmount || 0) > 0 && (
-                <div className="flex justify-between text-emerald-700 font-semibold">
+                <div className="flex justify-between text-emerald-800 font-bold">
                   <span>Kupon Promo ({order.voucherCode || "Diskon"})</span>
                   <span>-Rp {Number(order.discountAmount).toLocaleString("id-ID")}</span>
                 </div>
               )}
-              <div className="flex justify-between border-t border-slate-200/60 pt-2 text-slate-900">
+              <div className="flex justify-between border-t border-[#162018]/10 pt-2 text-[#162018]">
                 <span className="font-bold">Total Pembayaran</span>
-                <span className="font-black text-emerald-600 text-base">
+                <span className="font-black text-emerald-700 text-sm">
                   Rp {totalAmount.toLocaleString("id-ID")}
                 </span>
               </div>
@@ -975,10 +1046,15 @@ export default function OrderDetail() {
         </div>
 
         {/* Ordered Items List */}
-        <div className="pt-4 border-t border-slate-100">
-          <h2 className="text-base font-bold text-slate-900 mb-4">
-            Daftar Produk ({orderItems.length} item)
-          </h2>
+        <div className="pt-4 border-t border-[#162018]/10">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="font-condensed text-lg font-black uppercase tracking-wider text-[#162018]">
+              Daftar Produk ({orderItems.length} item)
+            </h2>
+            <span className="text-[11px] font-mono font-bold text-slate-500 uppercase">
+              Standar Jahitan Atelier RS
+            </span>
+          </div>
 
           <div className="space-y-3">
             {orderItems.map((item, index) => {
@@ -992,63 +1068,66 @@ export default function OrderDetail() {
               return (
                 <div
                   key={item.id || index}
-                  className="flex items-center justify-between gap-4 rounded-2xl border border-slate-100 bg-white p-4 shadow-xs transition hover:shadow-sm"
+                  className="flex items-center justify-between gap-4 rounded-2xl border border-[#162018]/10 bg-[#FAF8F4] p-4 shadow-2xs transition hover:border-[#162018]/25"
                 >
                   <div className="flex items-center gap-3.5 min-w-0">
                     <img
                       src={img}
                       alt={name}
-                      className="h-16 w-16 shrink-0 rounded-xl object-cover bg-slate-50 border border-slate-100"
+                      className="h-16 w-16 shrink-0 rounded-xl object-cover bg-white border border-[#162018]/10 shadow-2xs"
                       onError={(e) => {
                         e.currentTarget.onerror = null;
                         e.currentTarget.src = "https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=600&q=80";
                       }}
                     />
                     <div className="min-w-0">
-                      <h4 className="font-bold text-slate-900 truncate">{name}</h4>
+                      <h4 className="font-condensed text-base font-black uppercase tracking-wider text-[#162018] truncate">
+                        {name}
+                      </h4>
                       <div className="flex items-center gap-2 mt-0.5">
-                        <p className="text-xs text-slate-400">
+                        <p className="text-xs text-slate-500 font-mono">
                           {item.quantity} barang &times; Rp {price.toLocaleString("id-ID")}
                         </p>
                         {item.size && (
-                          <span className="inline-flex items-center rounded-md bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-700 border border-emerald-200/60">
+                          <span className="inline-flex items-center rounded-md bg-white px-2 py-0.5 text-[10px] font-mono font-bold text-emerald-800 border border-[#162018]/15 shadow-2xs">
                             Ukuran: {item.size}
                           </span>
                         )}
                       </div>
                       {item.customName && (
-                        <div className="mt-1 flex flex-wrap items-center gap-1.5 text-[11px] font-semibold text-emerald-800 bg-emerald-50/80 px-2 py-0.5 rounded-lg border border-emerald-200 w-fit">
-                          <span>🎽 Sablon: <strong>{item.customName}</strong> #{item.customNumber || "-"}</span>
-                          {item.customCollar && <span>({item.customCollar})</span>}
-                          {item.customTeam && <span>• {item.customTeam}</span>}
+                        <div className="mt-1.5 flex flex-wrap items-center gap-1.5 text-[11px] font-mono font-bold text-[#162018] bg-white px-2.5 py-1 rounded-lg border border-[#162018]/15 shadow-2xs w-fit">
+                          <Tag size={11} className="text-emerald-600" />
+                          <span>Custom: <strong>{item.customName}</strong> #{item.customNumber || "-"}</span>
+                          {item.customCollar && <span className="text-slate-500">({item.customCollar})</span>}
+                          {item.customTeam && <span className="text-slate-500">• {item.customTeam}</span>}
                         </div>
                       )}
                     </div>
                   </div>
 
                   <div className="flex items-center gap-3 shrink-0">
-                    <span className="font-extrabold text-slate-900">
+                    <span className="font-mono font-black text-[#162018] text-sm sm:text-base">
                       Rp {(price * item.quantity).toLocaleString("id-ID")}
                     </span>
                     {(order.status || "").toUpperCase() === "COMPLETED" && (
                       <button
                         type="button"
                         onClick={() => handleOpenReviewModal(item)}
-                        className={`flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-xl border transition active:scale-95 ${
+                        className={`flex items-center gap-1.5 text-xs font-condensed font-black uppercase tracking-wider px-3.5 py-2 rounded-xl border transition active:scale-95 shadow-2xs cursor-pointer ${
                           reviewedProductIds.has(item.productId || item.products?.id)
-                            ? "text-emerald-700 bg-emerald-50 border-emerald-200 hover:bg-emerald-100"
-                            : "text-amber-700 bg-amber-50 hover:bg-amber-100 border-amber-200/80"
+                            ? "text-emerald-800 bg-white border-emerald-300 hover:bg-emerald-50"
+                            : "text-amber-900 bg-white hover:bg-amber-50 border-amber-300"
                         }`}
                       >
                         <Star
                           size={13}
                           className={
                             reviewedProductIds.has(item.productId || item.products?.id)
-                              ? "fill-emerald-500 text-emerald-500"
+                              ? "fill-emerald-600 text-emerald-600"
                               : "fill-amber-500 text-amber-500"
                           }
                         />
-                        {reviewedProductIds.has(item.productId || item.products?.id) ? "Ubah Ulasan" : "Beri Ulasan"}
+                        <span>{reviewedProductIds.has(item.productId || item.products?.id) ? "Ubah Ulasan" : "Beri Ulasan"}</span>
                       </button>
                     )}
                   </div>
@@ -1059,24 +1138,54 @@ export default function OrderDetail() {
         </div>
 
         {/* Pending Callout Button */}
-        {isPending && (
-          <div className="rounded-2xl border border-amber-200 bg-amber-50/60 p-5 flex flex-col sm:flex-row items-center justify-between gap-4">
+        {isPending && !isExpired && (
+          <div className="rounded-3xl border border-white/15 bg-[#162018] p-6 text-white flex flex-col sm:flex-row items-center justify-between gap-4 shadow-md">
             <div>
-              <p className="font-bold text-amber-900">
-                Pesanan Anda Belum Dibayar
-              </p>
-              <p className="text-xs text-amber-700 mt-0.5">
-                Segera selesaikan pembayaran untuk memproses pengiriman produk Anda.
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-amber-400" />
+                <h4 className="font-condensed text-lg font-black uppercase tracking-wider text-white">
+                  Pesanan Anda Belum Dibayar
+                </h4>
+              </div>
+              <p className="text-xs text-slate-300 mt-1 font-mono">
+                Segera selesaikan pembayaran untuk memproses produksi dan pengiriman produk Anda.
               </p>
             </div>
 
             <button
               type="button"
               onClick={() => setShowModal(true)}
-              className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-xl bg-emerald-600 px-6 py-3 text-sm font-bold text-white shadow-md shadow-emerald-600/20 transition hover:bg-emerald-700 shrink-0"
+              className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-xl bg-[#B9382B] hover:bg-[#982D22] px-6 py-3 text-xs font-condensed font-black uppercase tracking-wider text-white shadow-md shadow-[#B9382B]/20 transition active:scale-95 shrink-0 cursor-pointer"
             >
-              <CreditCard size={18} />
-              Bayar Sekarang
+              <CreditCard size={16} />
+              <span>Bayar Sekarang</span>
+            </button>
+          </div>
+        )}
+
+        {/* Expired Callout */}
+        {isExpired && (
+          <div className="rounded-3xl border border-rose-500/25 bg-[#162018] p-6 text-white flex flex-col sm:flex-row items-center justify-between gap-4 shadow-md">
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-rose-400" />
+                <h4 className="font-condensed text-lg font-black uppercase tracking-wider text-rose-300">
+                  Batas Waktu Pembayaran Telah Kedaluwarsa
+                </h4>
+              </div>
+              <p className="text-xs text-slate-300 mt-1 font-mono">
+                Batas waktu pembayaran 24 jam telah berakhir. Tagihan pembayaran di Midtrans otomatis ditutup. Silakan lakukan pemesanan ulang untuk memproses produk pilihan Anda.
+              </p>
+            </div>
+
+            <button
+              type="button"
+              onClick={handleReorder}
+              disabled={reordering}
+              className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-xl bg-[#162018] hover:bg-black border border-white/20 px-6 py-3 text-xs font-condensed font-black uppercase tracking-wider text-white shadow-md transition active:scale-95 shrink-0 cursor-pointer disabled:opacity-50"
+            >
+              <RotateCcw size={16} className={reordering ? "animate-spin" : ""} />
+              <span>{reordering ? "Memproses..." : "Pesan Ulang Produk Ini"}</span>
             </button>
           </div>
         )}
@@ -1084,63 +1193,73 @@ export default function OrderDetail() {
 
       {/* Modal Beri Ulasan */}
       {reviewItem && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="relative w-full max-w-md bg-white rounded-3xl p-6 shadow-2xl border border-slate-100">
-            <div className="flex items-center justify-between pb-4 mb-4 border-b border-slate-100">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="relative w-full max-w-lg bg-[#162018] border border-white/15 rounded-3xl p-6 sm:p-8 text-white shadow-2xl space-y-5 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-start justify-between pb-4 border-b border-white/10">
               <div className="flex items-center gap-3">
-                <div className="p-2 rounded-xl bg-amber-50 text-amber-600 border border-amber-200">
-                  <Star size={20} className="fill-current" />
+                <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-amber-500/20 text-amber-400 border border-amber-500/30 shrink-0">
+                  <Star size={22} className="fill-current" />
                 </div>
                 <div>
-                  <h3 className="text-base font-bold text-slate-900">
+                  <h3 className="font-condensed text-xl font-black uppercase tracking-wider text-white">
                     {reviewedProductIds.has(reviewItem.productId || reviewItem.products?.id)
                       ? "Ubah Ulasan Produk"
                       : "Ulasan Produk"}
                   </h3>
-                  <p className="text-xs text-slate-500 truncate max-w-60">
+                  <p className="text-xs text-slate-400 font-mono truncate max-w-xs mt-0.5">
                     {reviewItem.productName || reviewItem.products?.name}
                   </p>
                 </div>
               </div>
               <button
+                type="button"
                 onClick={() => setReviewItem(null)}
-                className="p-1 text-slate-400 hover:text-slate-700 rounded-lg hover:bg-slate-100 transition"
+                className="p-2 text-slate-400 hover:text-white rounded-full hover:bg-white/10 transition cursor-pointer"
+                title="Tutup (Esc)"
               >
-                <X size={20} />
+                <X size={18} />
               </button>
             </div>
 
             <form onSubmit={handleSubmitReview} className="space-y-4">
               <div>
-                <label className="block text-xs font-semibold text-slate-600 mb-2">Beri Bintang</label>
+                <label className="block text-xs font-mono font-bold uppercase tracking-wider text-slate-300 mb-2">
+                  Beri Bintang Kepuasan
+                </label>
                 <div className="flex items-center gap-2">
                   {[1, 2, 3, 4, 5].map((star) => (
                     <button
                       type="button"
                       key={star}
                       onClick={() => setReviewRating(star)}
-                      className="p-1 transition hover:scale-110 active:scale-95"
+                      className="p-1 transition hover:scale-110 active:scale-95 cursor-pointer"
                     >
                       <Star
                         size={28}
-                        className={star <= reviewRating ? "text-amber-400 fill-amber-400" : "text-slate-200"}
+                        className={
+                          star <= reviewRating
+                            ? "text-amber-400 fill-amber-400"
+                            : "text-white/20 hover:text-amber-400/50"
+                        }
                       />
                     </button>
                   ))}
-                  <span className="text-sm font-bold text-slate-700 ml-2">
-                    {reviewRating} dari 5
+                  <span className="text-xs font-mono font-bold text-amber-300 ml-2 bg-amber-500/15 border border-amber-500/30 px-2.5 py-0.5 rounded-lg">
+                    {reviewRating} dari 5 Bintang
                   </span>
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-600 mb-2">Testimoni / Pengalaman Anda</label>
+                <label className="block text-xs font-mono font-bold uppercase tracking-wider text-slate-300 mb-2">
+                  Testimoni / Pengalaman Anda
+                </label>
                 <textarea
                   rows={4}
-                  placeholder="Ceritakan kualitas bahan jersey, sablon, kenyamanan, atau pengiriman..."
+                  placeholder="Ceritakan kualitas bahan jersey, sablon, kenyamanan, atau ketepatan jahitan..."
                   value={reviewComment}
                   onChange={(e) => setReviewComment(e.target.value)}
-                  className="w-full rounded-2xl border border-slate-200 p-3.5 text-sm text-slate-800 placeholder:text-slate-400 outline-none focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600 transition resize-none"
+                  className="w-full rounded-2xl border border-white/15 bg-white/5 p-4 text-sm text-white placeholder:text-slate-500 outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition resize-none font-sans-body"
                   required
                 />
               </div>
@@ -1148,11 +1267,11 @@ export default function OrderDetail() {
               {/* Upload Foto Produk Ulasan */}
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <label className="text-xs font-semibold text-slate-700 flex items-center gap-1.5">
-                    <Camera size={14} className="text-emerald-600" />
-                    Foto Produk (Opsional, Maks. 3)
+                  <label className="text-xs font-mono font-bold uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
+                    <Camera size={14} className="text-emerald-400" />
+                    <span>Foto Produk (Opsional, Maks. 3)</span>
                   </label>
-                  <span className="text-[11px] text-slate-400 font-mono">
+                  <span className="text-xs text-slate-400 font-mono">
                     {reviewImages.length}/3 Foto
                   </span>
                 </div>
@@ -1161,7 +1280,7 @@ export default function OrderDetail() {
                   {reviewImages.map((imgUrl, idx) => (
                     <div
                       key={idx}
-                      className="relative h-20 w-20 rounded-2xl overflow-hidden border border-slate-200 group bg-slate-50 shrink-0"
+                      className="relative h-20 w-20 rounded-2xl overflow-hidden border border-white/15 group bg-black/40 shrink-0"
                     >
                       <img
                         src={imgUrl}
@@ -1171,7 +1290,7 @@ export default function OrderDetail() {
                       <button
                         type="button"
                         onClick={() => handleRemovePhoto(idx)}
-                        className="absolute top-1 right-1 h-5 w-5 rounded-full bg-black/70 hover:bg-rose-600 text-white flex items-center justify-center transition shadow-xs"
+                        className="absolute top-1 right-1 h-5 w-5 rounded-full bg-black/80 hover:bg-rose-600 text-white flex items-center justify-center transition shadow-xs cursor-pointer"
                         title="Hapus foto"
                       >
                         <X size={12} />
@@ -1181,7 +1300,7 @@ export default function OrderDetail() {
 
                   {reviewImages.length < 3 && (
                     <label
-                      className={`h-20 w-20 rounded-2xl border-2 border-dashed border-slate-300 hover:border-emerald-500 hover:bg-emerald-50/40 flex flex-col items-center justify-center text-slate-400 hover:text-emerald-700 cursor-pointer transition shrink-0 ${
+                      className={`h-20 w-20 rounded-2xl border-2 border-dashed border-white/20 hover:border-emerald-400 hover:bg-emerald-500/10 flex flex-col items-center justify-center text-slate-400 hover:text-emerald-400 cursor-pointer transition shrink-0 ${
                         uploadingImage ? "opacity-50 pointer-events-none" : ""
                       }`}
                     >
@@ -1194,17 +1313,17 @@ export default function OrderDetail() {
                         disabled={uploadingImage}
                       />
                       {uploadingImage ? (
-                        <Loader2 size={20} className="animate-spin text-emerald-600" />
+                        <Loader2 size={20} className="animate-spin text-emerald-400" />
                       ) : (
                         <>
                           <ImagePlus size={20} />
-                          <span className="text-[10px] font-bold mt-1">+ Foto</span>
+                          <span className="text-[10px] font-mono font-bold mt-1">+ Foto</span>
                         </>
                       )}
                     </label>
                   )}
                 </div>
-                <p className="text-[11px] text-slate-400 mt-1.5">
+                <p className="text-[11px] text-slate-400 mt-1.5 font-mono">
                   Format JPG, PNG, WEBP (maks. 5MB). Foto asli jersey akan tampil di ulasan publik produk.
                 </p>
               </div>
@@ -1213,19 +1332,21 @@ export default function OrderDetail() {
                 <button
                   type="button"
                   onClick={() => setReviewItem(null)}
-                  className="flex-1 px-4 py-3 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-semibold transition"
+                  className="flex-1 px-5 py-3 rounded-xl border border-white/15 bg-white/5 hover:bg-white/10 text-slate-300 text-xs font-mono font-bold uppercase tracking-wider transition cursor-pointer"
                 >
                   Batal
                 </button>
                 <button
                   type="submit"
                   disabled={submittingReview}
-                  className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm shadow-md shadow-emerald-600/20 transition active:scale-95 disabled:opacity-50"
+                  className="flex-1 flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-condensed font-black uppercase tracking-wider text-sm shadow-md shadow-emerald-600/20 transition active:scale-95 disabled:opacity-50 cursor-pointer"
                 >
                   <CheckCircle2 size={16} />
-                  {reviewedProductIds.has(reviewItem?.productId || reviewItem?.products?.id)
-                    ? (submittingReview ? "Memperbarui..." : "Perbarui Ulasan")
-                    : (submittingReview ? "Mengirim..." : "Kirim Ulasan")}
+                  <span>
+                    {reviewedProductIds.has(reviewItem?.productId || reviewItem?.products?.id)
+                      ? (submittingReview ? "Memperbarui..." : "Perbarui Ulasan")
+                      : (submittingReview ? "Mengirim..." : "Kirim Ulasan")}
+                  </span>
                 </button>
               </div>
             </form>
@@ -1233,14 +1354,15 @@ export default function OrderDetail() {
         </div>
       )}
 
-      {/* Midtrans Reusable Modal */}
+      {/* Midtrans Payment Modal */}
       <MidtransModal
         isOpen={showModal}
         onClose={() => setShowModal(false)}
         order={order}
         onSuccess={() => {
+          setShowModal(false);
           setTimeout(() => {
-            getOrder();
+            getOrder(true);
           }, 600);
         }}
       />
@@ -1254,29 +1376,33 @@ export default function OrderDetail() {
 
       {/* Modal Batalkan Pesanan (Customer Mandiri) */}
       {showCancelModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="relative w-full max-w-md bg-white rounded-3xl p-6 shadow-2xl border border-slate-100 space-y-4">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-              <div className="flex items-center gap-2.5">
-                <div className="p-2 rounded-xl bg-rose-50 text-rose-600 border border-rose-200">
-                  <Ban size={20} />
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="relative w-full max-w-md bg-[#162018] border border-white/15 rounded-3xl p-6 sm:p-7 text-white shadow-2xl space-y-5">
+            <div className="flex items-start justify-between pb-3 border-b border-white/10">
+              <div className="flex items-center gap-3">
+                <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-rose-500/20 text-rose-400 border border-rose-500/30 shrink-0">
+                  <Ban size={22} />
                 </div>
                 <div>
-                  <h3 className="text-base font-bold text-slate-900">Batalkan Pesanan Ini?</h3>
-                  <p className="text-xs text-slate-400">Order #{order.orderNumber}</p>
+                  <h3 className="font-condensed text-xl font-black uppercase tracking-wider text-white">
+                    Batalkan Pesanan Ini?
+                  </h3>
+                  <p className="text-xs text-slate-400 font-mono mt-0.5">Order #{order.orderNumber}</p>
                 </div>
               </div>
               <button
+                type="button"
                 onClick={() => setShowCancelModal(false)}
-                className="text-slate-400 hover:text-slate-700 p-1 rounded-lg hover:bg-slate-100"
+                className="text-slate-400 hover:text-white p-2 rounded-full hover:bg-white/10 transition cursor-pointer"
+                title="Tutup (Esc)"
               >
                 <X size={18} />
               </button>
             </div>
 
             <form onSubmit={handleCancelOrder} className="space-y-4">
-              <p className="text-xs text-slate-600 leading-relaxed">
-                Pesanan yang dibatalkan tidak dapat dipulihkan. Mohon pilih alasan pembatalan agar kami dapat meningkatkan layanan RegarSport:
+              <p className="text-xs text-slate-300 leading-relaxed font-sans-body">
+                Pesanan yang dibatalkan tidak dapat dipulihkan. Mohon pilih alasan pembatalan agar kami dapat meningkatkan layanan Atelier RegarSport:
               </p>
 
               <div className="space-y-2">
@@ -1289,10 +1415,10 @@ export default function OrderDetail() {
                 ].map((reason) => (
                   <label
                     key={reason}
-                    className={`flex items-center gap-2.5 p-3 rounded-xl border text-xs cursor-pointer transition-all ${
+                    className={`flex items-center gap-3 p-3.5 rounded-xl border text-xs font-mono cursor-pointer transition-all ${
                       cancelReason === reason
-                        ? "bg-rose-50 border-rose-300 text-rose-900 font-bold"
-                        : "bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100"
+                        ? "bg-rose-500/15 border-rose-500/40 text-rose-200 font-bold shadow-2xs"
+                        : "bg-white/5 border-white/10 text-slate-300 hover:bg-white/10 hover:text-white"
                     }`}
                   >
                     <input
@@ -1301,7 +1427,7 @@ export default function OrderDetail() {
                       value={reason}
                       checked={cancelReason === reason}
                       onChange={(e) => setCancelReason(e.target.value)}
-                      className="accent-rose-600"
+                      className="accent-rose-500"
                     />
                     <span>{reason}</span>
                   </label>
@@ -1312,14 +1438,14 @@ export default function OrderDetail() {
                 <button
                   type="button"
                   onClick={() => setShowCancelModal(false)}
-                  className="px-4 py-2.5 rounded-xl border border-slate-200 text-slate-600 text-xs font-bold hover:bg-slate-50 cursor-pointer"
+                  className="px-5 py-2.5 rounded-xl border border-white/15 bg-white/5 hover:bg-white/10 text-slate-300 text-xs font-mono font-bold uppercase tracking-wider cursor-pointer"
                 >
                   Kembali
                 </button>
                 <button
                   type="submit"
                   disabled={cancelling}
-                  className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-md shadow-rose-600/20 transition active:scale-95 disabled:opacity-50 cursor-pointer"
+                  className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-condensed font-black uppercase tracking-wider shadow-md shadow-rose-600/20 transition active:scale-95 disabled:opacity-50 cursor-pointer"
                 >
                   {cancelling && <Loader2 size={14} className="animate-spin" />}
                   <span>Konfirmasi Batalkan</span>
@@ -1341,5 +1467,58 @@ export default function OrderDetail() {
       />
       </div>
     </div>
+  );
+}
+
+class OrderDetailErrorBoundary extends Component {
+  state = { hasError: false, error: null };
+  static getDerivedStateFromError(error) {
+    return { hasError: true, error };
+  }
+  componentDidCatch(error, info) {
+    console.error("OrderDetail crash caught by boundary:", error, info);
+  }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="bg-[#FAF8F4] min-h-screen py-16 px-4 flex flex-col items-center justify-center text-center font-sans-body">
+          <div className="p-4 rounded-3xl bg-white border border-rose-200 shadow-sm text-rose-500 mb-4">
+            <AlertCircle size={36} />
+          </div>
+          <h2 className="font-condensed text-2xl font-black uppercase text-slate-900">
+            Kendala Menampilkan Detail Pesanan
+          </h2>
+          <p className="text-xs text-slate-500 font-mono mt-1 max-w-md">
+            Sistem mendeteksi kendala pada pemuatan data pesanan. Silakan muat ulang atau periksa status pesanan di halaman utama.
+          </p>
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+            <Link
+              to="/dashboard/my-orders"
+              className="inline-flex items-center gap-2 rounded-xl bg-[#162018] px-5 py-2.5 text-xs font-mono font-bold text-white uppercase hover:bg-black transition shadow-xs"
+            >
+              <ArrowLeft size={14} />
+              <span>Kembali ke Pesanan Saya</span>
+            </Link>
+            <button
+              type="button"
+              onClick={() => window.location.reload()}
+              className="inline-flex items-center gap-2 rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-xs font-mono font-bold text-slate-700 hover:bg-slate-50 transition cursor-pointer"
+            >
+              <RotateCcw size={14} />
+              <span>Muat Ulang Halaman</span>
+            </button>
+          </div>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
+export default function OrderDetail() {
+  return (
+    <OrderDetailErrorBoundary>
+      <OrderDetailContent />
+    </OrderDetailErrorBoundary>
   );
 }

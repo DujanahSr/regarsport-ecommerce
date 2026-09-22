@@ -11,7 +11,6 @@ import {
   Package,
   ShieldCheck,
   Truck,
-  Sparkles,
   ChevronLeft,
 } from "lucide-react";
 import { useCart } from "../../context/CartContext";
@@ -61,9 +60,11 @@ export default function Cart() {
               <span>Lanjut Belanja Jersey</span>
             </Link>
 
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-[#162018] px-3.5 py-1 text-[11px] font-bold tracking-wider text-emerald-400 uppercase font-mono shadow-xs">
-              <Sparkles size={12} className="text-amber-400" />
-              Atelier Cicendo Bandung // Keranjang Resmi
+            <span className="inline-flex items-center gap-2 rounded-full bg-[#162018] px-3.5 py-1.5 text-[11px] font-bold tracking-wider text-emerald-400 uppercase font-mono shadow-xs border border-white/10">
+              <span className="px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 text-[9px] font-black border border-emerald-500/40">
+                CART
+              </span>
+              <span>Atelier Cicendo Bandung</span>
             </span>
           </div>
 

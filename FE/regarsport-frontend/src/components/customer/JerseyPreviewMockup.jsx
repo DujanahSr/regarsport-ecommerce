@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Sparkles, Shirt, CheckCircle2, Shield } from 'lucide-react';
+import { Award, Shirt, CheckCircle2, Shield } from 'lucide-react';
 
 export default function JerseyPreviewMockup({
   productImage = '',
@@ -21,7 +21,7 @@ export default function JerseyPreviewMockup({
       {/* View Switcher Header */}
       <div className="w-full px-4 py-3 flex items-center justify-between border-b border-slate-800/80 bg-slate-950/60 backdrop-blur-xs">
         <div className="flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+          <Shirt size={13} className="text-emerald-400 shrink-0" />
           <span className="text-[11px] font-bold font-mono tracking-wider text-emerald-400 uppercase">
             Live Preview Sablon
           </span>
@@ -294,7 +294,7 @@ export default function JerseyPreviewMockup({
             </div>
 
             <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-800/90 border border-slate-700/80 text-[10px] text-slate-300 font-mono shadow-xs">
-              <span className="w-1.5 h-1.5 rounded-full bg-yellow-400 animate-pulse" />
+              <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
               <span>Standar FIFA/Proliga: Nomor tercetak di <strong>Tengah Dada</strong></span>
             </div>
           </div>
@@ -304,7 +304,7 @@ export default function JerseyPreviewMockup({
       {/* Footer Info Ribbon */}
       <div className="w-full px-4 py-2.5 border-t border-slate-800/80 bg-slate-950/90 flex items-center justify-between text-[11px] text-slate-400 font-mono">
         <div className="flex items-center gap-1.5 text-emerald-400">
-          <Sparkles size={13} />
+          <Award size={13} />
           <span className="font-semibold">Cetak Sablon Sublimasi Wonogiri</span>
         </div>
         <span className="text-[10px] bg-slate-800 px-2 py-0.5 rounded text-slate-300">

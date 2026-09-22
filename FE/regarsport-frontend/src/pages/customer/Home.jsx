@@ -7,14 +7,13 @@ import {
   ArrowRight,
   ChevronLeft,
   ChevronRight,
-  Heart,
-  Plus,
+  Eye,
+  ShoppingCart,
   Phone,
   RotateCcw,
   Search,
   ShieldCheck,
   SlidersHorizontal,
-  Sparkles,
   Truck,
   Award,
   X,
@@ -66,20 +65,6 @@ const ProductCard = memo(function ProductCard({ product, user, isFav, onToggleFa
             Sisa {product.stock} pcs
           </span>
         ) : null}
-
-        {/* Wishlist Toggle Button */}
-        <button
-          type="button"
-          onClick={() => onToggleFav(product)}
-          className={`absolute top-3 right-3 w-8 h-8 rounded-full flex items-center justify-center transition-all cursor-pointer z-10 ${
-            isFav
-              ? "bg-[#B9382B] text-white shadow-md scale-105"
-              : "bg-white/85 hover:bg-white text-slate-700 hover:text-black shadow-xs hover:scale-105"
-          }`}
-          title={isFav ? "Hapus dari Favorit" : "Simpan ke Favorit"}
-        >
-          <Heart size={15} fill={isFav ? "currentColor" : "none"} />
-        </button>
       </div>
 
       {/* Card Body */}
@@ -109,8 +94,9 @@ const ProductCard = memo(function ProductCard({ product, user, isFav, onToggleFa
           <div className="flex items-center gap-2">
             <Link
               to={`/dashboard/product/${product.id}`}
-              className="px-3 py-2 rounded-full border border-black/10 hover:border-black/30 text-slate-700 hover:text-black text-xs font-bold uppercase tracking-wider transition-colors"
+              className="flex items-center gap-1 px-3 py-2 rounded-full border border-black/10 hover:border-black/30 text-slate-700 hover:text-black text-xs font-bold uppercase tracking-wider transition-colors"
             >
+              <Eye size={13} />
               Detail
             </Link>
 
@@ -121,7 +107,7 @@ const ProductCard = memo(function ProductCard({ product, user, isFav, onToggleFa
               className="flex items-center gap-1 px-4 py-2 rounded-full bg-[#111613] hover:bg-black text-white font-bold text-xs uppercase tracking-wider transition-all hover:scale-105 cursor-pointer shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
               title="Pesan Jersey"
             >
-              <Plus size={14} />
+              <ShoppingCart size={13} />
               <span>BELI</span>
             </button>
           </div>
@@ -290,7 +276,6 @@ export default function Home() {
     }
     try {
       await addToCart(product, 1, "L");
-      toast.success(`Berhasil menambahkan 1x ${product.name} (Ukuran L) ke keranjang!`);
     } catch {
       toast.error("Gagal menambahkan ke keranjang.");
     }
@@ -327,9 +312,11 @@ export default function Home() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
             {/* Left Narrative */}
             <div className="lg:col-span-8 space-y-4">
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 border border-white/15 text-xs font-semibold text-emerald-400">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-                <span>KATALOG RESMI 2026 • ATELIER CICENDO BANDUNG</span>
+              <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-white/10 border border-white/15 text-xs font-mono uppercase tracking-wider text-slate-200">
+                <span className="px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 font-mono text-[10px] font-black tracking-widest border border-emerald-500/40">
+                  RS // 2026
+                </span>
+                <span className="text-emerald-300 font-bold">KATALOG RESMI • ATELIER CICENDO BANDUNG</span>
               </div>
 
               <h1 className="font-condensed text-4xl sm:text-5xl lg:text-6xl font-black uppercase tracking-tight text-white leading-[0.95]">
@@ -360,7 +347,7 @@ export default function Home() {
                 </span>
                 <span>•</span>
                 <span className="flex items-center gap-1.5">
-                  <Sparkles size={16} className="text-emerald-400 shrink-0" />
+                  <Award size={16} className="text-emerald-400 shrink-0" />
                   <span>Sublimasi OEKO-TEX Permanen</span>
                 </span>
                 <span>•</span>
@@ -371,27 +358,39 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Right Custom Inquiry CTA Card */}
+            {/* Right Custom Inquiry CTA Card with Generated Background Texture */}
             <div className="lg:col-span-4">
-              <div className="p-6 rounded-3xl bg-black/40 border border-white/15 backdrop-blur-md shadow-2xl space-y-4">
-                <div className="flex items-center gap-2 text-emerald-400 text-xs font-bold uppercase tracking-wider">
-                  <Award size={16} />
-                  <span>KONSULTASI JERSEY TIM</span>
+              <div className="relative p-6 sm:p-7 rounded-3xl overflow-hidden border border-emerald-500/30 shadow-2xl space-y-4 group">
+                {/* Generated Technical Fabric Texture Background */}
+                <div
+                  className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
+                  style={{ backgroundImage: "url('/images/custom_cta_bg.jpg')" }}
+                />
+                {/* Deep Gradient Overlays for optimal contrast & legibility */}
+                <div className="absolute inset-0 bg-gradient-to-t from-[#0c130e] via-[#0f1911]/90 to-[#142017]/80 pointer-events-none" />
+                {/* Topographic Corak Overlay */}
+                <div className="absolute inset-0 bg-topography opacity-20 pointer-events-none" />
+
+                <div className="relative z-10 space-y-3.5">
+                  <div className="flex items-center gap-2 text-emerald-400 text-xs font-mono font-bold uppercase tracking-wider">
+                    <span className="px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 text-[10px] border border-emerald-500/40">CUSTOM</span>
+                    <span>KONSULTASI JERSEY TIM</span>
+                  </div>
+                  <h3 className="font-condensed text-2xl font-black uppercase text-white leading-tight">
+                    Ingin Buat Jersey Custom Khusus Tim Anda?
+                  </h3>
+                  <p className="text-xs text-slate-300 leading-relaxed font-sans">
+                    Desain gratis, bisa custom nama, nomor punggung pemain, serta logo sponsor tanpa batasan warna sublimasi.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={handleWhatsAppConsultation}
+                    className="w-full flex items-center justify-center gap-2 py-3.5 px-4 rounded-xl bg-emerald-500 hover:bg-emerald-400 active:scale-[0.99] text-[#0D130F] font-['Barlow_Condensed'] font-black text-sm uppercase tracking-wider transition-all cursor-pointer shadow-lg shadow-emerald-500/20"
+                  >
+                    <Phone size={15} />
+                    <span>Hubungi Desainer (WhatsApp)</span>
+                  </button>
                 </div>
-                <h3 className="font-condensed text-xl font-bold uppercase text-white leading-snug">
-                  Ingin Buat Jersey Custom Khusus Tim Anda?
-                </h3>
-                <p className="text-xs text-slate-300 leading-relaxed">
-                  Desain gratis, bisa custom nama, nomor punggung pemain, serta logo sponsor tanpa batasan warna sublimasi.
-                </p>
-                <button
-                  type="button"
-                  onClick={handleWhatsAppConsultation}
-                  className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-[#0D130F] font-black text-xs uppercase tracking-wider transition-all cursor-pointer shadow-lg shadow-emerald-500/20"
-                >
-                  <Phone size={15} />
-                  <span>Hubungi Desainer (WhatsApp)</span>
-                </button>
               </div>
             </div>
           </div>

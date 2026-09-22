@@ -25,7 +25,8 @@ import {
   Package,
   ArrowRight,
   ExternalLink,
-  Sparkles,
+  LayoutDashboard,
+  TrendingUp,
   Check,
   Clock,
   Trash2,
@@ -505,29 +506,27 @@ export default function Profile() {
 
   const RoleIcon = roleConfig.icon;
 
-  const cardBg = isAdminRoute
-    ? "bg-[#14141E] border border-white/10 text-white"
-    : "bg-white border border-stone-200/80 shadow-xs text-stone-900";
-
-  const subText = isAdminRoute ? "text-white/60" : "text-stone-500";
-  const headingText = isAdminRoute ? "text-white" : "text-stone-900";
-  const inputBg = isAdminRoute
-    ? "bg-white/5 border-white/10 text-white placeholder-white/30 focus:border-[#00BFA5] focus:ring-[#00BFA5]/20"
-    : "bg-[#FAF8F4] border-stone-300 text-stone-900 placeholder-stone-400 focus:border-[#162018] focus:bg-white focus:ring-2 focus:ring-[#162018]/10";
+  const cardBg = "bg-white border border-stone-200/80 shadow-xs text-stone-900";
+  const subText = "text-stone-500";
+  const headingText = "text-slate-900";
+  const inputBg = "bg-[#FAF8F4] border-stone-300 text-stone-900 placeholder-stone-400 focus:border-[#162018] focus:bg-white focus:ring-2 focus:ring-[#162018]/10";
 
   return (
-    <div className={`min-h-screen ${isAdminRoute ? "text-white" : "bg-[#FAF8F4] text-stone-900"} py-8 px-4 sm:px-6 lg:px-8`}>
+    <div className="min-h-screen bg-[#FAF8F4] text-stone-900 py-8 px-4 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-5xl space-y-6">
         
         {/* Tactical Captain Identity Card */}
-        <div className={`relative overflow-hidden rounded-3xl p-6 sm:p-8 transition-all ${
-          isAdminRoute
-            ? "bg-[#14141E] border border-white/10 text-white"
-            : "bg-[#162018] text-white border border-[#243327] shadow-xl"
-        }`}>
+        <div className="relative overflow-hidden rounded-3xl p-6 sm:p-8 bg-[#162018] text-white border border-[#243327] shadow-xl">
           {/* Topographic Background Overlay */}
-          <div className="absolute inset-0 bg-topography opacity-10 pointer-events-none" />
-          <div className="absolute top-0 right-0 w-96 h-96 bg-linear-to-bl from-emerald-500/10 via-transparent to-transparent pointer-events-none" />
+          <div className="absolute inset-0 z-0">
+            <img
+              src="/images/warehouse_hero_bg.jpg"
+              alt="Atelier Background"
+              className="w-full h-full object-cover object-center filter brightness-[0.25] contrast-125"
+            />
+            <div className="absolute inset-0 bg-gradient-to-r from-[#162018] via-[#162018]/90 to-transparent" />
+            <div className="absolute inset-0 bg-topography opacity-15 mix-blend-overlay pointer-events-none" />
+          </div>
 
           <div className="relative z-10 flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
             {/* Avatar & Captain Identity */}
@@ -658,7 +657,7 @@ export default function Profile() {
               {user.role === "logistics" && (
                 <Link
                   to="/admin/orders"
-                  className="inline-flex items-center justify-center gap-2 rounded-xl bg-purple-600 hover:bg-purple-700 px-5 py-3 font-condensed text-sm font-bold uppercase tracking-wider text-white shadow-lg transition"
+                  className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#B9382B] hover:bg-[#9E2D22] px-5 py-3 font-condensed text-sm font-bold uppercase tracking-wider text-white shadow-lg transition active:scale-95"
                 >
                   <Truck size={16} />
                   <span>Antrean Pesanan Gudang</span>
@@ -668,9 +667,9 @@ export default function Profile() {
               {user.role === "admin" && (
                 <Link
                   to="/admin"
-                  className="inline-flex items-center justify-center gap-2 rounded-xl bg-teal-500 hover:bg-teal-400 px-5 py-3 font-condensed text-sm font-bold uppercase tracking-wider text-stone-950 shadow-lg transition"
+                  className="inline-flex items-center justify-center gap-2 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 px-5 py-3 font-condensed text-sm font-bold uppercase tracking-wider text-white shadow-lg transition active:scale-95"
                 >
-                  <Sparkles size={16} />
+                  <LayoutDashboard size={16} />
                   <span>Buka Admin Dashboard</span>
                 </Link>
               )}
@@ -716,7 +715,7 @@ export default function Profile() {
             {user.role === "logistics" && (
               <>
                 <div className="rounded-2xl p-4 bg-white/5 border border-white/10">
-                  <div className="flex items-center gap-1.5 font-mono text-[11px] font-bold text-purple-300 uppercase mb-1">
+                  <div className="flex items-center gap-1.5 font-mono text-[11px] font-bold text-amber-400 uppercase mb-1">
                     <Package size={13} />
                     Perlu Dikemas (Paid)
                   </div>
@@ -726,7 +725,7 @@ export default function Profile() {
                 </div>
 
                 <div className="rounded-2xl p-4 bg-white/5 border border-white/10">
-                  <div className="flex items-center gap-1.5 font-mono text-[11px] font-bold text-purple-300 uppercase mb-1">
+                  <div className="flex items-center gap-1.5 font-mono text-[11px] font-bold text-emerald-400 uppercase mb-1">
                     <Truck size={13} />
                     Dalam Pengiriman
                   </div>
@@ -736,9 +735,9 @@ export default function Profile() {
                 </div>
 
                 <div className="col-span-2 md:col-span-1 rounded-2xl p-4 bg-white/5 border border-white/10">
-                  <div className="flex items-center gap-1.5 font-mono text-[11px] font-bold text-purple-300 uppercase mb-1">
+                  <div className="flex items-center gap-1.5 font-mono text-[11px] font-bold text-slate-300 uppercase mb-1">
                     <Building2 size={13} />
-                    Fasilitas Gudang
+                    Fasilitas Hub
                   </div>
                   <div className="font-condensed text-lg font-bold text-white truncate">
                     Atelier Cicendo Bandung Hub
@@ -751,7 +750,7 @@ export default function Profile() {
               <>
                 <div className="rounded-2xl p-4 bg-white/5 border border-white/10">
                   <div className="flex items-center gap-1.5 font-mono text-[11px] font-bold text-teal-400 uppercase mb-1">
-                    <Sparkles size={13} />
+                    <TrendingUp size={13} />
                     Total Omzet
                   </div>
                   <div className="font-condensed text-2xl font-black text-white">
@@ -788,58 +787,66 @@ export default function Profile() {
           <button
             type="button"
             onClick={() => setActiveTab("info")}
-            className={`flex items-center gap-2 px-4 py-3 font-condensed text-sm font-bold uppercase tracking-wider border-b-2 transition whitespace-nowrap ${
+            className={`flex items-center gap-2 px-4 py-3 font-condensed text-sm font-bold uppercase tracking-wider border-b-2 transition whitespace-nowrap cursor-pointer ${
               activeTab === "info"
-                ? isAdminRoute
-                  ? "border-[#00BFA5] text-[#00BFA5]"
-                  : "border-[#162018] text-[#162018]"
-                : "border-transparent text-stone-400 hover:text-stone-700 dark:hover:text-white"
+                ? "border-[#B9382B] text-[#B9382B]"
+                : "border-transparent text-stone-400 hover:text-stone-700"
             }`}
           >
             <User size={16} />
-            <span>01. Data Diri & Alamat Pengiriman</span>
+            <span>
+              {user.role === "logistics"
+                ? "01. Data Profil & Kontak Gudang"
+                : user.role === "admin"
+                ? "01. Data Profil Administrator"
+                : "01. Data Diri & Alamat Pengiriman"}
+            </span>
           </button>
 
           <button
             type="button"
             onClick={() => setActiveTab("security")}
-            className={`flex items-center gap-2 px-4 py-3 font-condensed text-sm font-bold uppercase tracking-wider border-b-2 transition whitespace-nowrap ${
+            className={`flex items-center gap-2 px-4 py-3 font-condensed text-sm font-bold uppercase tracking-wider border-b-2 transition whitespace-nowrap cursor-pointer ${
               activeTab === "security"
-                ? isAdminRoute
-                  ? "border-[#00BFA5] text-[#00BFA5]"
-                  : "border-[#162018] text-[#162018]"
-                : "border-transparent text-stone-400 hover:text-stone-700 dark:hover:text-white"
+                ? "border-[#B9382B] text-[#B9382B]"
+                : "border-transparent text-stone-400 hover:text-stone-700"
             }`}
           >
             <KeyRound size={16} />
-            <span>02. Keamanan & Sandi</span>
+            <span>02. Keamanan &amp; Sandi</span>
           </button>
 
           <button
             type="button"
             onClick={() => setActiveTab("activity")}
-            className={`flex items-center gap-2 px-4 py-3 font-condensed text-sm font-bold uppercase tracking-wider border-b-2 transition whitespace-nowrap ${
+            className={`flex items-center gap-2 px-4 py-3 font-condensed text-sm font-bold uppercase tracking-wider border-b-2 transition whitespace-nowrap cursor-pointer ${
               activeTab === "activity"
-                ? isAdminRoute
-                  ? "border-[#00BFA5] text-[#00BFA5]"
-                  : "border-[#162018] text-[#162018]"
-                : "border-transparent text-stone-400 hover:text-stone-700 dark:hover:text-white"
+                ? "border-[#B9382B] text-[#B9382B]"
+                : "border-transparent text-stone-400 hover:text-stone-700"
             }`}
           >
             <Clock size={16} />
-            <span>03. Riwayat & Aktivitas</span>
+            <span>03. Riwayat &amp; Aktivitas</span>
           </button>
         </div>
 
         {/* Tab 1: Informasi Profil & Kontak */}
         {activeTab === "info" && (
           <form onSubmit={handleSaveProfile} className={`rounded-3xl p-6 sm:p-8 ${cardBg}`}>
-            <div className="border-b border-stone-200/80 dark:border-white/10 pb-4 mb-6">
-              <h2 className="font-condensed text-xl font-bold uppercase tracking-wide">
-                Identitas Kapten & Alamat Ekspedisi
+            <div className="border-b border-stone-200/80 pb-4 mb-6">
+              <h2 className="font-condensed text-xl font-bold uppercase tracking-wide text-slate-900">
+                {user.role === "logistics"
+                  ? "Identitas Petugas Operasional & Kontak Logistik"
+                  : user.role === "admin"
+                  ? "Identitas Administrator & Super User"
+                  : "Identitas Kapten & Alamat Ekspedisi"}
               </h2>
               <p className={`text-xs mt-1 ${subText}`}>
-                Data kontak dan alamat Anda akan otomatis disinkronkan saat proses checkout pesanan jersey di Atelier Cicendo.
+                {user.role === "logistics"
+                  ? "Informasi profil staf logistik, kontak darurat, dan koordinasi hub Cicendo Bandung."
+                  : user.role === "admin"
+                  ? "Informasi akun administrator sentral dan konfigurasi profil sistem RegarSport."
+                  : "Data kontak dan alamat Anda akan otomatis disinkronkan saat proses checkout pesanan jersey di Atelier Cicendo."}
               </p>
             </div>
 
@@ -967,15 +974,11 @@ export default function Profile() {
             </div>
 
             {/* Action Buttons */}
-            <div className="mt-8 flex flex-wrap items-center gap-3 pt-6 border-t border-stone-200/80 dark:border-white/10">
+            <div className="mt-8 flex flex-wrap items-center gap-3 pt-6 border-t border-stone-200/80">
               <button
                 type="submit"
                 disabled={savingProfile || uploadingAvatar}
-                className={`inline-flex items-center gap-2 rounded-xl px-6 py-3 font-condensed text-sm font-bold uppercase tracking-wider text-white shadow-lg transition transform hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-50 disabled:cursor-not-allowed ${
-                  isAdminRoute
-                    ? "bg-[#00BFA5] hover:bg-[#00A892] text-stone-950 shadow-[#00BFA5]/20"
-                    : "bg-[#162018] hover:bg-stone-900 shadow-stone-900/20"
-                }`}
+                className="inline-flex items-center gap-2 rounded-xl px-6 py-3 font-condensed text-sm font-bold uppercase tracking-wider text-white bg-[#162018] hover:bg-black shadow-md transition transform hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
               >
                 <Save size={16} />
                 <span>{savingProfile ? "Menyimpan ke Server..." : "Simpan Perubahan Profil"}</span>
@@ -985,11 +988,7 @@ export default function Profile() {
                 type="button"
                 onClick={handleResetProfile}
                 disabled={savingProfile}
-                className={`inline-flex items-center gap-2 rounded-xl px-5 py-3 font-condensed text-sm font-bold uppercase tracking-wider border transition ${
-                  isAdminRoute
-                    ? "border-white/10 hover:bg-white/5 text-white/80"
-                    : "border-stone-300 hover:bg-stone-100 text-stone-700"
-                }`}
+                className="inline-flex items-center gap-2 rounded-xl px-5 py-3 font-condensed text-sm font-bold uppercase tracking-wider border border-stone-300 hover:bg-stone-100 text-stone-700 transition cursor-pointer"
               >
                 <RotateCcw size={16} />
                 <span>Reset</span>
@@ -1136,15 +1135,11 @@ export default function Profile() {
                 </div>
               </div>
 
-              <div className="mt-8 pt-6 border-t border-stone-200/80 dark:border-white/10">
+              <div className="mt-8 pt-6 border-t border-stone-200/80">
                 <button
                   type="submit"
                   disabled={changingPassword}
-                  className={`inline-flex items-center gap-2 rounded-xl px-6 py-3 font-condensed text-sm font-bold uppercase tracking-wider text-white shadow-lg transition transform hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-50 disabled:cursor-not-allowed ${
-                    isAdminRoute
-                      ? "bg-[#00BFA5] hover:bg-[#00A892] text-stone-950 shadow-[#00BFA5]/20"
-                      : "bg-[#162018] hover:bg-stone-900 shadow-stone-900/20"
-                  }`}
+                  className="inline-flex items-center gap-2 rounded-xl px-6 py-3 font-condensed text-sm font-bold uppercase tracking-wider text-white bg-[#162018] hover:bg-black shadow-md transition transform hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                 >
                   <Lock size={16} />
                   <span>{changingPassword ? "Menyimpan Sandi..." : "Perbarui Kata Sandi Sekarang"}</span>
@@ -1280,58 +1275,107 @@ export default function Profile() {
             )}
 
             {user.role === "logistics" && (
-              <div className={`rounded-3xl p-6 sm:p-8 ${cardBg} space-y-6`}>
+              <div className={`rounded-3xl p-6 sm:p-8 ${cardBg} space-y-6 shadow-sm`}>
                 <div>
-                  <h2 className="font-condensed text-xl font-bold uppercase tracking-wide">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="px-2.5 py-0.5 rounded-full bg-[#162018] text-[#FAF8F4] font-mono text-[10px] font-bold uppercase tracking-wider">
+                      RS // LOGISTICS HUB
+                    </span>
+                  </div>
+                  <h2 className="font-condensed text-xl font-bold uppercase tracking-wide text-slate-900">
                     Pusat Operasional Logistik Gudang
                   </h2>
                   <p className={`text-xs mt-1 ${subText}`}>
-                    Fasilitas pemenuhan pesanan, cetak massal label thermal, dan scanner barcode resi kurir.
+                    Fasilitas pemenuhan pesanan, cetak label thermal A6, manajemen stok pakaian atletik, dan retur garansi.
                   </p>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className={`rounded-2xl p-5 border ${isAdminRoute ? "border-white/10 bg-white/5" : "border-purple-200 bg-purple-50/50"}`}>
-                    <div className="flex items-center gap-2 text-purple-700 font-bold text-sm mb-2">
-                      <Package size={18} />
-                      Antrean Kemas (Paid)
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                  {/* Card 1: Dashboard Gudang */}
+                  <Link
+                    to="/admin/warehouse"
+                    className="rounded-2xl p-5 border border-stone-200/90 bg-[#FAF8F4] hover:bg-white hover:border-[#162018] hover:shadow-md transition-all group"
+                  >
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="p-2.5 rounded-xl bg-[#162018] text-white">
+                        <Truck size={20} />
+                      </div>
+                      <ArrowRight size={14} className="text-stone-400 group-hover:translate-x-1 transition-transform" />
                     </div>
-                    <p className={`text-xs mb-4 ${subText}`}>
-                      Terdapat {roleStats.warehousePending} pesanan yang telah dibayar dan siap dikemas oleh tim gudang.
+                    <div className="font-condensed text-base font-bold uppercase text-slate-900 group-hover:text-emerald-950 transition-colors">
+                      Dashboard Hub
+                    </div>
+                    <p className={`text-xs mt-1 ${subText}`}>
+                      Overview metrik harian dan pemindai barcode resi.
                     </p>
-                    <Link
-                      to="/admin/orders"
-                      className="inline-flex items-center gap-2 font-condensed text-xs font-bold uppercase tracking-wider text-white bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-xl transition shadow-xs"
-                    >
-                      <span>Buka Antrean Gudang</span>
-                      <ArrowRight size={14} />
-                    </Link>
-                  </div>
+                  </Link>
 
-                  <div className={`rounded-2xl p-5 border ${isAdminRoute ? "border-white/10 bg-white/5" : "border-stone-200 bg-stone-50"}`}>
-                    <div className="flex items-center gap-2 text-blue-600 font-bold text-sm mb-2">
-                      <Truck size={18} />
-                      Pengiriman Berjalan
+                  {/* Card 2: Antrean Kemas */}
+                  <Link
+                    to="/admin/orders"
+                    className="rounded-2xl p-5 border border-stone-200/90 bg-[#FAF8F4] hover:bg-white hover:border-[#B9382B] hover:shadow-md transition-all group"
+                  >
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="p-2.5 rounded-xl bg-[#B9382B] text-white">
+                        <Package size={20} />
+                      </div>
+                      <span className="font-mono text-xs font-bold px-2 py-0.5 rounded bg-[#FAF0ED] text-[#B9382B] border border-[#B9382B]/20">
+                        {roleStats.warehousePending}
+                      </span>
                     </div>
-                    <p className={`text-xs mb-4 ${subText}`}>
-                      Terdapat {roleStats.warehouseShipped} pesanan yang saat ini dalam perjalanan bersama kurir logistik.
+                    <div className="font-condensed text-base font-bold uppercase text-slate-900 group-hover:text-[#B9382B] transition-colors">
+                      Packing &amp; Resi
+                    </div>
+                    <p className={`text-xs mt-1 ${subText}`}>
+                      Cetak label thermal A6 dan input nomor resi pengiriman.
                     </p>
-                    <Link
-                      to="/admin/orders"
-                      className="inline-flex items-center gap-2 font-condensed text-xs font-bold uppercase tracking-wider text-stone-800 dark:text-white bg-stone-200 dark:bg-white/10 hover:bg-stone-300 px-4 py-2 rounded-xl transition"
-                    >
-                      <span>Lacak Pengiriman</span>
-                      <ArrowRight size={14} />
-                    </Link>
-                  </div>
+                  </Link>
+
+                  {/* Card 3: Stok Gudang */}
+                  <Link
+                    to="/admin/inventory"
+                    className="rounded-2xl p-5 border border-stone-200/90 bg-[#FAF8F4] hover:bg-white hover:border-amber-500 hover:shadow-md transition-all group"
+                  >
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="p-2.5 rounded-xl bg-amber-100 text-amber-900 border border-amber-200">
+                        <Layers size={20} />
+                      </div>
+                      <ArrowRight size={14} className="text-stone-400 group-hover:translate-x-1 transition-transform" />
+                    </div>
+                    <div className="font-condensed text-base font-bold uppercase text-slate-900 group-hover:text-amber-900 transition-colors">
+                      Stok Fisik Gudang
+                    </div>
+                    <p className={`text-xs mt-1 ${subText}`}>
+                      Pantau varian ukuran garmen dan restock barang masuk.
+                    </p>
+                  </Link>
+
+                  {/* Card 4: Retur Garansi */}
+                  <Link
+                    to="/admin/warranty-claims"
+                    className="rounded-2xl p-5 border border-stone-200/90 bg-[#FAF8F4] hover:bg-white hover:border-emerald-600 hover:shadow-md transition-all group"
+                  >
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="p-2.5 rounded-xl bg-stone-200 text-stone-800 border border-stone-300">
+                        <ShieldCheck size={20} />
+                      </div>
+                      <ArrowRight size={14} className="text-stone-400 group-hover:translate-x-1 transition-transform" />
+                    </div>
+                    <div className="font-condensed text-base font-bold uppercase text-slate-900 group-hover:text-emerald-950 transition-colors">
+                      Retur Garansi
+                    </div>
+                    <p className={`text-xs mt-1 ${subText}`}>
+                      Inspeksi unit klaim retur dan kirim apparel pengganti.
+                    </p>
+                  </Link>
                 </div>
               </div>
             )}
 
             {user.role === "admin" && (
-              <div className={`rounded-3xl p-6 sm:p-8 ${cardBg} space-y-6`}>
+              <div className={`rounded-3xl p-6 sm:p-8 ${cardBg} space-y-6 shadow-sm`}>
                 <div>
-                  <h2 className="font-condensed text-xl font-bold uppercase tracking-wide">
+                  <h2 className="font-condensed text-xl font-bold uppercase tracking-wide text-slate-900">
                     Pintasan Cepat Manajemen Toko
                   </h2>
                   <p className={`text-xs mt-1 ${subText}`}>
@@ -1342,42 +1386,42 @@ export default function Profile() {
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                   <Link
                     to="/admin"
-                    className={`flex flex-col items-center justify-center p-5 rounded-2xl border text-center transition hover:-translate-y-1 ${
-                      isAdminRoute ? "border-white/10 bg-white/5 hover:bg-white/10" : "border-stone-200 bg-[#FAF8F4] hover:bg-stone-100"
-                    }`}
+                    className="flex flex-col items-center justify-center p-5 rounded-2xl border border-stone-200 bg-[#FAF8F4] hover:bg-white hover:border-[#162018] hover:shadow-md text-center transition group"
                   >
-                    <Sparkles size={24} className="text-teal-400 mb-2" />
-                    <span className="font-condensed text-xs font-bold uppercase tracking-wider">Dashboard Omzet</span>
+                    <div className="p-3 rounded-xl bg-[#162018] text-white mb-2">
+                      <LayoutDashboard size={20} />
+                    </div>
+                    <span className="font-condensed text-xs font-bold uppercase tracking-wider text-slate-900">Dashboard Omzet</span>
                   </Link>
 
                   <Link
                     to="/admin/products"
-                    className={`flex flex-col items-center justify-center p-5 rounded-2xl border text-center transition hover:-translate-y-1 ${
-                      isAdminRoute ? "border-white/10 bg-white/5 hover:bg-white/10" : "border-stone-200 bg-[#FAF8F4] hover:bg-stone-100"
-                    }`}
+                    className="flex flex-col items-center justify-center p-5 rounded-2xl border border-stone-200 bg-[#FAF8F4] hover:bg-white hover:border-[#162018] hover:shadow-md text-center transition group"
                   >
-                    <ShoppingBag size={24} className="text-emerald-500 mb-2" />
-                    <span className="font-condensed text-xs font-bold uppercase tracking-wider">Kelola Katalog</span>
+                    <div className="p-3 rounded-xl bg-emerald-100 text-emerald-900 mb-2">
+                      <ShoppingBag size={20} />
+                    </div>
+                    <span className="font-condensed text-xs font-bold uppercase tracking-wider text-slate-900">Kelola Katalog</span>
                   </Link>
 
                   <Link
                     to="/admin/orders"
-                    className={`flex flex-col items-center justify-center p-5 rounded-2xl border text-center transition hover:-translate-y-1 ${
-                      isAdminRoute ? "border-white/10 bg-white/5 hover:bg-white/10" : "border-stone-200 bg-[#FAF8F4] hover:bg-stone-100"
-                    }`}
+                    className="flex flex-col items-center justify-center p-5 rounded-2xl border border-stone-200 bg-[#FAF8F4] hover:bg-white hover:border-[#B9382B] hover:shadow-md text-center transition group"
                   >
-                    <Package size={24} className="text-purple-500 mb-2" />
-                    <span className="font-condensed text-xs font-bold uppercase tracking-wider">Semua Pesanan</span>
+                    <div className="p-3 rounded-xl bg-[#FAF0ED] text-[#B9382B] mb-2">
+                      <Package size={20} />
+                    </div>
+                    <span className="font-condensed text-xs font-bold uppercase tracking-wider text-slate-900">Semua Pesanan</span>
                   </Link>
 
                   <Link
                     to="/admin/users"
-                    className={`flex flex-col items-center justify-center p-5 rounded-2xl border text-center transition hover:-translate-y-1 ${
-                      isAdminRoute ? "border-white/10 bg-white/5 hover:bg-white/10" : "border-stone-200 bg-[#FAF8F4] hover:bg-stone-100"
-                    }`}
+                    className="flex flex-col items-center justify-center p-5 rounded-2xl border border-stone-200 bg-[#FAF8F4] hover:bg-white hover:border-[#162018] hover:shadow-md text-center transition group"
                   >
-                    <User size={24} className="text-blue-500 mb-2" />
-                    <span className="font-condensed text-xs font-bold uppercase tracking-wider">Daftar Pengguna</span>
+                    <div className="p-3 rounded-xl bg-blue-100 text-blue-900 mb-2">
+                      <User size={20} />
+                    </div>
+                    <span className="font-condensed text-xs font-bold uppercase tracking-wider text-slate-900">Daftar Pengguna</span>
                   </Link>
                 </div>
               </div>

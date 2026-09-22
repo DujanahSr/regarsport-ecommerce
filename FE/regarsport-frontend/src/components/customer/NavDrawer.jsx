@@ -5,7 +5,7 @@ import {
   ChevronRight,
   ShieldCheck,
   Phone,
-  Sparkles,
+  Compass,
   User,
   LogOut,
   Building2,
@@ -86,7 +86,7 @@ export default function NavDrawer({ isOpen, onClose, onOpenSearch }) {
         {/* Header */}
         <div className="relative z-10 p-5 border-b border-white/10 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="w-2.5 h-2.5 rounded-full bg-red-500 animate-ping" />
+            <Compass size={16} className="text-emerald-400 shrink-0" />
             <span className="font-condensed text-xl font-bold tracking-wider uppercase text-slate-100">
               REGARSPORT APPAREL
             </span>
@@ -176,7 +176,7 @@ export default function NavDrawer({ isOpen, onClose, onOpenSearch }) {
               onClick={() => handleScrollTo("produk")}
               className="w-full flex items-center gap-3 py-2.5 px-3 text-xs font-semibold text-slate-300 hover:text-white hover:bg-white/5 rounded-lg transition-colors text-left cursor-pointer group"
             >
-              <Sparkles size={16} className="text-emerald-400 shrink-0 group-hover:scale-110 transition-transform" />
+              <Award size={16} className="text-emerald-400 shrink-0 group-hover:scale-110 transition-transform" />
               <span>Koleksi Rekomendasi Jersey</span>
             </button>
             <Link

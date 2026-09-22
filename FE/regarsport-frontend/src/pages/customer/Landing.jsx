@@ -5,18 +5,16 @@ import {
   Search,
   Menu,
   ShoppingBag,
-  Heart,
+  ShoppingCart,
   User,
   ArrowRight,
   ShieldCheck,
   Truck,
-  Sparkles,
   Star,
   CheckCircle2,
   Phone,
   Layers,
   Award,
-  Plus,
   Copy,
   Check,
   Ruler,
@@ -29,6 +27,7 @@ import {
   ChevronDown,
   LogOut,
   Package,
+  Bookmark,
 } from "lucide-react";
 
 import api from "../../services/api";
@@ -337,8 +336,8 @@ export default function Landing() {
                         onClick={() => setIsUserMenuOpen(false)}
                         className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-200 hover:text-white hover:bg-white/10 transition-colors font-medium"
                       >
-                        <Heart size={15} className="text-emerald-400" />
-                        <span>Wishlist Jersey Favorit</span>
+                        <Bookmark size={15} className="text-emerald-400" />
+                        <span>Koleksi Jersey Tersimpan</span>
                       </Link>
 
                       <Link
@@ -421,9 +420,11 @@ export default function Landing() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
             {/* Left Editorial Text */}
             <div className="lg:col-span-7 space-y-6 text-center lg:text-left">
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 border border-white/15 text-xs font-semibold text-emerald-400">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-                <span>KOLEKSI ATLETIK 2026 • ATELIER CICENDO BANDUNG</span>
+              <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-white/10 border border-white/15 text-xs font-mono uppercase tracking-wider text-slate-200">
+                <span className="px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 font-mono text-[10px] font-black tracking-widest border border-emerald-500/40">
+                  RS // 2026
+                </span>
+                <span className="text-emerald-300 font-bold">KOLEKSI ATLETIK • ATELIER CICENDO BANDUNG</span>
               </div>
 
               <h1 className="font-condensed text-5xl sm:text-6xl lg:text-7xl font-black uppercase tracking-tight text-white leading-[0.95]">
@@ -718,26 +719,6 @@ export default function Landing() {
                           GARANSI 100%
                         </span>
                       </div>
-
-                      {/* Wishlist Toggle Button */}
-                      <button
-                        onClick={() => {
-                          if (!user) {
-                            toast.error("Silakan login terlebih dahulu untuk menyimpan jersey favorit!");
-                            navigate("/login");
-                            return;
-                          }
-                          toggleWishlist(prod);
-                        }}
-                        className={`absolute top-3 right-3 w-8 h-8 rounded-full flex items-center justify-center transition-all cursor-pointer z-10 ${
-                          isFav
-                            ? "bg-[#B9382B] text-white shadow"
-                            : "bg-white/80 hover:bg-white text-slate-700 hover:text-black shadow-sm"
-                        }`}
-                        title="Favorit"
-                      >
-                        <Heart size={15} fill={isFav ? "currentColor" : "none"} />
-                      </button>
                     </div>
 
                     {/* Content */}
@@ -777,7 +758,7 @@ export default function Landing() {
                           className="flex items-center gap-1 px-4 py-2 rounded-full bg-[#111613] hover:bg-black text-white font-bold text-xs uppercase tracking-wider transition-all hover:scale-105 cursor-pointer shadow"
                           title="Pesan Jersey"
                         >
-                          <Plus size={14} />
+                          <ShoppingCart size={13} />
                           <span>BELI</span>
                         </button>
                       </div>
@@ -884,7 +865,7 @@ export default function Landing() {
                 desc: "Klaim garansi tanpa ribet dalam 7 hari. Salah ukuran atau jahitan cacat langsung diproses tim admin & gudang kami.",
               },
               {
-                icon: Sparkles,
+                icon: Award,
                 title: "SUBLIMASI WARNA PERMANEN",
                 desc: "Tinta bersertifikat OEKO-TEX standar Eropa. Warna tidak akan pudar atau mengelupas meski dicuci ratusan kali.",
               },
@@ -993,7 +974,7 @@ export default function Landing() {
             <div className="p-8 sm:p-10 rounded-3xl bg-linear-to-r from-[#18221B] via-[#1F2F23] to-[#18221B] border border-emerald-500/40 flex flex-col lg:flex-row items-center justify-between gap-6 shadow-2xl relative overflow-hidden">
               <div className="space-y-1.5 text-center lg:text-left z-10">
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px] font-black uppercase tracking-wider">
-                  <Sparkles size={12} />
+                  <Tag size={12} />
                   <span>KUPON AKTIF ANDA</span>
                 </div>
                 <h3 className="font-condensed text-2xl sm:text-3xl font-bold uppercase tracking-tight text-white">
@@ -1308,7 +1289,7 @@ export default function Landing() {
           <div className="relative z-10 w-full max-w-md bg-[#162018] border border-emerald-500/40 rounded-3xl p-6 sm:p-8 text-white shadow-2xl animate-scale-up space-y-5">
             <div className="flex items-center justify-between border-b border-white/10 pb-4">
               <div className="flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping" />
+                <Tag size={14} className="text-emerald-400 shrink-0" />
                 <span className="font-condensed text-lg font-bold tracking-wider uppercase text-emerald-300">
                   VOUCHER EKSKLUSIF REGARSPORT
                 </span>
@@ -1324,7 +1305,7 @@ export default function Landing() {
 
             <div className="text-center space-y-2">
               <div className="w-14 h-14 mx-auto rounded-2xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 flex items-center justify-center">
-                <Sparkles size={28} />
+                <Tag size={28} />
               </div>
               <h4 className="font-condensed text-2xl font-black uppercase text-white">
                 DISKON 15% PEMESANAN TIM

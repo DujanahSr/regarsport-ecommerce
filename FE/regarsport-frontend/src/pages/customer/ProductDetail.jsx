@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import {
-  Heart,
+  Bookmark,
+  BookmarkCheck,
   Minus,
   Plus,
   ShoppingCart,
@@ -18,7 +19,7 @@ import {
   Ruler,
   Info,
   Shirt,
-  Sparkles,
+  Award,
   Check,
   RotateCcw,
   Eye,
@@ -34,45 +35,28 @@ import { EmptyState, ScreenLoader } from "../../components/common/UiStates";
 import JerseyPreviewMockup from "../../components/customer/JerseyPreviewMockup";
 
 const getAvailableSizes = (prod) => {
-  if (!prod) return ["L"];
-  const catId = Number(prod.categoryId);
+  if (!prod) return ["S", "M", "L", "XL", "XXL", "3XL"];
   const name = (prod.name || "").toLowerCase();
-  const catName = (prod.categoryName || "").toLowerCase();
 
-  // 1. Sepatu Olahraga (Cat 2 or name contains "sepatu")
-  if (catId === 2 || catName.includes("sepatu") || name.includes("sepatu") || name.includes("shoes") || name.includes("boots")) {
+  // 1. Sepatu Olahraga
+  if (name.includes("sepatu") || name.includes("shoes") || name.includes("boots")) {
     return ["39", "40", "41", "42", "43", "44", "45"];
   }
 
-  // 2. Peralatan & Bola Olahraga (Cat 3)
-  if (catId === 3 || name.includes("bola") || name.includes("ball") || name.includes("sarung") || name.includes("deker") || name.includes("guard")) {
-    if (name.includes("basket")) {
-      return ["Size 7 (Resmi)", "Size 6 (Remaja/Wanita)"];
-    }
-    if (name.includes("futsal")) {
-      return ["Size 4 (Standar Futsal)"];
-    }
-    if (name.includes("bola") || name.includes("soccer")) {
-      return ["Size 5 (Resmi FIFA)", "Size 4 (Junior)"];
-    }
-    if (name.includes("sarung") || name.includes("kiper") || name.includes("gloves")) {
-      return ["Size 8", "Size 9", "Size 10", "Size 11"];
-    }
-    if (name.includes("deker") || name.includes("shin")) {
-      return ["S", "M", "L"];
-    }
-    return ["Standar Resmi"];
+  // 2. Sarung Tangan / Deker
+  if (name.includes("sarung") || name.includes("gloves")) {
+    return ["Size 8", "Size 9", "Size 10", "Size 11"];
+  }
+  if (name.includes("deker") || name.includes("guard")) {
+    return ["S", "M", "L"];
   }
 
-  // 3. Tas & Aksesoris Olahraga (Cat 5)
-  if (catId === 5 || catName.includes("aksesoris") || catName.includes("tas") || name.includes("tas") || name.includes("botol") || name.includes("kaos kaki")) {
-    if (name.includes("kaos kaki") || name.includes("socks")) {
-      return ["All Size (39-44)"];
-    }
+  // 3. Tas / Aksesoris
+  if (name.includes("tas") || name.includes("bag") || name.includes("botol") || name.includes("kaos kaki")) {
     return ["All Size"];
   }
 
-  // 4. Default: Jersey & Pakaian Olahraga (Cat 1 & 4)
+  // 4. Default: Jersey & Apparel Atletik Sublimasi (S - 3XL)
   return ["S", "M", "L", "XL", "XXL", "3XL"];
 };
 
@@ -85,49 +69,38 @@ const getDefaultSize = (sizes) => {
 
 const getProductType = (prod) => {
   if (!prod) return "clothing";
-  const catId = Number(prod.categoryId);
   const name = (prod.name || "").toLowerCase();
-  const catName = (prod.categoryName || "").toLowerCase();
 
-  if (catId === 2 || catName.includes("sepatu") || name.includes("sepatu") || name.includes("shoes") || name.includes("boots")) {
+  if (name.includes("sepatu") || name.includes("shoes") || name.includes("boots")) {
     return "shoes";
   }
-  if (catId === 3 || name.includes("bola") || name.includes("ball") || name.includes("sarung") || name.includes("deker") || name.includes("guard")) {
+  if (name.includes("bola ") || name.includes("ball") || name.includes("sarung") || name.includes("deker")) {
     return "equipment";
   }
   return "clothing";
 };
 
-// Filter ketat agar kustomisasi sablon HANYA aktif untuk kategori Jersey / Pakaian Olahraga
+// Filter untuk kustomisasi sablon: aktif untuk seluruh produk apparel/jersey RegarSport
 const isCustomizableJersey = (prod) => {
-  if (!prod) return false;
-  const prodType = getProductType(prod);
-  if (prodType === "shoes" || prodType === "equipment") return false;
-  const catId = Number(prod.categoryId);
+  if (!prod) return true;
   const name = (prod.name || "").toLowerCase();
-  const catName = (prod.categoryName || "").toLowerCase();
 
-  // Pastikan sepatu, bola, deker, sarung tangan, atau tas tidak lolos
+  // Non-jersey items
   if (
-    catId === 2 || catId === 3 || catId === 5 ||
-    catName.includes("sepatu") || catName.includes("bola") || catName.includes("tas") || catName.includes("aksesoris") ||
-    name.includes("sepatu") || name.includes("shoes") || name.includes("bola") || name.includes("ball") || name.includes("sarung") || name.includes("tas")
+    name.includes("sepatu") ||
+    name.includes("shoes") ||
+    name.includes("boots") ||
+    name.includes("sarung") ||
+    name.includes("gloves") ||
+    name.includes("deker") ||
+    name.includes("tas ") ||
+    name.includes("botol")
   ) {
     return false;
   }
 
-  // Khusus kategori Jersey & Pakaian Olahraga (Cat 1 atau 4)
-  return (
-    catId === 1 ||
-    catId === 4 ||
-    catName.includes("jersey") ||
-    catName.includes("pakaian") ||
-    catName.includes("baju") ||
-    catName.includes("kaos") ||
-    name.includes("jersey") ||
-    name.includes("baju") ||
-    name.includes("kaos")
-  );
+  // Seluruh kategori 1 (Sepakbola/Futsal), 2 (Bola Voli), 3 (Badminton), 4 (Esports), 5 (Basket) adalah jersey kustom
+  return true;
 };
 
 export default function ProductDetail() {
@@ -426,9 +399,11 @@ export default function ProductDetail() {
         </Link>
 
         <div className="flex items-center gap-2">
-          <span className="hidden sm:inline-flex items-center gap-1.5 rounded-full bg-[#162018] px-3.5 py-1.5 text-[11px] font-bold tracking-wider text-emerald-400 uppercase font-mono shadow-xs">
-            <Sparkles size={12} className="text-amber-400" />
-            Atelier Cicendo Bandung // Pro Series
+          <span className="hidden sm:inline-flex items-center gap-2 rounded-full bg-[#162018] px-3.5 py-1.5 text-[11px] font-bold tracking-wider text-emerald-400 uppercase font-mono shadow-xs border border-white/10">
+            <span className="px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 text-[9px] font-black border border-emerald-500/40">
+              PRO SERIES
+            </span>
+            <span>Atelier Cicendo Bandung</span>
           </span>
           <span className="inline-flex items-center rounded-full bg-[#FAF8F4] px-3.5 py-1.5 text-[11px] font-bold uppercase tracking-wider text-slate-700 border border-[#162018]/15">
             {product.categoryName || "Official Sportswear"}
@@ -921,28 +896,36 @@ export default function ProductDetail() {
               <button
                 type="button"
                 onClick={async () => {
+                  if (!user) {
+                    toast.error("Silakan login untuk menyimpan jersey favorit!");
+                    navigate("/login");
+                    return;
+                  }
                   if (isWishlisted(product.id)) {
                     await removeWishlist(product.id);
                   } else {
                     await addToWishlist(product);
                   }
                 }}
-                className={`group flex items-center gap-2 rounded-2xl border px-4 py-3.5 text-sm font-bold transition-all cursor-pointer ${
+                className={`group flex items-center gap-2 rounded-2xl border px-4 py-3.5 text-xs sm:text-sm font-mono font-bold uppercase tracking-wider transition-all cursor-pointer ${
                   isWishlisted(product.id)
-                    ? "border-rose-200 bg-rose-50/80 text-rose-700 hover:bg-rose-100/80 shadow-xs"
-                    : "border-slate-200 bg-white text-slate-700 hover:border-rose-300 hover:bg-rose-50/50 hover:text-rose-600 shadow-xs"
+                    ? "border-emerald-600 bg-emerald-50 text-emerald-800 shadow-xs"
+                    : "border-[#162018]/15 bg-white text-slate-700 hover:border-[#162018] hover:text-[#162018] shadow-xs"
                 }`}
-                title={isWishlisted(product.id) ? "Hapus dari wishlist" : "Simpan ke wishlist"}
+                title={isWishlisted(product.id) ? "Hapus dari Koleksi Favorit" : "Simpan ke Koleksi Favorit"}
               >
-                <Heart
-                  size={18}
-                  className={`transition-transform duration-200 group-hover:scale-110 ${
-                    isWishlisted(product.id)
-                      ? "fill-rose-500 text-rose-500"
-                      : "text-slate-400 group-hover:text-rose-500"
-                  }`}
-                />
-                <span className="hidden sm:inline">{isWishlisted(product.id) ? "Tersimpan" : "Wishlist"}</span>
+                {isWishlisted(product.id) ? (
+                  <BookmarkCheck
+                    size={18}
+                    className="text-emerald-700 fill-emerald-700 transition-transform duration-200 group-hover:scale-110"
+                  />
+                ) : (
+                  <Bookmark
+                    size={18}
+                    className="text-slate-400 group-hover:text-[#162018] transition-transform duration-200 group-hover:scale-110"
+                  />
+                )}
+                <span className="hidden sm:inline">{isWishlisted(product.id) ? "Tersimpan" : "Simpan"}</span>
               </button>
 
               <button
@@ -1004,7 +987,7 @@ export default function ProductDetail() {
 
                 <div className="flex items-start gap-2.5 rounded-2xl bg-white border border-[#162018]/10 p-3 shadow-2xs">
                   <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-xl bg-emerald-100/70 text-emerald-700">
-                    <Sparkles size={15} />
+                    <Award size={15} />
                   </div>
                   <div>
                     <h4 className="text-xs font-bold text-slate-900">Anti-Luntur Seumur Hidup</h4>
@@ -1389,28 +1372,33 @@ export default function ProductDetail() {
           </div>
         )}
 
-        {/* Panduan Ukuran (Size Chart) Modal */}
+        {/* Panduan Ukuran (Size Chart) Tactical Modal */}
         {showSizeChart && (
           <div
             className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-sm p-4 animate-in fade-in duration-200"
             onClick={() => setShowSizeChart(false)}
           >
             <div
-              className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-white rounded-3xl p-6 sm:p-8 shadow-2xl border border-slate-100"
+              className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-[#162018] rounded-3xl p-6 sm:p-8 shadow-2xl border border-white/15 text-white space-y-6"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Modal Header */}
-              <div className="flex items-start justify-between pb-4 border-b border-slate-100 mb-6">
+              <div className="flex items-start justify-between pb-4 border-b border-white/10">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-700 border border-emerald-200/80 shadow-xs shrink-0">
+                  <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 shadow-xs shrink-0">
                     <Ruler size={22} />
                   </div>
                   <div>
-                    <h3 className="text-xl font-black text-slate-900 tracking-tight">
-                      Panduan Ukuran (Size Chart) 📏
-                    </h3>
-                    <p className="text-xs text-slate-500 mt-0.5">
-                      Standar ukuran resmi RegarSport untuk performa dan kenyamanan optimal.
+                    <div className="flex items-center gap-2">
+                      <h3 className="font-condensed text-xl font-black uppercase tracking-wider text-white">
+                        Panduan Ukuran (Size Chart)
+                      </h3>
+                      <span className="rounded-full bg-emerald-400/10 px-2.5 py-0.5 text-[10px] font-mono font-bold uppercase tracking-wider text-emerald-300 border border-emerald-400/20">
+                        Atelier Cicendo
+                      </span>
+                    </div>
+                    <p className="text-xs text-slate-400 font-mono mt-0.5">
+                      Standar ukuran resmi RegarSport untuk performa atletik dan kenyamanan optimal.
                     </p>
                   </div>
                 </div>
@@ -1418,56 +1406,56 @@ export default function ProductDetail() {
                 <button
                   type="button"
                   onClick={() => setShowSizeChart(false)}
-                  className="rounded-full p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-700 transition"
+                  className="rounded-full p-2 text-slate-400 hover:bg-white/10 hover:text-white transition cursor-pointer"
                   title="Tutup (Esc)"
                 >
-                  <X size={20} />
+                  <X size={18} />
                 </button>
               </div>
 
               {/* Category Tabs inside Modal */}
-              <div className="flex items-center gap-2 p-1.5 bg-slate-100 rounded-2xl mb-6">
+              <div className="flex items-center gap-2 p-1.5 bg-black/40 border border-white/10 rounded-2xl">
                 <button
                   type="button"
                   onClick={() => setActiveChartTab("clothing")}
-                  className={`flex-1 py-2 text-xs font-bold rounded-xl transition ${
+                  className={`flex-1 py-2 text-xs font-mono font-bold uppercase tracking-wider rounded-xl transition cursor-pointer ${
                     activeChartTab === "clothing"
-                      ? "bg-white text-emerald-700 shadow-sm"
-                      : "text-slate-600 hover:text-slate-900"
+                      ? "bg-[#111613] text-emerald-400 border border-emerald-500/30 shadow-sm"
+                      : "text-slate-400 hover:text-white"
                   }`}
                 >
-                  👕 Jersey & Pakaian
+                  Jersey &amp; Apparel
                 </button>
                 <button
                   type="button"
                   onClick={() => setActiveChartTab("shoes")}
-                  className={`flex-1 py-2 text-xs font-bold rounded-xl transition ${
+                  className={`flex-1 py-2 text-xs font-mono font-bold uppercase tracking-wider rounded-xl transition cursor-pointer ${
                     activeChartTab === "shoes"
-                      ? "bg-white text-emerald-700 shadow-sm"
-                      : "text-slate-600 hover:text-slate-900"
+                      ? "bg-[#111613] text-emerald-400 border border-emerald-500/30 shadow-sm"
+                      : "text-slate-400 hover:text-white"
                   }`}
                 >
-                  👟 Sepatu Olahraga
+                  Sepatu Olahraga
                 </button>
                 <button
                   type="button"
                   onClick={() => setActiveChartTab("equipment")}
-                  className={`flex-1 py-2 text-xs font-bold rounded-xl transition ${
+                  className={`flex-1 py-2 text-xs font-mono font-bold uppercase tracking-wider rounded-xl transition cursor-pointer ${
                     activeChartTab === "equipment"
-                      ? "bg-white text-emerald-700 shadow-sm"
-                      : "text-slate-600 hover:text-slate-900"
+                      ? "bg-[#111613] text-emerald-400 border border-emerald-500/30 shadow-sm"
+                      : "text-slate-400 hover:text-white"
                   }`}
                 >
-                  ⚽ Bola & Aksesoris
+                  Perlengkapan &amp; Bola
                 </button>
               </div>
 
               {/* Tab 1: Clothing / Jersey */}
               {activeChartTab === "clothing" && (
                 <div className="space-y-4">
-                  <div className="overflow-x-auto rounded-2xl border border-slate-200">
+                  <div className="overflow-x-auto rounded-2xl border border-white/10 bg-black/30">
                     <table className="w-full text-left text-xs">
-                      <thead className="bg-slate-50 text-slate-700 font-bold uppercase tracking-wider border-b border-slate-200">
+                      <thead className="bg-white/10 text-emerald-400 font-mono font-bold uppercase tracking-wider text-[11px] border-b border-white/10">
                         <tr>
                           <th className="p-3.5">Ukuran</th>
                           <th className="p-3.5">Lebar Dada (cm)</th>
@@ -1476,7 +1464,7 @@ export default function ProductDetail() {
                           <th className="p-3.5">Rekomendasi BB (kg)</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-slate-100 font-medium text-slate-700">
+                      <tbody className="divide-y divide-white/5 font-mono text-slate-200">
                         {[
                           { size: "S", chest: "48", length: "68", tb: "155 - 165", bb: "50 - 60" },
                           { size: "M", chest: "50", length: "70", tb: "160 - 170", bb: "58 - 68" },
@@ -1487,14 +1475,14 @@ export default function ProductDetail() {
                         ].map((row) => (
                           <tr
                             key={row.size}
-                            className={`transition hover:bg-emerald-50/40 ${
-                              selectedSize === row.size ? "bg-emerald-50/80 font-bold text-emerald-900" : ""
+                            className={`transition hover:bg-white/5 ${
+                              selectedSize === row.size ? "bg-emerald-500/15 text-emerald-300 font-bold border-l-2 border-emerald-400" : ""
                             }`}
                           >
                             <td className="p-3.5 font-bold flex items-center gap-1.5">
-                              <span>{row.size}</span>
+                              <span className="text-white">{row.size}</span>
                               {selectedSize === row.size && (
-                                <span className="rounded-full bg-emerald-600 text-white text-[9px] px-1.5 py-0.5">
+                                <span className="rounded-full bg-emerald-400/20 text-emerald-300 text-[9px] font-mono uppercase px-2 py-0.5 border border-emerald-400/30">
                                   Pilihan Anda
                                 </span>
                               )}
@@ -1509,15 +1497,15 @@ export default function ProductDetail() {
                     </table>
                   </div>
 
-                  <div className="rounded-2xl border border-amber-200/80 bg-amber-50/60 p-4 text-xs text-amber-900 space-y-1.5">
-                    <p className="font-bold flex items-center gap-1.5">
-                      <Info size={14} className="text-amber-600" />
-                      Tips Pengukuran Jersey & Pakaian:
+                  <div className="rounded-2xl border border-amber-400/20 bg-amber-400/5 p-4 text-xs text-amber-200/90 space-y-1.5 font-mono">
+                    <p className="font-bold flex items-center gap-1.5 text-amber-300 uppercase tracking-wider text-[11px]">
+                      <Info size={14} className="text-amber-400 shrink-0" />
+                      Tips Pengukuran Jersey &amp; Pakaian:
                     </p>
-                    <ul className="list-disc list-inside space-y-1 text-slate-600 pl-1 text-[11px]">
-                      <li>Ukur <strong>Lebar Dada</strong> dari bawah ketiak kiri ke ketiak kanan secara mendatar pada baju yang pas Anda pakai.</li>
-                      <li>Toleransi jahit manual sekitar <strong>&plusmn; 1-2 cm</strong>.</li>
-                      <li>Untuk gaya <em>loose fit</em> atau bernapas lega saat berolahraga, Anda dapat memilih 1 tingkat di atas ukuran standar.</li>
+                    <ul className="list-disc list-inside space-y-1 text-slate-300 pl-1 text-[11px] font-sans">
+                      <li>Ukur <strong className="text-white">Lebar Dada</strong> dari bawah ketiak kiri ke ketiak kanan secara mendatar pada jersey favorit Anda.</li>
+                      <li>Toleransi jahit manual atelier sekitar <strong className="text-white">&plusmn; 1-2 cm</strong>.</li>
+                      <li>Untuk gaya <em>loose fit</em> saat bertanding intensif, Anda dapat memilih 1 ukuran di atas rekomendasi.</li>
                     </ul>
                   </div>
                 </div>
@@ -1526,9 +1514,9 @@ export default function ProductDetail() {
               {/* Tab 2: Shoes */}
               {activeChartTab === "shoes" && (
                 <div className="space-y-4">
-                  <div className="overflow-x-auto rounded-2xl border border-slate-200">
+                  <div className="overflow-x-auto rounded-2xl border border-white/10 bg-black/30">
                     <table className="w-full text-left text-xs">
-                      <thead className="bg-slate-50 text-slate-700 font-bold uppercase tracking-wider border-b border-slate-200">
+                      <thead className="bg-white/10 text-emerald-400 font-mono font-bold uppercase tracking-wider text-[11px] border-b border-white/10">
                         <tr>
                           <th className="p-3.5">Size (EU)</th>
                           <th className="p-3.5">Panjang Kaki (cm)</th>
@@ -1536,7 +1524,7 @@ export default function ProductDetail() {
                           <th className="p-3.5">UK</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-slate-100 font-medium text-slate-700">
+                      <tbody className="divide-y divide-white/5 font-mono text-slate-200">
                         {[
                           { eu: "39", cm: "24.5", us: "6.5", uk: "5.5" },
                           { eu: "40", cm: "25.0", us: "7.0", uk: "6.0" },
@@ -1548,14 +1536,14 @@ export default function ProductDetail() {
                         ].map((row) => (
                           <tr
                             key={row.eu}
-                            className={`transition hover:bg-emerald-50/40 ${
-                              selectedSize === row.eu ? "bg-emerald-50/80 font-bold text-emerald-900" : ""
+                            className={`transition hover:bg-white/5 ${
+                              selectedSize === row.eu ? "bg-emerald-500/15 text-emerald-300 font-bold border-l-2 border-emerald-400" : ""
                             }`}
                           >
                             <td className="p-3.5 font-bold flex items-center gap-1.5">
-                              <span>EU {row.eu}</span>
+                              <span className="text-white">EU {row.eu}</span>
                               {selectedSize === row.eu && (
-                                <span className="rounded-full bg-emerald-600 text-white text-[9px] px-1.5 py-0.5">
+                                <span className="rounded-full bg-emerald-400/20 text-emerald-300 text-[9px] font-mono uppercase px-2 py-0.5 border border-emerald-400/30">
                                   Pilihan Anda
                                 </span>
                               )}
@@ -1569,15 +1557,15 @@ export default function ProductDetail() {
                     </table>
                   </div>
 
-                  <div className="rounded-2xl border border-amber-200/80 bg-amber-50/60 p-4 text-xs text-amber-900 space-y-1.5">
-                    <p className="font-bold flex items-center gap-1.5">
-                      <Info size={14} className="text-amber-600" />
+                  <div className="rounded-2xl border border-amber-400/20 bg-amber-400/5 p-4 text-xs text-amber-200/90 space-y-1.5 font-mono">
+                    <p className="font-bold flex items-center gap-1.5 text-amber-300 uppercase tracking-wider text-[11px]">
+                      <Info size={14} className="text-amber-400 shrink-0" />
                       Tips Pengukuran Telapak Kaki:
                     </p>
-                    <ul className="list-disc list-inside space-y-1 text-slate-600 pl-1 text-[11px]">
-                      <li>Letakkan tumit merapat ke dinding di atas selembar kertas putih tegak lurus.</li>
-                      <li>Tandai ujung jari kaki terpanjang Anda dengan pensil.</li>
-                      <li>Ukur jaraknya dan tambahkan <strong>0.5 cm</strong> untuk kenyamanan saat menggunakan kaos kaki olahraga tebal.</li>
+                    <ul className="list-disc list-inside space-y-1 text-slate-300 pl-1 text-[11px] font-sans">
+                      <li>Letakkan tumit merapat ke dinding di atas kertas putih tegak lurus.</li>
+                      <li>Tandai ujung jari kaki terpanjang dengan pensil lalu ukur panjangnya dalam cm.</li>
+                      <li>Tambahkan <strong className="text-white">0.5 cm</strong> untuk ruang gerak saat mengenakan kaos kaki tebal.</li>
                     </ul>
                   </div>
                 </div>
@@ -1587,62 +1575,62 @@ export default function ProductDetail() {
               {activeChartTab === "equipment" && (
                 <div className="space-y-4">
                   <div className="grid gap-3 sm:grid-cols-2">
-                    <div className="rounded-2xl border border-slate-200 bg-slate-50/50 p-4">
-                      <span className="inline-block rounded-lg bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 mb-1.5">
-                        Sepakbola Lapangan Besar
+                    <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+                      <span className="inline-block rounded-lg bg-emerald-400/20 text-emerald-300 text-[10px] font-mono font-bold uppercase tracking-wider px-2 py-0.5 mb-1.5 border border-emerald-400/30">
+                        Sepakbola Lapangan
                       </span>
-                      <h4 className="font-bold text-slate-900 text-sm">Bola Size 5 (Resmi FIFA)</h4>
-                      <p className="text-xs text-slate-600 mt-1">
-                        Keliling 68-70 cm, berat 410-450 gr. Standar kompetisi usia 12 tahun ke atas hingga dewasa profesional.
+                      <h4 className="font-condensed text-base font-bold text-white uppercase tracking-wide">Bola Size 5 (Resmi FIFA)</h4>
+                      <p className="text-xs text-slate-300 mt-1 font-mono">
+                        Keliling 68-70 cm, berat 410-450 gr. Standar kompetisi usia 12 tahun ke atas hingga level profesional.
                       </p>
                     </div>
 
-                    <div className="rounded-2xl border border-slate-200 bg-slate-50/50 p-4">
-                      <span className="inline-block rounded-lg bg-blue-100 text-blue-800 text-[10px] font-bold px-2 py-0.5 mb-1.5">
-                        Futsal & Indoor
+                    <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+                      <span className="inline-block rounded-lg bg-sky-400/20 text-sky-300 text-[10px] font-mono font-bold uppercase tracking-wider px-2 py-0.5 mb-1.5 border border-sky-400/30">
+                        Futsal &amp; Indoor
                       </span>
-                      <h4 className="font-bold text-slate-900 text-sm">Bola Size 4 (Standar Futsal)</h4>
-                      <p className="text-xs text-slate-600 mt-1">
+                      <h4 className="font-condensed text-base font-bold text-white uppercase tracking-wide">Bola Size 4 (Standar Futsal)</h4>
+                      <p className="text-xs text-slate-300 mt-1 font-mono">
                         Keliling 62-64 cm, berat 400-440 gr. Pantulan rendah (low bounce) khusus lapangan indoor/sintetis.
                       </p>
                     </div>
 
-                    <div className="rounded-2xl border border-slate-200 bg-slate-50/50 p-4">
-                      <span className="inline-block rounded-lg bg-amber-100 text-amber-800 text-[10px] font-bold px-2 py-0.5 mb-1.5">
+                    <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+                      <span className="inline-block rounded-lg bg-amber-400/20 text-amber-300 text-[10px] font-mono font-bold uppercase tracking-wider px-2 py-0.5 mb-1.5 border border-amber-400/30">
                         Bola Basket
                       </span>
-                      <h4 className="font-bold text-slate-900 text-sm">Size 7 (Pria) & Size 6 (Wanita)</h4>
-                      <p className="text-xs text-slate-600 mt-1">
-                        Size 7 standar resmi kompetisi pria SMA/kuliah/FIBA. Size 6 untuk wanita & remaja usia 12-14 tahun.
+                      <h4 className="font-condensed text-base font-bold text-white uppercase tracking-wide">Size 7 (Pria) &amp; Size 6 (Wanita)</h4>
+                      <p className="text-xs text-slate-300 mt-1 font-mono">
+                        Size 7 standar resmi kompetisi pria SMA/kuliah/FIBA. Size 6 untuk wanita &amp; remaja usia 12-14 tahun.
                       </p>
                     </div>
 
-                    <div className="rounded-2xl border border-slate-200 bg-slate-50/50 p-4">
-                      <span className="inline-block rounded-lg bg-purple-100 text-purple-800 text-[10px] font-bold px-2 py-0.5 mb-1.5">
-                        Sarung Tangan Kiper & Deker
+                    <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+                      <span className="inline-block rounded-lg bg-purple-400/20 text-purple-300 text-[10px] font-mono font-bold uppercase tracking-wider px-2 py-0.5 mb-1.5 border border-purple-400/30">
+                        Perlengkapan Kiper &amp; Deker
                       </span>
-                      <h4 className="font-bold text-slate-900 text-sm">Size 8 - 11 & Shin Guard M/L</h4>
-                      <p className="text-xs text-slate-600 mt-1">
-                        Size 8 (telapak 18cm), Size 9 (telapak 19cm), Size 10 (telapak 20cm). Deker M (&lt;170cm), L (&gt;170cm).
+                      <h4 className="font-condensed text-base font-bold text-white uppercase tracking-wide">Size 8 - 11 &amp; Shin Guard M/L</h4>
+                      <p className="text-xs text-slate-300 mt-1 font-mono">
+                        Size 8 (telapak 18cm), Size 9 (19cm), Size 10 (20cm). Deker M (&lt;170cm), L (&gt;170cm).
                       </p>
                     </div>
                   </div>
 
-                  <div className="rounded-2xl border border-slate-200 bg-slate-50/50 p-4 text-xs text-slate-600">
-                    <p className="font-bold text-slate-800 mb-1">Aksesoris & Tas Olahraga:</p>
-                    <p className="text-[11px] leading-relaxed">
-                      Kategori tas ransel gym, duffle bag, kaos kaki, dan botol minum RegarSport berukuran <strong>All Size</strong> yang dirancang universal dan ergonomis.
+                  <div className="rounded-2xl border border-white/10 bg-white/5 p-4 text-xs text-slate-300 font-mono">
+                    <p className="font-bold text-white mb-1 uppercase tracking-wider text-[11px]">Aksesoris &amp; Tas Olahraga:</p>
+                    <p className="text-[11px] leading-relaxed text-slate-400">
+                      Kategori tas ransel gym, duffle bag, kaos kaki, dan botol minum RegarSport berukuran <strong className="text-white">All Size</strong> dengan konstruksi ergonomis.
                     </p>
                   </div>
                 </div>
               )}
 
               {/* Modal Footer */}
-              <div className="mt-6 flex justify-end">
+              <div className="pt-2 flex justify-end">
                 <button
                   type="button"
                   onClick={() => setShowSizeChart(false)}
-                  className="rounded-xl bg-emerald-600 px-6 py-2.5 text-xs font-bold text-white shadow-md shadow-emerald-600/20 transition hover:bg-emerald-700 active:scale-95"
+                  className="rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 px-6 py-2.5 text-xs font-mono font-bold uppercase tracking-wider text-white transition active:scale-95 cursor-pointer"
                 >
                   Tutup Panduan
                 </button>

@@ -61,7 +61,10 @@ public class MidtransService {
                 customerDetails.put("email", (customerEmail != null && !customerEmail.isBlank()) ? customerEmail : "customer@regarsport.com");
 
                 Map<String, Object> callbacks = new HashMap<>();
-                callbacks.put("finish", (frontendUrl != null ? frontendUrl : "http://localhost:5173") + "/dashboard/my-orders");
+                String baseUrl = (frontendUrl != null && !frontendUrl.isBlank()) ? frontendUrl : "http://localhost:5173";
+                callbacks.put("finish", baseUrl + "/dashboard/my-orders");
+                callbacks.put("unfinish", baseUrl + "/dashboard/my-orders");
+                callbacks.put("error", baseUrl + "/dashboard/my-orders");
 
                 Map<String, Object> requestBody = new HashMap<>();
                 requestBody.put("transaction_details", transactionDetails);
@@ -89,6 +92,31 @@ public class MidtransService {
                     if (token != null && !token.isBlank()) {
                         log.info("Successfully received official Snap token from Midtrans: {}", token);
                         return new SnapResult(token, redirectUrl);
+                    }
+                } else if (response.statusCode() == 400 && response.body().contains("order_id")) {
+                    log.info("Order ID already taken in Midtrans, retrying with unique suffix for order: {}", orderNumber);
+                    String retryOrderId = orderNumber + "-R" + (System.currentTimeMillis() % 10000);
+                    transactionDetails.put("order_id", retryOrderId);
+                    String retryJson = objectMapper.writeValueAsString(requestBody);
+                    HttpRequest retryRequest = HttpRequest.newBuilder()
+                            .uri(URI.create(snapApiUrl))
+                            .header("Content-Type", "application/json")
+                            .header("Accept", "application/json")
+                            .header("Authorization", authHeader)
+                            .timeout(Duration.ofSeconds(15))
+                            .POST(HttpRequest.BodyPublishers.ofString(retryJson, StandardCharsets.UTF_8))
+                            .build();
+                    HttpResponse<String> retryResponse = httpClient.send(retryRequest, HttpResponse.BodyHandlers.ofString());
+                    if (retryResponse.statusCode() >= 200 && retryResponse.statusCode() < 300) {
+                        JsonNode root = objectMapper.readTree(retryResponse.body());
+                        String token = root.path("token").asText();
+                        String redirectUrl = root.path("redirect_url").asText();
+                        if (token != null && !token.isBlank()) {
+                            log.info("Successfully received Snap token from retry: {}", token);
+                            return new SnapResult(token, redirectUrl);
+                        }
+                    } else {
+                        log.warn("Midtrans Snap retry failed with HTTP {}: {}", retryResponse.statusCode(), retryResponse.body());
                     }
                 } else {
                     log.warn("Midtrans Snap API returned HTTP {}: {}", response.statusCode(), response.body());

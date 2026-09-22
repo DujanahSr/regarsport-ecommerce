@@ -3,7 +3,7 @@ import {
   Zap,
   Award,
   MapPin,
-  Sparkles,
+  Layers,
   ArrowRight,
   Printer,
   Shirt,
@@ -136,7 +136,7 @@ export default function About() {
               <div className="space-y-4">
                 <div className="flex items-start gap-4">
                   <div className="rounded-xl bg-white/10 p-2.5 text-emerald-400 shrink-0">
-                    <Sparkles size={20} />
+                    <Layers size={20} />
                   </div>
                   <div>
                     <h3 className="font-condensed text-base font-bold uppercase tracking-wider text-white">
