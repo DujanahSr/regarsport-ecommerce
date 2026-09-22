@@ -222,30 +222,26 @@ export default function WarrantyClaims() {
   }, [claims]);
 
   return (
-    <div className={isLogistics ? "space-y-8 animate-in fade-in duration-300 pb-12" : "min-h-screen bg-[#0D0D0D] pb-12"}>
+    <div className="space-y-8 animate-in fade-in duration-300 pb-12">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-4">
-          <div className={`p-3.5 rounded-2xl ${isLogistics ? "bg-[#162018] text-white shadow-sm" : "bg-emerald-500/10 border border-emerald-500/30 text-emerald-400"}`}>
+          <div className="p-3.5 rounded-2xl bg-[#162018] text-white shadow-sm shrink-0">
             <ShieldCheck size={32} />
           </div>
           <div>
             <div className="flex items-center gap-2 mb-1">
-              <span className={`px-2.5 py-0.5 rounded-md font-mono text-[10px] font-black tracking-widest ${
-                isLogistics ? "bg-[#162018] text-[#FAF8F4]" : "bg-emerald-500/20 text-emerald-300 border border-emerald-500/40"
-              }`}>
+              <span className="px-2.5 py-0.5 rounded-md font-mono text-[10px] font-black tracking-widest bg-[#162018] text-[#FAF8F4]">
                 {isLogistics ? "RS // WARRANTY DISPATCH" : "RS // WARRANTY CENTER"}
               </span>
-              <span className={`text-[11px] font-mono uppercase tracking-widest ${isLogistics ? "text-stone-500" : "text-slate-400"}`}>
+              <span className="text-[11px] font-mono uppercase tracking-widest text-stone-500">
                 {isLogistics ? "INSPEKSI FISIK & PENGGANTIAN RESMI" : "VERIFIKASI KLAIM PELANGGAN"}
               </span>
             </div>
-            <h1 className={`font-['Barlow_Condensed'] font-black text-3xl sm:text-4xl uppercase tracking-tight leading-none ${
-              isLogistics ? "text-slate-900" : "text-white"
-            }`}>
+            <h1 className="font-['Barlow_Condensed'] font-black text-3xl sm:text-4xl uppercase tracking-tight leading-none text-slate-900">
               {isLogistics ? "RETUR & PENGGANTIAN GARANSI" : "KLAIM GARANSI & RETUR"}
             </h1>
-            <p className={`text-xs sm:text-sm mt-1.5 ${isLogistics ? "text-stone-500" : "text-slate-400"}`}>
+            <p className="text-xs sm:text-sm mt-1.5 text-stone-500">
               {isLogistics
                 ? "Pemeriksaan paket retur masuk, pengepakan tukar ukuran, dan pengiriman resi pengganti"
                 : "Verifikasi tiket kendala pelanggan, validasi bukti foto, dan persetujuan klaim garansi"}
@@ -256,11 +252,7 @@ export default function WarrantyClaims() {
         <button
           onClick={fetchClaims}
           disabled={loading}
-          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition active:scale-95 cursor-pointer self-start md:self-auto ${
-            isLogistics
-              ? "bg-white hover:bg-stone-100 text-stone-700 border border-stone-200 shadow-xs"
-              : "bg-[#14141E] border border-white/10 hover:border-white/20 text-slate-300 hover:text-white"
-          }`}
+          className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition active:scale-95 cursor-pointer self-start md:self-auto bg-white hover:bg-stone-100 text-stone-700 border border-stone-200 shadow-xs"
         >
           <RefreshCw size={14} className={loading ? "animate-spin" : ""} />
           <span>Segarkan Data</span>
@@ -268,66 +260,58 @@ export default function WarrantyClaims() {
       </div>
 
       {/* KPI Stats Bar */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
-        <div className={`p-5 rounded-3xl border flex items-center gap-3.5 shadow-sm ${
-          isLogistics ? "bg-white border-stone-200/80" : "bg-[#14141E] border-white/5"
-        }`}>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        <div className="p-5 rounded-3xl border flex items-center gap-3.5 shadow-xs bg-white border-stone-200/80">
           <div className="w-10 h-10 rounded-2xl bg-amber-50 border border-amber-200 text-amber-800 flex items-center justify-center shrink-0">
             <Clock size={20} />
           </div>
           <div>
-            <div className={`text-2xl font-black font-['Barlow_Condensed'] ${isLogistics ? "text-slate-900" : "text-white"}`}>
+            <div className="text-2xl font-black font-['Barlow_Condensed'] text-slate-900">
               {stats.pending}
             </div>
-            <div className={`text-[11px] font-semibold ${isLogistics ? "text-stone-500" : "text-slate-400"}`}>
+            <div className="text-[11px] font-semibold text-stone-500">
               Menunggu Verifikasi CS
             </div>
           </div>
         </div>
 
-        <div className={`p-5 rounded-3xl border flex items-center gap-3.5 shadow-sm ${
-          isLogistics ? "bg-white border-stone-200/80" : "bg-[#14141E] border-white/5"
-        }`}>
+        <div className="p-5 rounded-3xl border flex items-center gap-3.5 shadow-xs bg-white border-stone-200/80">
           <div className="w-10 h-10 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 flex items-center justify-center shrink-0">
             <CheckCircle2 size={20} />
           </div>
           <div>
-            <div className={`text-2xl font-black font-['Barlow_Condensed'] ${isLogistics ? "text-slate-900" : "text-white"}`}>
+            <div className="text-2xl font-black font-['Barlow_Condensed'] text-slate-900">
               {stats.approved}
             </div>
-            <div className={`text-[11px] font-semibold ${isLogistics ? "text-stone-500" : "text-slate-400"}`}>
+            <div className="text-[11px] font-semibold text-stone-500">
               Disetujui / Siap Kirim
             </div>
           </div>
         </div>
 
-        <div className={`p-5 rounded-3xl border flex items-center gap-3.5 shadow-sm ${
-          isLogistics ? "bg-white border-stone-200/80" : "bg-[#14141E] border-white/5"
-        }`}>
+        <div className="p-5 rounded-3xl border flex items-center gap-3.5 shadow-xs bg-white border-stone-200/80">
           <div className="w-10 h-10 rounded-2xl bg-stone-100 border border-stone-200 text-stone-800 flex items-center justify-center shrink-0">
             <Layers size={20} />
           </div>
           <div>
-            <div className={`text-2xl font-black font-['Barlow_Condensed'] ${isLogistics ? "text-slate-900" : "text-white"}`}>
+            <div className="text-2xl font-black font-['Barlow_Condensed'] text-slate-900">
               {stats.processing}
             </div>
-            <div className={`text-[11px] font-semibold ${isLogistics ? "text-stone-500" : "text-slate-400"}`}>
+            <div className="text-[11px] font-semibold text-stone-500">
               Diproses di Gudang
             </div>
           </div>
         </div>
 
-        <div className={`p-5 rounded-3xl border flex items-center gap-3.5 shadow-sm ${
-          isLogistics ? "bg-white border-stone-200/80" : "bg-[#14141E] border-white/5"
-        }`}>
+        <div className="p-5 rounded-3xl border flex items-center gap-3.5 shadow-xs bg-white border-stone-200/80">
           <div className="w-10 h-10 rounded-2xl bg-stone-100 border border-stone-200 text-stone-800 flex items-center justify-center shrink-0">
             <Truck size={20} />
           </div>
           <div>
-            <div className={`text-2xl font-black font-['Barlow_Condensed'] ${isLogistics ? "text-slate-900" : "text-white"}`}>
+            <div className="text-2xl font-black font-['Barlow_Condensed'] text-slate-900">
               {stats.resolved}
             </div>
-            <div className={`text-[11px] font-semibold ${isLogistics ? "text-stone-500" : "text-slate-400"}`}>
+            <div className="text-[11px] font-semibold text-stone-500">
               Pengganti Terkirim / Selesai
             </div>
           </div>
@@ -335,7 +319,7 @@ export default function WarrantyClaims() {
       </div>
 
       {/* Filter Tabs & Search */}
-      <div className="space-y-4 mb-6">
+      <div className="space-y-4">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div className="flex items-center gap-2 overflow-x-auto pb-2 no-scrollbar">
             {[
@@ -347,31 +331,6 @@ export default function WarrantyClaims() {
               { label: "Ditolak", value: "REJECTED" },
             ].map((tab) => {
               const isActive = (statusFilter || "").toUpperCase() === tab.value;
-              if (isLogistics) {
-                return (
-                  <button
-                    key={tab.value}
-                    onClick={() => {
-                      setPage(1);
-                      setStatusFilter(tab.value);
-                    }}
-                    className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${
-                      isActive
-                        ? "bg-[#111613] text-white shadow-md"
-                        : "bg-white text-stone-600 hover:text-black hover:bg-stone-100 border border-stone-200"
-                    }`}
-                  >
-                    <span>{tab.label}</span>
-                    {tab.badge && (
-                      <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${
-                        isActive ? "bg-white/20 text-white" : "bg-amber-50 text-amber-800 border border-amber-200"
-                      }`}>
-                        {tab.badge}
-                      </span>
-                    )}
-                  </button>
-                );
-              }
               return (
                 <button
                   key={tab.value}
@@ -379,19 +338,17 @@ export default function WarrantyClaims() {
                     setPage(1);
                     setStatusFilter(tab.value);
                   }}
-                  className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${
+                  className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${
                     isActive
-                      ? "bg-[#00BFA5] text-black shadow-lg shadow-[#00BFA5]/25"
-                      : "bg-[#14141E] text-slate-400 hover:text-white hover:bg-white/5 border border-white/5"
+                      ? "bg-[#111613] text-white shadow-md"
+                      : "bg-white text-stone-600 hover:text-black hover:bg-stone-100 border border-stone-200"
                   }`}
                 >
                   <span>{tab.label}</span>
                   {tab.badge && (
-                    <span
-                      className={`text-[10px] px-1.5 py-0.5 rounded-full font-black ${
-                        isActive ? "bg-black/20 text-black" : "bg-amber-500/20 text-amber-400"
-                      }`}
-                    >
+                    <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${
+                      isActive ? "bg-white/20 text-white" : "bg-amber-50 text-amber-800 border border-amber-200"
+                    }`}>
                       {tab.badge}
                     </span>
                   )}
@@ -408,29 +365,23 @@ export default function WarrantyClaims() {
               placeholder="Cari Tiket, Order, Produk..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className={`w-full pl-10 pr-4 py-2.5 rounded-full text-xs outline-none transition font-mono ${
-                isLogistics
-                  ? "bg-white border border-stone-200 text-slate-900 placeholder:text-stone-400 focus:border-[#162018]"
-                  : "bg-[#14141E] border border-white/10 text-white placeholder-slate-500 focus:border-[#00BFA5]"
-              }`}
+              className="w-full pl-10 pr-4 py-2.5 rounded-full text-xs outline-hidden transition font-mono bg-white border border-stone-200/80 text-slate-900 placeholder:text-stone-400 focus:border-[#B9382B] focus:ring-1 focus:ring-[#B9382B] shadow-xs"
             />
           </div>
         </div>
       </div>
 
       {/* Main Table */}
-      <div className={`rounded-3xl overflow-hidden shadow-sm ${
-        isLogistics ? "bg-white border border-stone-200/80" : "bg-[#14141E] border border-white/10 shadow-xl"
-      }`}>
+      <div className="rounded-3xl overflow-hidden shadow-xs bg-white border border-stone-200/80">
         {loading ? (
           <div className="py-20 flex flex-col items-center justify-center text-center">
-            <RefreshCw size={32} className={`animate-spin mb-3 ${isLogistics ? "text-slate-800" : "text-[#00BFA5]"}`} />
-            <p className={`text-sm ${isLogistics ? "text-stone-500" : "text-slate-400"}`}>Memuat data klaim garansi...</p>
+            <RefreshCw size={32} className="animate-spin mb-3 text-[#B9382B]" />
+            <p className="text-sm text-stone-500 font-semibold">Memuat data klaim garansi...</p>
           </div>
         ) : filteredClaims.length === 0 ? (
           <div className="py-20 px-4 text-center">
-            <ShieldCheck size={48} className="text-stone-400 mx-auto mb-3" />
-            <h3 className={`text-base font-bold mb-1 ${isLogistics ? "text-slate-900" : "text-white"}`}>Tidak Ada Tiket Klaim</h3>
+            <ShieldCheck size={48} className="text-stone-300 mx-auto mb-3" />
+            <h3 className="text-base font-bold mb-1 text-slate-900">Tidak Ada Tiket Klaim</h3>
             <p className="text-xs text-stone-500 max-w-sm mx-auto">
               {statusFilter
                 ? `Tidak ditemukan tiket klaim dengan status "${statusFilter}".`
@@ -441,9 +392,7 @@ export default function WarrantyClaims() {
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse text-xs">
               <thead>
-                <tr className={`border-b font-bold uppercase tracking-wider text-[11px] ${
-                  isLogistics ? "bg-stone-50 border-stone-200 text-stone-600" : "border-white/10 bg-white/[0.02] text-slate-400"
-                }`}>
+                <tr className="border-b font-bold uppercase tracking-wider text-[11px] bg-stone-50/70 border-stone-200 text-stone-600">
                   <th className="py-4 px-5">Tiket Klaim &amp; Tanggal</th>
                   <th className="py-4 px-5">No. Pesanan &amp; Pemesan</th>
                   <th className="py-4 px-5">Produk &amp; Solusi</th>
@@ -453,7 +402,7 @@ export default function WarrantyClaims() {
                   <th className="py-4 px-5 text-right">Aksi</th>
                 </tr>
               </thead>
-              <tbody className={`divide-y ${isLogistics ? "divide-stone-100" : "divide-white/5"}`}>
+              <tbody className="divide-y divide-stone-100">
                 {filteredClaims.map((claim) => {
                   const statusInfo = statusConfig[claim.status] || statusConfig.PENDING;
                   const StatusIcon = statusInfo.icon;
@@ -475,35 +424,35 @@ export default function WarrantyClaims() {
                   return (
                     <tr
                       key={claim.id || claim.claimNumber}
-                      className="hover:bg-white/[0.02] transition-colors group"
+                      className="hover:bg-stone-50/60 transition-colors group"
                     >
                       {/* Ticket Number & Date */}
                       <td className="py-4 px-5">
                         <div className="flex items-center gap-1.5">
-                          <span className="font-mono font-bold text-[#00BFA5] text-sm">
+                          <span className="font-mono font-bold text-[#B9382B] text-sm">
                             #{claim.claimNumber}
                           </span>
                           <button
                             onClick={() => handleCopy(claim.claimNumber, "No. Tiket")}
-                            className="text-slate-500 hover:text-white p-1 rounded transition cursor-pointer"
+                            className="text-stone-400 hover:text-slate-900 p-1 rounded-md transition cursor-pointer"
                             title="Salin Tiket"
                           >
                             {copiedText === "No. Tiket" ? (
-                              <Check size={12} className="text-emerald-400" />
+                              <Check size={12} className="text-emerald-600" />
                             ) : (
                               <Copy size={12} />
                             )}
                           </button>
                         </div>
-                        <div className="text-[10px] text-slate-500 mt-0.5">{dateStr}</div>
+                        <div className="text-[10px] text-stone-400 font-mono mt-0.5">{dateStr}</div>
                       </td>
 
                       {/* Order Number & User */}
                       <td className="py-4 px-5">
-                        <div className="font-mono font-semibold text-slate-200">
+                        <div className="font-mono font-bold text-slate-800">
                           {claim.orderNumber || `#${claim.orderId}`}
                         </div>
-                        <div className="text-[10px] text-slate-500 mt-0.5">
+                        <div className="text-[10px] text-stone-400 font-mono mt-0.5">
                           User ID: #{claim.userId}
                         </div>
                       </td>
@@ -514,16 +463,16 @@ export default function WarrantyClaims() {
                           <img
                             src={claim.productImage || "https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=100"}
                             alt={claim.productName}
-                            className="w-10 h-10 rounded-lg object-cover bg-black/40 border border-white/10 shrink-0"
+                            className="w-10 h-10 rounded-xl object-cover bg-stone-100 border border-stone-200 shrink-0"
                           />
                           <div className="min-w-0">
-                            <div className="font-bold text-slate-200 truncate" title={claim.productName}>
+                            <div className="font-bold text-slate-900 truncate" title={claim.productName}>
                               {claim.productName}
                             </div>
-                            <div className="flex items-center gap-1 text-[11px] text-amber-300 font-semibold mt-0.5">
+                            <div className="flex items-center gap-1 text-[11px] text-stone-600 font-semibold mt-0.5">
                               <span>{solutionLabels[claim.solution] || claim.solution}</span>
                               {claim.requestedSize && (
-                                <span className="bg-amber-500/20 text-amber-300 px-1.5 py-0.2 rounded text-[10px] font-mono">
+                                <span className="bg-[#FAF0ED] text-[#B9382B] border border-[#B9382B]/20 px-1.5 py-0.2 rounded-md text-[10px] font-mono font-bold">
                                   Size {claim.requestedSize}
                                 </span>
                               )}
@@ -541,7 +490,7 @@ export default function WarrantyClaims() {
                                 key={i}
                                 type="button"
                                 onClick={() => setPreviewImage(img)}
-                                className="relative w-9 h-9 rounded-lg overflow-hidden border border-white/10 hover:border-[#00BFA5] transition group/img cursor-pointer"
+                                className="relative w-9 h-9 rounded-xl overflow-hidden border border-stone-200 hover:border-[#B9382B] transition group/img cursor-pointer shadow-xs"
                               >
                                 <img src={img} alt="Bukti" className="w-full h-full object-cover" />
                                 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/img:opacity-100 flex items-center justify-center transition">
@@ -550,13 +499,13 @@ export default function WarrantyClaims() {
                               </button>
                             ))}
                             {evidenceUrls.length > 2 && (
-                              <span className="text-[10px] text-slate-400 font-bold bg-white/5 px-1.5 py-1 rounded">
+                              <span className="text-[10px] text-stone-600 font-bold bg-stone-100 px-1.5 py-1 rounded-md">
                                 +{evidenceUrls.length - 2}
                               </span>
                             )}
                           </div>
                         ) : (
-                          <span className="text-[10px] text-slate-500 italic">Tanpa foto</span>
+                          <span className="text-[10px] text-stone-400 italic">Tanpa foto</span>
                         )}
                       </td>
 
@@ -574,19 +523,19 @@ export default function WarrantyClaims() {
                       <td className="py-4 px-5">
                         {claim.replacementTrackingNumber ? (
                           <div className="space-y-0.5">
-                            <div className="font-mono text-xs font-bold text-emerald-400 flex items-center gap-1">
+                            <div className="font-mono text-xs font-bold text-emerald-700 flex items-center gap-1">
                               <span>{claim.replacementTrackingNumber}</span>
                               <button
                                 onClick={() => handleCopy(claim.replacementTrackingNumber, "Resi Pengganti")}
-                                className="text-slate-500 hover:text-white p-0.5 rounded cursor-pointer"
+                                className="text-stone-400 hover:text-slate-800 p-0.5 rounded-md cursor-pointer"
                               >
                                 <Copy size={11} />
                               </button>
                             </div>
-                            <span className="text-[10px] text-slate-400">Pengganti Terkirim</span>
+                            <span className="text-[10px] text-stone-500 font-medium">Pengganti Terkirim</span>
                           </div>
                         ) : (
-                          <span className="text-slate-500 text-[11px]">-</span>
+                          <span className="text-stone-400 text-[11px]">-</span>
                         )}
                       </td>
 
@@ -595,7 +544,7 @@ export default function WarrantyClaims() {
                         <button
                           type="button"
                           onClick={() => handleOpenDetailModal(claim)}
-                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/5 hover:bg-[#00BFA5] text-slate-300 hover:text-black font-bold text-xs border border-white/10 hover:border-[#00BFA5] transition active:scale-95 cursor-pointer"
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-stone-100 hover:bg-[#162018] text-stone-700 hover:text-white font-bold text-xs border border-stone-200 transition active:scale-95 cursor-pointer shadow-xs"
                         >
                           <Eye size={13} />
                           <span>Tinjau</span>
@@ -611,7 +560,7 @@ export default function WarrantyClaims() {
 
         {/* Pagination Footer */}
         {totalPages > 1 && (
-          <div className="p-4 border-t border-white/5 flex items-center justify-between text-xs text-slate-400">
+          <div className="p-4 border-t border-stone-100 flex items-center justify-between text-xs text-stone-500">
             <div>
               Menampilkan {filteredClaims.length} dari total {totalElements} tiket klaim
             </div>
@@ -619,17 +568,17 @@ export default function WarrantyClaims() {
               <button
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
                 disabled={page <= 1}
-                className="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 disabled:opacity-40 disabled:hover:bg-white/5 text-white font-bold transition"
+                className="px-3 py-1.5 rounded-lg bg-stone-100 hover:bg-stone-200 disabled:opacity-40 text-stone-700 font-bold transition cursor-pointer"
               >
                 Sebelumnya
               </button>
-              <span className="px-2 font-bold text-white">
+              <span className="px-2 font-bold text-slate-800">
                 {page} / {totalPages}
               </span>
               <button
                 onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                 disabled={page >= totalPages}
-                className="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 disabled:opacity-40 disabled:hover:bg-white/5 text-white font-bold transition"
+                className="px-3 py-1.5 rounded-lg bg-stone-100 hover:bg-stone-200 disabled:opacity-40 text-stone-700 font-bold transition cursor-pointer"
               >
                 Selanjutnya
               </button>
@@ -640,33 +589,33 @@ export default function WarrantyClaims() {
 
       {/* Detail & Action Modal */}
       {activeClaim && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in">
-          <div className="bg-[#14141E] border border-white/10 rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl flex flex-col">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in">
+          <div className="bg-white border border-stone-200 rounded-3xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl flex flex-col text-slate-900">
             {/* Modal Header */}
-            <div className="p-5 border-b border-white/10 flex items-center justify-between sticky top-0 bg-[#14141E]/95 backdrop-blur-md z-10">
+            <div className="p-5 border-b border-stone-100 flex items-center justify-between sticky top-0 bg-white/95 backdrop-blur-md z-10">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-[#00BFA5]/10 border border-[#00BFA5]/20 text-[#00BFA5] flex items-center justify-center">
+                <div className="w-10 h-10 rounded-2xl bg-[#FAF0ED] border border-[#B9382B]/20 text-[#B9382B] flex items-center justify-center shadow-xs">
                   <ShieldCheck size={22} />
                 </div>
                 <div>
-                  <h3 className="text-base font-black text-white flex items-center gap-2">
+                  <h3 className="text-base font-black text-slate-900 flex items-center gap-2 font-['Barlow_Condensed'] uppercase tracking-wide">
                     <span>Tiket #{activeClaim.claimNumber}</span>
                     <span
-                      className={`text-[10px] px-2 py-0.5 rounded-full font-bold border ${
+                      className={`text-[10px] px-2.5 py-0.5 rounded-full font-bold border ${
                         (statusConfig[activeClaim.status] || statusConfig.PENDING).color
                       }`}
                     >
                       {(statusConfig[activeClaim.status] || statusConfig.PENDING).badge}
                     </span>
                   </h3>
-                  <p className="text-xs text-slate-400">
+                  <p className="text-xs text-stone-500 font-mono">
                     Order: {activeClaim.orderNumber || `#${activeClaim.orderId}`} &bull; Pemesan ID: #{activeClaim.userId}
                   </p>
                 </div>
               </div>
               <button
                 onClick={handleCloseModal}
-                className="p-2 text-slate-400 hover:text-white rounded-xl hover:bg-white/5 transition"
+                className="p-1.5 text-stone-400 hover:text-slate-900 rounded-xl hover:bg-stone-100 transition cursor-pointer"
               >
                 <X size={18} />
               </button>
@@ -675,22 +624,22 @@ export default function WarrantyClaims() {
             {/* Modal Body */}
             <div className="p-6 space-y-6 text-xs flex-1">
               {/* Product Info Card */}
-              <div className="p-4 rounded-xl bg-white/[0.02] border border-white/5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="p-4 rounded-2xl bg-stone-50 border border-stone-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div className="flex items-center gap-3.5">
                   <img
                     src={activeClaim.productImage || "https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=100"}
                     alt={activeClaim.productName}
-                    className="w-14 h-14 rounded-xl object-cover bg-black/40 border border-white/10 shrink-0"
+                    className="w-14 h-14 rounded-xl object-cover bg-white border border-stone-200 shrink-0"
                   />
                   <div>
-                    <h4 className="font-bold text-white text-sm">{activeClaim.productName}</h4>
-                    <p className="text-slate-400 mt-0.5">
-                      Kategori: <span className="text-slate-200">{categoryLabels[activeClaim.category] || activeClaim.category}</span>
+                    <h4 className="font-bold text-slate-900 text-sm">{activeClaim.productName}</h4>
+                    <p className="text-stone-500 mt-0.5">
+                      Kategori: <span className="text-slate-800 font-semibold">{categoryLabels[activeClaim.category] || activeClaim.category}</span>
                     </p>
-                    <p className="text-emerald-400 font-semibold mt-0.5">
+                    <p className="text-[#B9382B] font-bold mt-0.5">
                       Solusi: {solutionLabels[activeClaim.solution] || activeClaim.solution}
                       {activeClaim.requestedSize && (
-                        <span className="ml-1 text-white font-mono bg-emerald-500/20 px-1.5 py-0.5 rounded">
+                        <span className="ml-1 text-[#B9382B] font-mono bg-[#FAF0ED] px-1.5 py-0.5 rounded-md border border-[#B9382B]/20">
                           (Ukuran Baru: {activeClaim.requestedSize})
                         </span>
                       )}
@@ -701,18 +650,18 @@ export default function WarrantyClaims() {
 
               {/* Customer Complaint Description */}
               <div className="space-y-1.5">
-                <div className="text-slate-400 font-bold uppercase tracking-wider text-[11px] flex items-center gap-1.5">
-                  <MessageSquare size={13} className="text-[#00BFA5]" />
+                <div className="text-stone-700 font-bold uppercase tracking-wider text-[11px] flex items-center gap-1.5">
+                  <MessageSquare size={13} className="text-[#B9382B]" />
                   Keluhan / Alasan Pelanggan:
                 </div>
-                <div className="p-3.5 rounded-xl bg-white/[0.02] border border-white/5 text-slate-200 text-xs leading-relaxed italic">
+                <div className="p-3.5 rounded-2xl bg-stone-50 border border-stone-200 text-slate-800 text-xs leading-relaxed italic">
                   &ldquo;{activeClaim.description || "Tidak ada deskripsi tambahan."}&rdquo;
                 </div>
               </div>
 
               {/* Evidence Images Gallery */}
               <div className="space-y-2">
-                <div className="text-slate-400 font-bold uppercase tracking-wider text-[11px]">
+                <div className="text-stone-700 font-bold uppercase tracking-wider text-[11px]">
                   Foto Bukti Cacat / Ukuran (Cloudinary CDN):
                 </div>
                 {activeClaim.evidenceImages ? (
@@ -721,7 +670,7 @@ export default function WarrantyClaims() {
                       <div
                         key={idx}
                         onClick={() => setPreviewImage(img.trim())}
-                        className="group/thumb relative aspect-square rounded-xl overflow-hidden border border-white/10 hover:border-[#00BFA5] bg-black/40 cursor-pointer transition"
+                        className="group/thumb relative aspect-square rounded-2xl overflow-hidden border border-stone-200 hover:border-[#B9382B] bg-stone-100 cursor-pointer transition shadow-xs"
                       >
                         <img
                           src={img.trim()}
@@ -735,25 +684,25 @@ export default function WarrantyClaims() {
                     ))}
                   </div>
                 ) : (
-                  <p className="text-slate-500 italic">Tidak ada foto bukti yang disertakan.</p>
+                  <p className="text-stone-400 italic">Tidak ada foto bukti yang disertakan.</p>
                 )}
               </div>
 
               {/* Existing Admin Notes or Tracking */}
               {(activeClaim.adminNotes || activeClaim.replacementTrackingNumber) && (
-                <div className="p-3.5 rounded-xl bg-slate-900/60 border border-white/10 space-y-2">
-                  <div className="font-bold text-slate-300 text-[11px] uppercase tracking-wider">
+                <div className="p-3.5 rounded-2xl bg-stone-50 border border-stone-200 space-y-2">
+                  <div className="font-bold text-stone-700 text-[11px] uppercase tracking-wider">
                     Catatan Internal & Tracking Saat Ini:
                   </div>
                   {activeClaim.adminNotes && (
-                    <div className="text-slate-300">
-                      <span className="text-slate-500 font-semibold">Catatan CS/Admin: </span>
+                    <div className="text-slate-800">
+                      <span className="text-stone-500 font-semibold">Catatan CS/Admin: </span>
                       {activeClaim.adminNotes}
                     </div>
                   )}
                   {activeClaim.replacementTrackingNumber && (
-                    <div className="text-emerald-400 font-mono font-bold">
-                      <span className="text-slate-500 font-semibold">Resi Pengganti: </span>
+                    <div className="text-emerald-700 font-mono font-bold">
+                      <span className="text-stone-500 font-semibold">Resi Pengganti: </span>
                       {activeClaim.replacementTrackingNumber}
                     </div>
                   )}
@@ -761,19 +710,19 @@ export default function WarrantyClaims() {
               )}
 
               {/* Action Forms */}
-              <div className="pt-4 border-t border-white/10 space-y-4">
+              <div className="pt-4 border-t border-stone-100 space-y-4">
                 <div className="flex items-center justify-between">
-                  <h5 className="font-bold text-white text-xs uppercase tracking-wider">
+                  <h5 className="font-bold text-slate-900 text-xs uppercase tracking-wider">
                     Tindakan & Verifikasi
                   </h5>
-                  <span className="text-[10px] text-slate-500">
+                  <span className="text-[10px] text-stone-500 font-semibold">
                     Role Anda: {isLogistics ? "Gudang / Logistik" : "Admin / CS"}
                   </span>
                 </div>
 
                 {/* Form Input Catatan CS / Alasan */}
                 <div>
-                  <label className="block text-slate-400 text-xs font-semibold mb-1.5">
+                  <label className="block text-stone-700 text-xs font-bold uppercase tracking-wider mb-1.5">
                     Catatan Verifikasi / Instruksi untuk Pelanggan:
                   </label>
                   <textarea
@@ -781,27 +730,27 @@ export default function WarrantyClaims() {
                     placeholder="Contoh: Disetujui. Silakan kirimkan jersey lama ke Gudang RegarSport Wonogiri..."
                     value={adminNotes}
                     onChange={(e) => setAdminNotes(e.target.value)}
-                    className="w-full p-3 rounded-xl bg-black/40 border border-white/10 focus:border-[#00BFA5] text-xs text-white placeholder-slate-500 outline-none transition resize-none"
+                    className="w-full p-3 rounded-xl bg-stone-50 border border-stone-200 focus:bg-white focus:border-[#B9382B] focus:ring-1 focus:ring-[#B9382B] text-xs text-slate-900 placeholder:text-stone-400 outline-hidden transition resize-none leading-relaxed font-medium"
                   />
                 </div>
 
                 {/* If APPROVED or PROCESSING, show Replacement Tracking Input for Gudang */}
                 {(activeClaim.status === "APPROVED" || activeClaim.status === "PROCESSING") && (
-                  <div className="p-4 rounded-xl bg-[#00BFA5]/5 border border-[#00BFA5]/20 space-y-3">
-                    <div className="flex items-center gap-2 text-xs font-bold text-[#00BFA5]">
+                  <div className="p-4 rounded-2xl bg-[#FAF0ED] border border-[#B9382B]/20 space-y-3">
+                    <div className="flex items-center gap-2 text-xs font-bold text-[#B9382B]">
                       <Truck size={15} />
                       <span>Pengiriman Produk Pengganti / Hasil Retur (Gudang)</span>
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                       <div>
-                        <label className="block text-slate-400 text-[11px] font-semibold mb-1">
+                        <label className="block text-stone-700 text-[11px] font-bold mb-1">
                           Pilih Ekspedisi:
                         </label>
                         <select
                           value={replacementCourier}
                           onChange={(e) => setReplacementCourier(e.target.value)}
-                          className="w-full px-3 py-2 rounded-xl bg-[#14141E] border border-white/10 text-xs text-white outline-none focus:border-[#00BFA5]"
+                          className="w-full px-3 py-2 rounded-xl bg-white border border-stone-200 text-xs text-slate-900 outline-hidden focus:border-[#B9382B] font-semibold cursor-pointer"
                         >
                           {courierList.map((c) => (
                             <option key={c} value={c}>
@@ -812,7 +761,7 @@ export default function WarrantyClaims() {
                       </div>
 
                       <div className="sm:col-span-2">
-                        <label className="block text-slate-400 text-[11px] font-semibold mb-1">
+                        <label className="block text-stone-700 text-[11px] font-bold mb-1">
                           Nomor Resi Baru:
                         </label>
                         <input
@@ -820,7 +769,7 @@ export default function WarrantyClaims() {
                           placeholder="Misal: JT88927192801"
                           value={replacementTrackingNumber}
                           onChange={(e) => setReplacementTrackingNumber(e.target.value)}
-                          className="w-full px-3 py-2 rounded-xl bg-[#14141E] border border-white/10 text-xs text-white outline-none focus:border-[#00BFA5] font-mono"
+                          className="w-full px-3 py-2 rounded-xl bg-white border border-stone-200 text-xs text-slate-900 outline-hidden focus:border-[#B9382B] font-mono font-bold"
                         />
                       </div>
                     </div>
@@ -835,7 +784,7 @@ export default function WarrantyClaims() {
                         type="button"
                         disabled={submittingAction}
                         onClick={() => handleUpdateStatus("REJECTED")}
-                        className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 text-xs font-bold transition active:scale-95 disabled:opacity-50 cursor-pointer"
+                        className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-xs font-bold transition active:scale-95 disabled:opacity-50 cursor-pointer"
                       >
                         <XCircle size={15} />
                         <span>Tolak Klaim</span>
@@ -845,7 +794,7 @@ export default function WarrantyClaims() {
                         type="button"
                         disabled={submittingAction}
                         onClick={() => handleUpdateStatus("APPROVED")}
-                        className="flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-lg shadow-emerald-600/25 transition active:scale-95 disabled:opacity-50 cursor-pointer"
+                        className="flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-[#B9382B] hover:bg-[#9E2D22] text-white text-xs font-bold shadow-md transition active:scale-95 disabled:opacity-50 cursor-pointer"
                       >
                         <CheckCircle2 size={15} />
                         <span>Setujui Klaim</span>
@@ -859,7 +808,7 @@ export default function WarrantyClaims() {
                         type="button"
                         disabled={submittingAction}
                         onClick={() => handleUpdateStatus("PROCESSING")}
-                        className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-blue-500/20 hover:bg-blue-500/30 text-blue-300 border border-blue-500/30 text-xs font-bold transition active:scale-95 disabled:opacity-50 cursor-pointer"
+                        className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 text-xs font-bold transition active:scale-95 disabled:opacity-50 cursor-pointer"
                       >
                         <RefreshCw size={14} />
                         <span>Terima Retur & Proses di Gudang</span>
@@ -869,7 +818,7 @@ export default function WarrantyClaims() {
                         type="button"
                         disabled={submittingAction}
                         onClick={() => handleUpdateStatus("RESOLVED")}
-                        className="flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white text-xs font-bold shadow-lg shadow-emerald-600/25 transition active:scale-95 disabled:opacity-50 cursor-pointer"
+                        className="flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-md transition active:scale-95 disabled:opacity-50 cursor-pointer"
                       >
                         <Truck size={15} />
                         <span>Kirim Resi Pengganti & Selesaikan</span>
@@ -882,7 +831,7 @@ export default function WarrantyClaims() {
                       type="button"
                       disabled={submittingAction}
                       onClick={() => handleUpdateStatus("RESOLVED")}
-                      className="flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white text-xs font-bold shadow-lg shadow-emerald-600/25 transition active:scale-95 disabled:opacity-50 cursor-pointer"
+                      className="flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-md transition active:scale-95 disabled:opacity-50 cursor-pointer"
                     >
                       <Truck size={15} />
                       <span>Kirim Resi Pengganti & Selesaikan</span>
@@ -894,7 +843,7 @@ export default function WarrantyClaims() {
                       type="button"
                       disabled={submittingAction}
                       onClick={() => handleUpdateStatus(activeClaim.status)}
-                      className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 text-white text-xs font-bold transition active:scale-95 disabled:opacity-50 cursor-pointer"
+                      className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-stone-100 hover:bg-stone-200 text-slate-800 text-xs font-bold transition active:scale-95 disabled:opacity-50 cursor-pointer"
                     >
                       <Check size={14} />
                       <span>Perbarui Catatan Saja</span>
@@ -916,7 +865,7 @@ export default function WarrantyClaims() {
           <div className="relative max-w-3xl max-h-[85vh] overflow-hidden rounded-2xl border border-white/20 shadow-2xl bg-black">
             <button
               onClick={() => setPreviewImage(null)}
-              className="absolute top-3 right-3 z-10 p-2 rounded-full bg-black/70 text-white hover:bg-black transition"
+              className="absolute top-3 right-3 z-10 p-2 rounded-full bg-black/70 text-white hover:bg-black transition cursor-pointer"
             >
               <X size={18} />
             </button>

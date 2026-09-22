@@ -316,18 +316,18 @@ export default function BulkShippingLabelModal({ isOpen, onClose, orders = [] })
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm overflow-y-auto animate-in fade-in duration-200">
-      <div className="relative w-full max-w-2xl bg-[#14141E] border border-white/10 rounded-3xl p-6 shadow-2xl my-8 max-h-[90vh] flex flex-col">
+      <div className="relative w-full max-w-2xl bg-white border border-stone-200 rounded-3xl p-6 shadow-2xl my-8 max-h-[90vh] flex flex-col">
         {/* Modal Header */}
-        <div className="flex items-center justify-between pb-4 mb-4 border-b border-white/10 shrink-0">
+        <div className="flex items-center justify-between pb-4 mb-4 border-b border-stone-100 shrink-0">
           <div className="flex items-center gap-2.5">
-            <div className="p-2 rounded-xl bg-white/10 text-white border border-white/10">
+            <div className="p-2.5 rounded-xl bg-[#162018] text-white shadow-sm">
               <Layers size={20} />
             </div>
             <div>
-              <h3 className="text-base font-bold text-white">
+              <h3 className="text-base font-bold text-stone-900 font-['Barlow_Condensed'] uppercase tracking-wide">
                 Cetak Massal Label Thermal ({orders.length} Paket)
               </h3>
-              <p className="text-xs text-white/50">
+              <p className="text-xs text-stone-500">
                 Format Continuous Thermal A6 (100 x 150 mm)
               </p>
             </div>
@@ -336,13 +336,13 @@ export default function BulkShippingLabelModal({ isOpen, onClose, orders = [] })
           <div className="flex items-center gap-2">
             <button
               onClick={handlePrint}
-              className="flex items-center gap-2 px-4 py-2 bg-[#162018] hover:bg-black text-white font-bold text-xs rounded-xl shadow-md border border-white/20 transition active:scale-95 cursor-pointer"
+              className="flex items-center gap-2 px-4 py-2 bg-[#B9382B] hover:bg-[#9E2D22] text-white font-bold text-xs rounded-xl shadow-sm transition active:scale-95 cursor-pointer"
             >
               <Printer size={15} /> Cetak Semua ({orders.length}) Label
             </button>
             <button
               onClick={onClose}
-              className="p-2 text-white/50 hover:text-white rounded-xl hover:bg-white/5 transition cursor-pointer"
+              className="p-2 text-stone-400 hover:text-stone-800 rounded-xl hover:bg-stone-100 transition cursor-pointer"
               title="Tutup [Esc]"
             >
               <X size={18} />
@@ -351,7 +351,7 @@ export default function BulkShippingLabelModal({ isOpen, onClose, orders = [] })
         </div>
 
         {/* Scrollable Preview Container */}
-        <div className="flex-1 overflow-y-auto pr-1 bg-zinc-950/60 p-4 rounded-2xl border border-white/5">
+        <div className="flex-1 overflow-y-auto pr-1 bg-stone-100/80 p-4 rounded-2xl border border-stone-200">
           <div
             id="bulk-thermal-shipping-container"
             ref={printRef}
@@ -369,20 +369,20 @@ export default function BulkShippingLabelModal({ isOpen, onClose, orders = [] })
         </div>
 
         {/* Modal Footer Controls */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 mt-4 pt-3 border-t border-white/10 shrink-0">
-          <span className="text-[11px] font-mono text-slate-400">
-            Terpilih <strong className="text-white">{orders.length}</strong> pesanan • Pintasan: <kbd className="px-1.5 py-0.5 rounded bg-white/10 text-white font-bold">Ctrl + P</kbd>
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 mt-4 pt-3 border-t border-stone-100 shrink-0">
+          <span className="text-[11px] font-mono text-stone-500">
+            Terpilih <strong className="text-stone-900">{orders.length}</strong> pesanan • Pintasan: <kbd className="px-1.5 py-0.5 rounded bg-stone-100 text-stone-700 font-bold border border-stone-200">Ctrl + P</kbd>
           </span>
           <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
             <button
               onClick={onClose}
-              className="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-white/70 hover:text-white text-xs font-semibold transition cursor-pointer"
+              className="px-4 py-2 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-semibold transition cursor-pointer"
             >
               Tutup [Esc]
             </button>
             <button
               onClick={handlePrint}
-              className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#162018] hover:bg-black text-white text-xs font-bold transition shadow-lg border border-white/20 active:scale-95 cursor-pointer"
+              className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#162018] hover:bg-black text-white text-xs font-bold transition shadow-md active:scale-95 cursor-pointer"
             >
               <Printer size={16} /> Cetak {orders.length} Label Sekarang
             </button>

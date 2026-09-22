@@ -230,112 +230,130 @@ export default function Products() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0D0D0D] pb-10">
+    <div className="space-y-8 pb-12">
       {/* Header */}
-      <div className="flex items-center gap-4 mb-10">
-        <div className="relative">
-          <div className="absolute inset-0 bg-[#00BFA5]/20 blur-xl rounded-2xl" />
-          <div className="relative bg-[#00BFA5]/10 border border-[#00BFA5]/30 p-3 rounded-2xl">
-            <Package size={28} className="text-[#00BFA5]" />
-          </div>
-        </div>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-4xl font-black text-white tracking-[-1px]">PRODUCTS</h1>
-          <p className="text-[#2a3a3a] text-sm">Kelola produk dengan pencarian dan pagination</p>
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-stone-100 border border-stone-200 text-stone-700 text-[10px] font-bold tracking-widest uppercase mb-2">
+            <Package size={12} className="text-[#B9382B]" />
+            <span>RS // INVENTORY CATALOGUE</span>
+          </div>
+          <h1 className="font-['Barlow_Condensed'] font-black uppercase tracking-tight text-3xl sm:text-4xl text-slate-900 leading-none">
+            KATALOG PRODUK OLAHRAGA
+          </h1>
+          <p className="text-stone-500 text-xs sm:text-sm mt-1">
+            Kelola inventaris apparel, penetapan harga, stok per ukuran, dan dokumentasi visual produk.
+          </p>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <div className="bg-white border border-stone-200/80 px-4 py-2 rounded-2xl shadow-xs text-right">
+            <p className="text-[10px] font-bold text-stone-400 uppercase tracking-widest">Total Produk</p>
+            <p className="font-['Barlow_Condensed'] font-black text-xl text-slate-900 leading-tight">
+              {products.length} Item Ditampilkan
+            </p>
+          </div>
         </div>
       </div>
 
       {/* Search & Filter Bar */}
-      <div className="flex flex-col md:flex-row md:items-center gap-4 mb-8">
-        <div className="flex items-center gap-3 bg-[#14141E] border border-white/5 rounded-2xl px-5 py-3 flex-1 md:max-w-md hover:border-[#00BFA5]/20 transition-all duration-300 group">
-          <Search size={20} className="text-white/30 group-hover:text-[#00BFA5]/60 transition-colors duration-300" />
+      <div className="flex flex-col md:flex-row md:items-center gap-3">
+        <div className="flex items-center gap-3 bg-white border border-stone-200/80 rounded-2xl px-4 py-3 flex-1 md:max-w-md shadow-xs focus-within:border-[#B9382B] focus-within:ring-1 focus-within:ring-[#B9382B] transition-all group">
+          <Search size={18} className="text-stone-400 group-focus-within:text-[#B9382B] transition-colors" />
           <input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Cari produk..."
-            className="flex-1 bg-transparent text-white text-sm outline-none placeholder:text-white/30"
+            placeholder="Cari jersey, sepatu, aksesoris..."
+            className="flex-1 bg-transparent text-slate-900 text-sm outline-hidden placeholder:text-stone-400"
           />
           {search && (
             <button
               onClick={() => setSearch("")}
-              className="p-1 rounded-lg hover:bg-white/5 text-white/30 hover:text-white/60 transition-all"
+              className="p-1 rounded-lg hover:bg-stone-100 text-stone-400 hover:text-stone-700 transition-all cursor-pointer"
             >
               <X size={16} />
             </button>
           )}
         </div>
 
-        <select
-          value={categoryFilter}
-          onChange={(e) => {
-            setPage(1);
-            setCategoryFilter(e.target.value);
-          }}
-          className="bg-[#14141E] border border-white/5 rounded-2xl px-5 py-3 text-white text-sm outline-none hover:border-[#00BFA5]/20 focus:border-[#00BFA5]/40 transition-all duration-300 cursor-pointer appearance-none bg-no-repeat bg-position-[right_1rem_center] bg-size-[1rem]"
-          style={{
-            backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%2300BFA5' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`,
-          }}
-        >
-          <option value="">Semua Kategori</option>
-          {categories.map((cat) => (
-            <option key={cat.id} value={cat.id} className="bg-[#0D0D0D]">
-              {cat.name}
-            </option>
-          ))}
-        </select>
+        <div className="relative">
+          <select
+            value={categoryFilter}
+            onChange={(e) => {
+              setPage(1);
+              setCategoryFilter(e.target.value);
+            }}
+            className="bg-white border border-stone-200/80 rounded-2xl px-4 py-3 text-slate-800 text-sm font-semibold outline-hidden focus:border-[#B9382B] transition-all cursor-pointer shadow-xs pr-10 appearance-none"
+          >
+            <option value="">Semua Kategori</option>
+            {categories.map((cat) => (
+              <option key={cat.id} value={cat.id}>
+                {cat.name}
+              </option>
+            ))}
+          </select>
+          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-stone-500">
+            <svg className="w-4 h-4 fill-current" viewBox="0 0 20 20">
+              <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
+            </svg>
+          </div>
+        </div>
       </div>
 
       {/* Form Card */}
-      <div className="bg-[#14141E] border border-white/5 rounded-3xl p-8 mb-10">
-        <h2 className="text-lg font-bold text-white mb-6 flex items-center gap-3">
-          {editingId ? (
-            <>
-              <Pencil size={20} className="text-[#00BFA5]" />
-              Edit Produk
-            </>
-          ) : (
-            <>
-              <Plus size={20} className="text-[#00BFA5]" />
-              Tambah Produk Baru
-            </>
-          )}
-          <div className="h-px flex-1 bg-white/10" />
+      <div className="bg-white border border-stone-200/80 rounded-3xl p-6 sm:p-8 shadow-xs">
+        <div className="flex items-center justify-between pb-5 mb-6 border-b border-stone-100">
+          <div className="flex items-center gap-3">
+            <div className={`p-2.5 rounded-2xl ${editingId ? "bg-amber-50 text-amber-800 border border-amber-200" : "bg-[#FAF0ED] text-[#B9382B] border border-[#B9382B]/20"}`}>
+              {editingId ? <Pencil size={20} /> : <Plus size={20} />}
+            </div>
+            <div>
+              <h2 className="font-['Barlow_Condensed'] font-black uppercase tracking-wide text-2xl text-slate-900 leading-none">
+                {editingId ? "Edit Rincian Produk" : "Tambah Produk Baru"}
+              </h2>
+              <p className="text-xs text-stone-500 mt-0.5">
+                {editingId ? "Perbarui informasi spesifikasi atau foto produk" : "Daftarkan jersey atau apparel baru ke etalase toko"}
+              </p>
+            </div>
+          </div>
           {editingId && (
-            <span className="text-xs font-mono text-[#00BFA5]/60">ID: #{editingId}</span>
+            <span className="font-mono text-xs font-bold px-3 py-1.5 rounded-xl bg-stone-100 border border-stone-200 text-stone-700">
+              ID: #{editingId}
+            </span>
           )}
-        </h2>
+        </div>
 
         <form onSubmit={handleCreate} className="space-y-6">
           {/* Baris 1: Nama, Kategori, Harga, Stok */}
           <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
             {/* Nama Produk */}
             <div className="md:col-span-5">
-              <label className="block text-xs font-bold uppercase tracking-widest text-slate-400 mb-2">
-                Nama Produk
+              <label className="block text-[11px] font-bold uppercase tracking-wider text-stone-700 mb-2">
+                Nama Produk *
               </label>
               <input
                 type="text"
-                placeholder="Contoh: Sepatu Running Pro X"
+                placeholder="Contoh: Jersey Timnas Home Pro 2026"
                 value={form.name}
                 onChange={(e) => setForm({ ...form, name: e.target.value })}
-                className="w-full bg-[#0D0D0D] border border-white/10 rounded-2xl px-5 py-4 text-white placeholder:text-slate-500 focus:outline-none focus:border-[#00BFA5]/60 transition-all duration-300"
+                className="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-3 text-slate-900 text-sm placeholder:text-stone-400 focus:bg-white focus:border-[#B9382B] focus:ring-1 focus:ring-[#B9382B] outline-hidden transition-all"
               />
             </div>
 
             {/* Kategori */}
             <div className="md:col-span-3">
-              <label className="block text-xs font-bold uppercase tracking-widest text-slate-400 mb-2">
-                Kategori
+              <label className="block text-[11px] font-bold uppercase tracking-wider text-stone-700 mb-2">
+                Kategori *
               </label>
               <select
                 value={form.category_id}
                 onChange={(e) => setForm({ ...form, category_id: e.target.value })}
-                className="w-full bg-[#0D0D0D] border border-white/10 rounded-2xl px-5 py-4 text-white focus:outline-none focus:border-[#00BFA5]/60 transition-all duration-300 cursor-pointer"
+                className="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-3 text-slate-900 text-sm focus:bg-white focus:border-[#B9382B] focus:ring-1 focus:ring-[#B9382B] outline-hidden transition-all cursor-pointer font-medium"
               >
-                <option value="">Pilih</option>
+                <option value="">Pilih Kategori</option>
                 {categories.map((cat) => (
-                  <option key={cat.id} value={cat.id} className="bg-[#0D0D0D]">
+                  <option key={cat.id} value={cat.id}>
                     {cat.name}
                   </option>
                 ))}
@@ -344,29 +362,29 @@ export default function Products() {
 
             {/* Harga */}
             <div className="md:col-span-2">
-              <label className="block text-xs font-bold uppercase tracking-widest text-slate-400 mb-2">
-                Harga (Rp)
+              <label className="block text-[11px] font-bold uppercase tracking-wider text-stone-700 mb-2">
+                Harga (Rp) *
               </label>
               <input
                 type="number"
                 placeholder="0"
                 value={form.price}
                 onChange={(e) => setForm({ ...form, price: e.target.value })}
-                className="w-full bg-[#0D0D0D] border border-white/10 rounded-2xl px-5 py-4 text-white placeholder:text-slate-500 focus:outline-none focus:border-[#00BFA5]/60 transition-all duration-300 [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none"
+                className="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-3 text-slate-900 text-sm placeholder:text-stone-400 focus:bg-white focus:border-[#B9382B] focus:ring-1 focus:ring-[#B9382B] outline-hidden transition-all font-mono font-bold"
               />
             </div>
 
             {/* Stok */}
             <div className="md:col-span-2">
-              <label className="block text-xs font-bold uppercase tracking-widest text-slate-400 mb-2">
-                Stok
+              <label className="block text-[11px] font-bold uppercase tracking-wider text-stone-700 mb-2">
+                Total Stok
               </label>
               <input
                 type="number"
                 placeholder="0"
                 value={form.stock}
                 onChange={(e) => setForm({ ...form, stock: e.target.value })}
-                className="w-full bg-[#0D0D0D] border border-white/10 rounded-2xl px-5 py-4 text-white placeholder:text-slate-500 focus:outline-none focus:border-[#00BFA5]/60 transition-all duration-300 [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none"
+                className="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-3 text-slate-900 text-sm placeholder:text-stone-400 focus:bg-white focus:border-[#B9382B] focus:ring-1 focus:ring-[#B9382B] outline-hidden transition-all font-mono font-bold"
               />
             </div>
           </div>
@@ -375,23 +393,23 @@ export default function Products() {
           <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
             {/* Deskripsi */}
             <div className="md:col-span-7">
-              <label className="block text-xs font-bold uppercase tracking-widest text-slate-400 mb-2">
-                Deskripsi
+              <label className="block text-[11px] font-bold uppercase tracking-wider text-stone-700 mb-2">
+                Deskripsi Produk & Spesifikasi Bahan
               </label>
               <textarea
-                placeholder="Deskripsi produk..."
+                placeholder="Jelaskan bahan kain (misal Dry-Fit Milano, Anti-Bakteri), teknologi sablon, dan instruksi perawatan..."
                 value={form.description}
                 onChange={(e) => setForm({ ...form, description: e.target.value })}
                 rows={3}
-                className="w-full bg-[#0D0D0D] border border-white/10 rounded-2xl px-5 py-4 text-white placeholder:text-slate-500 focus:outline-none focus:border-[#00BFA5]/60 transition-all duration-300 resize-none"
+                className="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-3 text-slate-900 text-sm placeholder:text-stone-400 focus:bg-white focus:border-[#B9382B] focus:ring-1 focus:ring-[#B9382B] outline-hidden transition-all resize-none leading-relaxed"
               />
             </div>
 
             {/* Upload / Ganti Gambar */}
             <div className="md:col-span-5">
               <div className="flex items-center justify-between mb-2">
-                <label className="block text-xs font-bold uppercase tracking-widest text-slate-400">
-                  {editingId ? "Ganti Gambar Produk" : "Gambar Produk"}
+                <label className="block text-[11px] font-bold uppercase tracking-wider text-stone-700">
+                  {editingId ? "Ganti Foto Produk" : "Foto Utama Produk"}
                 </label>
                 {imagePreview && (
                   <button
@@ -402,16 +420,16 @@ export default function Products() {
                       setImagePreview("");
                       if (fileInputRef.current) fileInputRef.current.value = "";
                     }}
-                    className="text-[11px] text-red-400 hover:text-red-300 font-medium transition cursor-pointer"
+                    className="text-[11px] text-rose-600 hover:text-rose-700 font-bold transition cursor-pointer"
                   >
-                    Hapus Gambar
+                    Hapus Foto
                   </button>
                 )}
               </div>
 
               {imagePreview ? (
-                <div className="relative border border-white/10 rounded-2xl p-2.5 bg-[#0C0C16] flex items-center gap-4 h-31">
-                  <div className="w-24 h-full rounded-xl overflow-hidden bg-black/40 shrink-0 border border-white/5 flex items-center justify-center">
+                <div className="relative border border-stone-200 rounded-2xl p-2.5 bg-stone-50 flex items-center gap-4 h-28">
+                  <div className="w-24 h-full rounded-xl overflow-hidden bg-white shrink-0 border border-stone-200 flex items-center justify-center">
                     <img
                       src={imagePreview}
                       alt="Preview"
@@ -423,32 +441,32 @@ export default function Products() {
                     />
                   </div>
                   <div className="flex-1 flex flex-col justify-center gap-1.5 pr-2">
-                    <p className="text-xs text-slate-300 font-medium truncate max-w-48">
-                      {image ? image.name : "Foto produk terpilih"}
+                    <p className="text-xs text-slate-800 font-semibold truncate max-w-48">
+                      {image ? image.name : "Foto produk aktif"}
                     </p>
                     <button
                       type="button"
                       onClick={() => fileInputRef.current?.click()}
-                      className="w-fit flex items-center gap-1.5 bg-white/5 hover:bg-[#00BFA5]/20 hover:text-[#00BFA5] border border-white/10 px-3 py-1.5 rounded-xl text-xs text-white/80 font-medium transition active:scale-95 cursor-pointer"
+                      className="w-fit flex items-center gap-1.5 bg-white hover:bg-stone-100 border border-stone-200 px-3 py-1.5 rounded-xl text-xs text-stone-700 font-bold transition active:scale-95 cursor-pointer shadow-xs"
                     >
                       <Upload size={13} />
-                      Pilih Foto Lain
+                      Ganti Berkas
                     </button>
                   </div>
                 </div>
               ) : (
                 <div
                   onClick={() => fileInputRef.current?.click()}
-                  className="flex flex-col items-center justify-center border border-dashed border-white/20 hover:border-[#00BFA5]/50 rounded-2xl h-31 cursor-pointer transition-all duration-300 group bg-white/1 hover:bg-white/3"
+                  className="flex flex-col items-center justify-center border-2 border-dashed border-stone-200 hover:border-[#B9382B]/60 rounded-2xl h-28 cursor-pointer transition-all group bg-stone-50/60 hover:bg-white"
                 >
-                  <div className="w-10 h-10 rounded-2xl bg-white/5 flex items-center justify-center mb-1.5 group-hover:bg-[#00BFA5]/10 transition-all duration-300 group-hover:scale-110">
-                    <Upload size={20} className="text-slate-400 group-hover:text-[#00BFA5] transition-colors duration-300" />
+                  <div className="w-9 h-9 rounded-xl bg-white border border-stone-200 flex items-center justify-center mb-1 group-hover:scale-105 transition-all shadow-xs">
+                    <Upload size={18} className="text-stone-500 group-hover:text-[#B9382B] transition-colors" />
                   </div>
-                  <span className="text-xs text-slate-400 group-hover:text-slate-200 transition-colors">
-                    Klik untuk upload gambar baru
+                  <span className="text-xs text-stone-700 font-semibold group-hover:text-slate-900 transition-colors">
+                    Klik untuk unggah foto jersey
                   </span>
-                  <span className="text-[10px] text-slate-600">
-                    Format JPG, PNG, WEBP (Maksimal 10MB)
+                  <span className="text-[10px] text-stone-400">
+                    JPG, PNG, WEBP (Maksimal 10MB)
                   </span>
                 </div>
               )}
@@ -467,14 +485,14 @@ export default function Products() {
           </div>
 
           {/* Action Buttons */}
-          <div className="flex gap-3 pt-4 border-t border-white/5">
+          <div className="flex items-center gap-3 pt-4 border-t border-stone-100">
             {editingId ? (
               <>
                 <button
                   type="button"
                   onClick={handleUpdate}
                   disabled={submitting}
-                  className="flex-1 bg-[#00BFA5] hover:bg-[#00BFA5]/90 disabled:opacity-70 text-black font-bold py-4 rounded-2xl transition-all duration-300 flex items-center justify-center gap-2 hover:shadow-[0_0_30px_rgba(0,191,165,0.2)] active:scale-[0.98]"
+                  className="flex-1 bg-[#B9382B] hover:bg-[#9E2D22] disabled:opacity-70 text-white font-bold py-3.5 px-6 rounded-xl transition-all flex items-center justify-center gap-2 shadow-md active:scale-[0.98] cursor-pointer"
                 >
                   {submitting ? (
                     <>
@@ -482,28 +500,28 @@ export default function Products() {
                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                       </svg>
-                      Menyimpan...
+                      Menyimpan Perubahan...
                     </>
                   ) : (
                     <>
                       <Pencil size={18} />
-                      Simpan Perubahan
+                      Simpan Perubahan Produk
                     </>
                   )}
                 </button>
                 <button
                   type="button"
                   onClick={resetForm}
-                  className="px-8 py-4 border border-white/10 hover:bg-white/5 rounded-2xl transition-all duration-300 text-white/60 hover:text-white"
+                  className="px-6 py-3.5 bg-stone-100 hover:bg-stone-200 rounded-xl transition text-stone-700 font-bold text-sm cursor-pointer"
                 >
-                  <X size={20} />
+                  Batal
                 </button>
               </>
             ) : (
               <button
                 type="submit"
                 disabled={submitting || !form.name.trim() || !form.price}
-                className="flex-1 bg-[#00BFA5] hover:bg-[#00BFA5]/90 disabled:opacity-50 disabled:cursor-not-allowed text-black font-bold py-4 rounded-2xl transition-all duration-300 flex items-center justify-center gap-2 hover:shadow-[0_0_30px_rgba(0,191,165,0.2)] active:scale-[0.98]"
+                className="flex-1 bg-[#B9382B] hover:bg-[#9E2D22] disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-3.5 px-6 rounded-xl transition-all flex items-center justify-center gap-2 shadow-md active:scale-[0.98] cursor-pointer"
               >
                 {submitting ? (
                   <>
@@ -511,12 +529,12 @@ export default function Products() {
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                     </svg>
-                    Menambahkan...
+                    Menambahkan ke Database...
                   </>
                 ) : (
                   <>
                     <Plus size={20} />
-                    Tambah Produk
+                    Terbitkan Produk Baru
                   </>
                 )}
               </button>
@@ -527,56 +545,56 @@ export default function Products() {
 
       {/* Product Grid */}
       {loading ? (
-        <ScreenLoader label="Memuat produk..." />
+        <ScreenLoader label="Memuat produk katalog..." />
       ) : products.length === 0 ? (
         <EmptyState
           title="Produk belum ditemukan"
-          description="Coba ubah kata kunci pencarian atau tambahkan produk baru."
+          description="Coba ubah kata kunci pencarian atau daftarkan produk baru melalui form di atas."
         />
       ) : (
         <>
-          <div className="flex items-center justify-between mb-4">
-            <p className="text-sm text-slate-400">
-              Menampilkan <span className="text-white font-semibold">{products.length}</span> produk
+          <div className="flex items-center justify-between">
+            <p className="text-xs font-bold text-stone-500 uppercase tracking-wider">
+              Menampilkan <span className="text-slate-900 font-black">{products.length}</span> item pada etalase
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {products.map((product) => (
               <div
                 key={product.id}
-                className="group bg-[#14141E] border border-white/5 rounded-3xl overflow-hidden hover:border-[#00BFA5]/20 transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_20px_60px_rgba(0,191,165,0.08)]"
+                className="group bg-white border border-stone-200/80 rounded-3xl overflow-hidden hover:border-stone-300 hover:shadow-xl transition-all duration-300 flex flex-col justify-between"
               >
                 {/* Image Container */}
-                <div className="relative aspect-square bg-[#0C0C16] overflow-hidden">
+                <div className="relative aspect-square bg-stone-100 overflow-hidden">
                   <img
-                    src={product.image_url || "https://placehold.co/400x400/1a1a2a/4a5a5a?text=No+Image"}
+                    src={product.image_url || "https://placehold.co/400x400/e2e8f0/64748b?text=No+Image"}
                     alt={product.name}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
                     loading="lazy"
                   />
 
-                  {/* Overlay on hover */}
-                  <div className="absolute inset-0 bg-linear-to-t from-[#0D0D0D] via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                  {/* Gradient Overlay on hover */}
+                  <div className="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
                   {/* Quick actions overlay */}
-                  <div className="absolute bottom-3 left-3 right-3 flex gap-1.5 translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-400 ease-out">
+                  <div className="absolute bottom-3 left-3 right-3 flex gap-1.5 translate-y-3 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
                     <button
                       onClick={() => setSelectedProductForStock(product)}
-                      className="flex-1 flex items-center justify-center gap-1 bg-[#14141E]/95 backdrop-blur-sm hover:bg-[#00BFA5] text-[#00BFA5] hover:text-black px-2 py-2 rounded-xl text-xs font-bold transition-all duration-300 border border-white/10 hover:border-[#00BFA5]/50 cursor-pointer shadow-lg"
+                      className="flex-1 flex items-center justify-center gap-1 bg-white/95 backdrop-blur-xs hover:bg-[#162018] text-stone-800 hover:text-white px-2 py-2 rounded-xl text-xs font-bold transition-all border border-stone-200/80 shadow-md cursor-pointer"
                       title="Kelola kuota stok per ukuran"
                     >
                       <Sliders size={13} /> Stok
                     </button>
                     <button
                       onClick={() => handleEdit(product)}
-                      className="flex-1 flex items-center justify-center gap-1 bg-[#14141E]/95 backdrop-blur-sm hover:bg-blue-500 text-blue-400 hover:text-white px-2 py-2 rounded-xl text-xs font-bold transition-all duration-300 border border-white/10 hover:border-blue-400/50 cursor-pointer shadow-lg"
+                      className="flex-1 flex items-center justify-center gap-1 bg-white/95 backdrop-blur-xs hover:bg-blue-600 text-blue-700 hover:text-white px-2 py-2 rounded-xl text-xs font-bold transition-all border border-stone-200/80 shadow-md cursor-pointer"
                     >
                       <Pencil size={13} /> Edit
                     </button>
                     <button
                       onClick={() => handleDelete(product.id)}
-                      className="flex items-center justify-center bg-[#14141E]/95 backdrop-blur-sm hover:bg-red-500 text-red-400 hover:text-white p-2 rounded-xl text-xs font-semibold transition-all duration-300 border border-white/10 hover:border-red-400/50 cursor-pointer shadow-lg"
+                      className="flex items-center justify-center bg-white/95 backdrop-blur-xs hover:bg-rose-600 text-rose-700 hover:text-white p-2 rounded-xl text-xs font-bold transition-all border border-stone-200/80 shadow-md cursor-pointer"
                       title="Hapus produk"
                     >
                       <Trash2 size={13} />
@@ -586,7 +604,7 @@ export default function Products() {
                   {/* Category Badge */}
                   {product.category?.name && (
                     <div className="absolute top-3 left-3">
-                      <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-lg bg-[#00BFA5]/10 text-[#00BFA5] border border-[#00BFA5]/20 backdrop-blur-sm">
+                      <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md bg-[#FAF0ED] text-[#B9382B] border border-[#B9382B]/20 backdrop-blur-xs shadow-xs">
                         {product.category.name}
                       </span>
                     </div>
@@ -594,70 +612,74 @@ export default function Products() {
 
                   {/* Stock Badge */}
                   <div className="absolute top-3 right-3">
-                    <span className={`text-[10px] font-bold px-2.5 py-1 rounded-lg backdrop-blur-sm border ${product.stock > 10
-                        ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
+                    <span className={`text-[10px] font-bold px-2.5 py-1 rounded-md border shadow-xs ${
+                      product.stock > 10
+                        ? "bg-emerald-50 text-emerald-800 border-emerald-200"
                         : product.stock > 0
-                          ? "bg-amber-500/10 text-amber-400 border-amber-500/20"
-                          : "bg-red-500/10 text-red-400 border-red-500/20"
-                      }`}>
-                      {product.stock > 0 ? `${product.stock} total` : "Habis"}
+                        ? "bg-amber-50 text-amber-800 border-amber-200"
+                        : "bg-rose-50 text-rose-800 border-rose-200"
+                    }`}>
+                      {product.stock > 0 ? `${product.stock} pcs` : "Habis"}
                     </span>
                   </div>
                 </div>
 
                 {/* Content */}
-                <div className="p-5">
-                  <h3 className="text-white font-bold text-base truncate group-hover:text-[#00BFA5] transition-colors duration-300">
-                    {product.name}
-                  </h3>
+                <div className="p-5 flex-1 flex flex-col justify-between">
+                  <div>
+                    <h3 className="text-slate-900 font-bold text-base line-clamp-1 group-hover:text-[#B9382B] transition-colors">
+                      {product.name}
+                    </h3>
 
-                  {product.description && (
-                    <p className="text-slate-500 text-xs mt-1.5 line-clamp-2 leading-relaxed">
-                      {product.description}
-                    </p>
-                  )}
+                    {product.description && (
+                      <p className="text-stone-500 text-xs mt-1.5 line-clamp-2 leading-relaxed">
+                        {product.description}
+                      </p>
+                    )}
 
-                  {/* Size Stock Chips Breakdown */}
-                  {product.sizeStocks && Object.keys(product.sizeStocks).length > 0 && (
-                    <div className="flex flex-wrap gap-1 mt-3 pt-3 border-t border-white/5">
-                      {Object.entries(product.sizeStocks).slice(0, 5).map(([sz, st]) => {
-                        const numSt = Number(st) || 0;
-                        const isZero = numSt === 0;
-                        const isLow = numSt > 0 && numSt < 5;
-                        return (
-                          <span
-                            key={sz}
-                            className={`text-[9px] font-bold px-1.5 py-0.5 rounded-md border ${
-                              isZero
-                                ? "bg-rose-500/10 text-rose-400 border-rose-500/20 line-through opacity-60"
-                                : isLow
-                                ? "bg-amber-500/10 text-amber-400 border-amber-500/20"
-                                : "bg-white/5 text-slate-300 border-white/10"
-                            }`}
-                          >
-                            {sz}:{st}
+                    {/* Size Stock Chips Breakdown */}
+                    {product.sizeStocks && Object.keys(product.sizeStocks).length > 0 && (
+                      <div className="flex flex-wrap gap-1 mt-3 pt-3 border-t border-stone-100">
+                        {Object.entries(product.sizeStocks).slice(0, 5).map(([sz, st]) => {
+                          const numSt = Number(st) || 0;
+                          const isZero = numSt === 0;
+                          const isLow = numSt > 0 && numSt < 5;
+                          return (
+                            <span
+                              key={sz}
+                              className={`text-[9px] font-mono font-bold px-1.5 py-0.5 rounded-md border ${
+                                isZero
+                                  ? "bg-rose-50 text-rose-700 border-rose-200 line-through opacity-70"
+                                  : isLow
+                                  ? "bg-amber-50 text-amber-800 border-amber-200"
+                                  : "bg-stone-100 text-stone-700 border-stone-200"
+                              }`}
+                            >
+                              {sz}:{st}
+                            </span>
+                          );
+                        })}
+                        {Object.keys(product.sizeStocks).length > 5 && (
+                          <span className="text-[9px] text-stone-400 self-center px-1">
+                            +{Object.keys(product.sizeStocks).length - 5}
                           </span>
-                        );
-                      })}
-                      {Object.keys(product.sizeStocks).length > 5 && (
-                        <span className="text-[9px] text-slate-500 self-center px-1">
-                          +{Object.keys(product.sizeStocks).length - 5}
-                        </span>
-                      )}
-                    </div>
-                  )}
+                        )}
+                      </div>
+                    )}
+                  </div>
 
-                  <div className="flex items-end justify-between mt-4">
+                  <div className="flex items-end justify-between mt-4 pt-3 border-t border-stone-100">
                     <div>
-                      <p className="text-[#00BFA5] font-black text-xl tracking-tight">
+                      <p className="text-[10px] text-stone-400 font-bold uppercase tracking-wider">Harga Resmi</p>
+                      <p className="text-[#B9382B] font-['Barlow_Condensed'] font-black text-2xl tracking-tight leading-none mt-0.5">
                         Rp {Number(product.price).toLocaleString("id-ID")}
                       </p>
                     </div>
                     <button
                       onClick={() => setSelectedProductForStock(product)}
-                      className="text-[10px] text-slate-400 hover:text-[#00BFA5] flex items-center gap-1 font-semibold transition cursor-pointer"
+                      className="text-[11px] text-stone-600 hover:text-[#B9382B] flex items-center gap-1 font-bold transition cursor-pointer"
                     >
-                      <Sliders size={11} />
+                      <Sliders size={12} />
                       Ubah Stok
                     </button>
                   </div>
@@ -670,11 +692,11 @@ export default function Products() {
 
       {/* Pagination */}
       {!loading && totalPages > 1 && (
-        <div className="flex items-center justify-center gap-4 mt-12">
+        <div className="flex items-center justify-center gap-3 mt-10">
           <button
             disabled={page === 1}
             onClick={() => setPage((p) => Math.max(p - 1, 1))}
-            className="flex items-center gap-2 px-5 py-3 bg-[#14141E] border border-white/5 hover:border-white/20 rounded-2xl text-white/60 disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-300 hover:text-white active:scale-95"
+            className="flex items-center gap-1.5 px-4 py-2.5 bg-white border border-stone-200/80 hover:bg-stone-50 rounded-xl text-stone-700 disabled:opacity-40 disabled:cursor-not-allowed transition font-bold text-xs shadow-xs cursor-pointer"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -682,15 +704,16 @@ export default function Products() {
             Sebelumnya
           </button>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5">
             {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
               <button
                 key={p}
                 onClick={() => setPage(p)}
-                className={`w-10 h-10 rounded-xl text-sm font-semibold transition-all duration-300 active:scale-90 ${p === page
-                    ? "bg-[#00BFA5] text-black shadow-[0_0_20px_rgba(0,191,165,0.3)]"
-                    : "bg-[#14141E] border border-white/5 text-white/50 hover:text-white hover:border-white/20"
-                  }`}
+                className={`w-9 h-9 rounded-xl text-xs font-bold transition cursor-pointer ${
+                  p === page
+                    ? "bg-[#B9382B] text-white shadow-xs"
+                    : "bg-white border border-stone-200/80 text-stone-600 hover:bg-stone-50 hover:text-slate-900"
+                }`}
               >
                 {p}
               </button>
@@ -700,7 +723,7 @@ export default function Products() {
           <button
             disabled={page === totalPages}
             onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
-            className="flex items-center gap-2 px-5 py-3 bg-[#14141E] border border-white/5 hover:border-white/20 rounded-2xl text-white/60 disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-300 hover:text-white active:scale-95"
+            className="flex items-center gap-1.5 px-4 py-2.5 bg-white border border-stone-200/80 hover:bg-stone-50 rounded-xl text-stone-700 disabled:opacity-40 disabled:cursor-not-allowed transition font-bold text-xs shadow-xs cursor-pointer"
           >
             Berikutnya
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -722,15 +745,6 @@ export default function Products() {
           }}
         />
       )}
-
-      {/* Subtle background grid pattern */}
-      <div
-        className="fixed inset-0 pointer-events-none opacity-[0.015] z-[-1]"
-        style={{
-          backgroundImage: `linear-gradient(#00BFA5 1px, transparent 1px), linear-gradient(90deg, #00BFA5 1px, transparent 1px)`,
-          backgroundSize: '80px 80px'
-        }}
-      />
     </div>
   );
 }

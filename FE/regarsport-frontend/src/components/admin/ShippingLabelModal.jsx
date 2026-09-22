@@ -240,29 +240,29 @@ export default function ShippingLabelModal({ isOpen, onClose, order }) {
         }
       `}</style>
 
-      <div className="relative w-full max-w-xl bg-[#14141E] border border-white/10 rounded-3xl p-6 shadow-2xl my-8">
+      <div className="relative w-full max-w-xl bg-white border border-stone-200 rounded-3xl p-6 shadow-2xl my-8">
         {/* Modal Actions Header */}
-        <div className="flex items-center justify-between pb-4 mb-4 border-b border-white/10 print:hidden">
+        <div className="flex items-center justify-between pb-4 mb-4 border-b border-stone-100 print:hidden">
           <div className="flex items-center gap-2.5">
-            <div className="p-2 rounded-xl bg-[#00BFA5]/10 text-[#00BFA5] border border-[#00BFA5]/20">
+            <div className="p-2.5 rounded-xl bg-[#162018] text-white shadow-sm">
               <Truck size={20} />
             </div>
             <div>
-              <h3 className="text-base font-bold text-white">Label Pengiriman Gudang</h3>
-              <p className="text-xs text-white/50">Ukuran Thermal A6 (100 x 150 mm)</p>
+              <h3 className="text-base font-bold text-stone-900 font-['Barlow_Condensed'] uppercase tracking-wide">Label Pengiriman Gudang</h3>
+              <p className="text-xs text-stone-500">Ukuran Thermal A6 (100 x 150 mm)</p>
             </div>
           </div>
 
           <div className="flex items-center gap-2">
             <button
               onClick={handlePrint}
-              className="flex items-center gap-2 px-4 py-2 bg-[#00BFA5] hover:bg-[#00BFA5]/90 text-black font-bold text-xs rounded-xl shadow-lg shadow-[#00BFA5]/20 transition active:scale-95 cursor-pointer"
+              className="flex items-center gap-2 px-4 py-2 bg-[#B9382B] hover:bg-[#9E2D22] text-white font-bold text-xs rounded-xl shadow-sm transition active:scale-95 cursor-pointer"
             >
               <Printer size={15} /> Cetak Thermal (A6)
             </button>
             <button
               onClick={onClose}
-              className="p-2 text-white/50 hover:text-white rounded-xl hover:bg-white/5 transition"
+              className="p-2 text-stone-400 hover:text-stone-800 rounded-xl hover:bg-stone-100 transition cursor-pointer"
               title="Tutup"
             >
               <X size={18} />
@@ -271,7 +271,7 @@ export default function ShippingLabelModal({ isOpen, onClose, order }) {
         </div>
 
         {/* ===================== PHYSICAL THERMAL LABEL CONTAINER ===================== */}
-        <div className="flex justify-center bg-zinc-900/60 p-3 sm:p-5 rounded-2xl border border-white/5 overflow-x-auto">
+        <div className="flex justify-center bg-stone-100/80 p-3 sm:p-5 rounded-2xl border border-stone-200 overflow-x-auto">
           <div
             id="thermal-shipping-label"
             ref={printRef}
@@ -404,20 +404,20 @@ export default function ShippingLabelModal({ isOpen, onClose, order }) {
         </div>
 
         {/* Modal Footer Controls */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 mt-5 pt-3 border-t border-white/10 print:hidden">
-          <span className="text-[11px] font-mono text-slate-400">
-            Pintasan: <kbd className="px-1.5 py-0.5 rounded bg-white/10 font-bold text-white">Ctrl + P</kbd> untuk cetak langsung, <kbd className="px-1.5 py-0.5 rounded bg-white/10 font-bold text-white">Esc</kbd> tutup
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 mt-5 pt-3 border-t border-stone-100 print:hidden">
+          <span className="text-[11px] font-mono text-stone-500">
+            Pintasan: <kbd className="px-1.5 py-0.5 rounded bg-stone-100 font-bold text-stone-700 border border-stone-200">Ctrl + P</kbd> untuk cetak langsung, <kbd className="px-1.5 py-0.5 rounded bg-stone-100 font-bold text-stone-700 border border-stone-200">Esc</kbd> tutup
           </span>
           <div className="flex gap-2 w-full sm:w-auto justify-end">
             <button
               onClick={onClose}
-              className="px-4 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-white/70 hover:text-white text-xs font-semibold transition cursor-pointer"
+              className="px-4 py-2.5 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-semibold transition cursor-pointer"
             >
               Tutup [Esc]
             </button>
             <button
               onClick={handlePrint}
-              className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#162018] hover:bg-black text-white text-xs font-bold transition shadow-lg border border-white/20 active:scale-95 cursor-pointer"
+              className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#162018] hover:bg-black text-white text-xs font-bold transition shadow-md active:scale-95 cursor-pointer"
             >
               <Printer size={16} /> Cetak Label Thermal
             </button>

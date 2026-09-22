@@ -114,76 +114,76 @@ export default function ManageSizeStockModal({ product, onClose, onStockUpdated 
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fadeIn">
-      <div className="relative w-full max-w-xl bg-[#12121A] border border-white/10 rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+      <div className="bg-white border border-stone-200/80 rounded-3xl shadow-2xl w-full max-w-xl overflow-hidden flex flex-col max-h-[90vh]">
         {/* Modal Header */}
-        <div className="p-6 border-b border-white/10 flex items-center justify-between bg-white/2">
+        <div className="p-6 border-b border-stone-100 flex items-center justify-between bg-stone-50/50">
           <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-2xl bg-[#00BFA5]/10 border border-[#00BFA5]/30 text-[#00BFA5]">
-              <Package size={22} />
+            <div className="p-2.5 rounded-2xl bg-[#162018] text-white shadow-sm">
+              <Package size={20} />
             </div>
             <div>
-              <h2 className="text-lg font-bold text-white leading-snug truncate max-w-sm">
-                Manajemen Stok Ukuran
+              <h2 className="text-base font-bold text-slate-900 font-['Barlow_Condensed'] uppercase tracking-wide truncate max-w-sm">
+                Manajemen Stok Ukuran Produk
               </h2>
-              <p className="text-xs text-slate-400 truncate max-w-sm">
+              <p className="text-xs text-stone-500 truncate max-w-sm font-medium">
                 {product.name}
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-white/5 transition-all cursor-pointer"
+            className="p-2 rounded-xl text-stone-400 hover:text-slate-900 hover:bg-stone-100 transition-all cursor-pointer"
           >
-            <X size={20} />
+            <X size={18} />
           </button>
         </div>
 
         {/* Modal Body */}
         <div className="p-6 overflow-y-auto flex-1 space-y-6">
           {/* Summary Banner */}
-          <div className="flex items-center justify-between p-4 rounded-2xl bg-gradient-to-r from-[#00BFA5]/10 via-[#00BFA5]/5 to-transparent border border-[#00BFA5]/20">
+          <div className="flex items-center justify-between p-4 rounded-2xl bg-stone-50 border border-stone-200">
             <div>
-              <p className="text-xs text-slate-400 font-medium">Total Akumulasi Stok</p>
-              <p className="text-2xl font-black text-white">{totalStock} <span className="text-xs text-[#00BFA5] font-semibold">pcs</span></p>
+              <p className="text-[11px] font-mono text-stone-500 font-bold uppercase tracking-wider">Total Akumulasi Stok Fisik</p>
+              <p className="text-3xl font-black text-slate-900 font-['Barlow_Condensed']">{totalStock} <span className="text-xs text-stone-500 font-sans font-normal">pcs</span></p>
             </div>
-            <span className="text-xs px-3 py-1 rounded-full bg-[#00BFA5]/20 text-[#00BFA5] font-bold border border-[#00BFA5]/30">
+            <span className="text-xs px-3 py-1.5 rounded-full bg-white text-stone-800 font-mono font-bold border border-stone-200 shadow-2xs">
               {Object.keys(sizeStocks).length} Varian Ukuran
             </span>
           </div>
 
           {/* Size Stocks Table / List */}
           <div className="space-y-3">
-            <label className="block text-xs font-bold uppercase tracking-widest text-slate-400">
-              Daftar Ukuran & Penyesuaian Stok
+            <label className="block text-xs font-bold uppercase tracking-widest text-stone-600">
+              Daftar Ukuran &amp; Penyesuaian Kuota Stok
             </label>
             <div className="space-y-2.5">
               {Object.entries(sizeStocks).map(([size, qty]) => {
                 const numQty = Number(qty) || 0;
                 let stockStatus = {
-                  label: "Aman",
-                  color: "text-emerald-400 bg-emerald-500/10 border-emerald-500/30",
+                  label: "Ready Stock",
+                  color: "text-emerald-800 bg-emerald-50 border-emerald-200",
                 };
                 if (numQty === 0) {
                   stockStatus = {
                     label: "Habis",
-                    color: "text-rose-400 bg-rose-500/10 border-rose-500/30",
+                    color: "text-[#B9382B] bg-[#FAF0ED] border-[#B9382B]/20",
                   };
                 } else if (numQty < 5) {
                   stockStatus = {
                     label: "Menipis",
-                    color: "text-amber-400 bg-amber-500/10 border-amber-500/30",
+                    color: "text-amber-800 bg-amber-50 border-amber-200",
                   };
                 }
 
                 return (
                   <div
                     key={size}
-                    className="flex flex-col sm:flex-row sm:items-center justify-between p-3.5 rounded-2xl bg-white/3 border border-white/5 hover:border-white/15 transition-all gap-3"
+                    className="flex flex-col sm:flex-row sm:items-center justify-between p-3.5 rounded-2xl bg-stone-50/70 border border-stone-200/80 hover:border-stone-300 transition-all gap-3"
                   >
                     {/* Size Label & Status */}
                     <div className="flex items-center gap-3 min-w-32">
-                      <div className="w-10 h-10 rounded-xl bg-[#00BFA5]/10 border border-[#00BFA5]/30 flex items-center justify-center font-black text-white text-sm">
+                      <div className="w-10 h-10 rounded-xl bg-white border border-stone-200 flex items-center justify-center font-black text-slate-900 text-sm shadow-2xs font-mono">
                         {size}
                       </div>
                       <div>
@@ -194,11 +194,11 @@ export default function ManageSizeStockModal({ product, onClose, onStockUpdated 
                     </div>
 
                     {/* Stock Quick Controls */}
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1.5">
                       <button
                         type="button"
                         onClick={() => handleQuickAdjust(size, -5)}
-                        className="px-2 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-xs font-bold text-slate-300 transition cursor-pointer"
+                        className="px-2 py-1.5 rounded-lg bg-white hover:bg-stone-200 text-xs font-bold text-stone-700 transition cursor-pointer border border-stone-200 shadow-2xs"
                         title="Kurangi 5"
                       >
                         -5
@@ -206,7 +206,7 @@ export default function ManageSizeStockModal({ product, onClose, onStockUpdated 
                       <button
                         type="button"
                         onClick={() => handleQuickAdjust(size, -1)}
-                        className="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 text-sm font-bold text-slate-300 transition flex items-center justify-center cursor-pointer"
+                        className="w-8 h-8 rounded-lg bg-white hover:bg-stone-200 text-sm font-bold text-stone-700 transition flex items-center justify-center cursor-pointer border border-stone-200 shadow-2xs"
                         title="Kurangi 1"
                       >
                         -
@@ -217,13 +217,13 @@ export default function ManageSizeStockModal({ product, onClose, onStockUpdated 
                         min="0"
                         value={qty}
                         onChange={(e) => handleStockChange(size, e.target.value)}
-                        className="w-16 h-8 text-center bg-[#0C0C14] border border-white/10 rounded-lg text-white font-bold text-sm focus:outline-none focus:border-[#00BFA5] transition [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none"
+                        className="w-16 h-8 text-center bg-white border border-stone-300 rounded-lg text-slate-900 font-bold text-sm focus:outline-none focus:border-[#162018] transition [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none shadow-2xs"
                       />
 
                       <button
                         type="button"
                         onClick={() => handleQuickAdjust(size, 1)}
-                        className="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 text-sm font-bold text-slate-300 transition flex items-center justify-center cursor-pointer"
+                        className="w-8 h-8 rounded-lg bg-white hover:bg-stone-200 text-sm font-bold text-stone-700 transition flex items-center justify-center cursor-pointer border border-stone-200 shadow-2xs"
                         title="Tambah 1"
                       >
                         +
@@ -231,7 +231,7 @@ export default function ManageSizeStockModal({ product, onClose, onStockUpdated 
                       <button
                         type="button"
                         onClick={() => handleQuickAdjust(size, 5)}
-                        className="px-2 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-xs font-bold text-slate-300 transition cursor-pointer"
+                        className="px-2 py-1.5 rounded-lg bg-white hover:bg-stone-200 text-xs font-bold text-stone-700 transition cursor-pointer border border-stone-200 shadow-2xs"
                         title="Tambah 5"
                       >
                         +5
@@ -240,10 +240,10 @@ export default function ManageSizeStockModal({ product, onClose, onStockUpdated 
                       <button
                         type="button"
                         onClick={() => handleDeleteSize(size)}
-                        className="p-1.5 rounded-lg hover:bg-rose-500/20 text-slate-500 hover:text-rose-400 transition ml-1 cursor-pointer"
+                        className="p-1.5 rounded-lg hover:bg-rose-50 text-stone-400 hover:text-rose-600 transition ml-1 cursor-pointer"
                         title="Hapus ukuran ini"
                       >
-                        <Trash2 size={16} />
+                        <Trash2 size={15} />
                       </button>
                     </div>
                   </div>
@@ -253,29 +253,29 @@ export default function ManageSizeStockModal({ product, onClose, onStockUpdated 
           </div>
 
           {/* Add New Custom Size Form */}
-          <form onSubmit={handleAddSize} className="p-4 rounded-2xl bg-white/2 border border-dashed border-white/10 flex flex-col sm:flex-row items-center gap-3">
+          <form onSubmit={handleAddSize} className="p-4 rounded-2xl bg-stone-50 border border-dashed border-stone-300 flex flex-col sm:flex-row items-center gap-3">
             <div className="flex-1 w-full sm:w-auto">
               <input
                 type="text"
                 placeholder="Ukuran baru (misal: 3XL, 46)..."
                 value={newSizeName}
                 onChange={(e) => setNewSizeName(e.target.value)}
-                className="w-full bg-[#0C0C14] border border-white/10 rounded-xl px-3.5 py-2 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-[#00BFA5]"
+                className="w-full bg-white border border-stone-200 rounded-xl px-3.5 py-2 text-xs text-slate-900 placeholder:text-stone-400 focus:outline-none focus:border-[#162018]"
               />
             </div>
-            <div className="w-full sm:w-28">
+            <div className="w-full sm:w-24">
               <input
                 type="number"
                 min="0"
                 placeholder="Stok"
                 value={newSizeQty}
                 onChange={(e) => setNewSizeQty(e.target.value)}
-                className="w-full bg-[#0C0C14] border border-white/10 rounded-xl px-3.5 py-2 text-xs text-white text-center focus:outline-none focus:border-[#00BFA5]"
+                className="w-full bg-white border border-stone-200 rounded-xl px-3.5 py-2 text-xs text-slate-900 text-center focus:outline-none focus:border-[#162018]"
               />
             </div>
             <button
               type="submit"
-              className="w-full sm:w-auto flex items-center justify-center gap-1.5 bg-white/5 hover:bg-[#00BFA5]/20 hover:text-[#00BFA5] border border-white/10 px-4 py-2 rounded-xl text-xs font-bold text-slate-300 transition cursor-pointer shrink-0"
+              className="w-full sm:w-auto flex items-center justify-center gap-1.5 bg-[#162018] hover:bg-black text-white px-4 py-2 rounded-xl text-xs font-bold transition cursor-pointer shrink-0 shadow-xs"
             >
               <Plus size={14} />
               Tambah Ukuran
@@ -284,11 +284,11 @@ export default function ManageSizeStockModal({ product, onClose, onStockUpdated 
         </div>
 
         {/* Modal Footer */}
-        <div className="p-6 border-t border-white/10 flex items-center justify-between bg-white/2">
+        <div className="p-6 border-t border-stone-100 flex items-center justify-between bg-stone-50/50">
           <button
             type="button"
             onClick={onClose}
-            className="px-5 py-2.5 rounded-xl text-slate-400 hover:text-white text-sm font-semibold transition cursor-pointer"
+            className="px-5 py-2.5 rounded-xl text-stone-600 hover:text-slate-900 text-xs font-bold transition cursor-pointer"
           >
             Batal
           </button>
@@ -297,11 +297,11 @@ export default function ManageSizeStockModal({ product, onClose, onStockUpdated 
             type="button"
             onClick={handleSaveAll}
             disabled={saving}
-            className="flex items-center gap-2 bg-[#00BFA5] hover:bg-[#00BFA5]/90 text-black px-6 py-2.5 rounded-xl text-sm font-bold shadow-[0_0_20px_rgba(0,191,165,0.25)] transition active:scale-95 disabled:opacity-50 cursor-pointer"
+            className="flex items-center gap-2 bg-[#B9382B] hover:bg-[#9E2D22] text-white px-6 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider shadow-md transition active:scale-95 disabled:opacity-50 cursor-pointer"
           >
             {saving ? (
               <>
-                <svg className="animate-spin h-4 w-4 text-black" viewBox="0 0 24 24">
+                <svg className="animate-spin h-4 w-4 text-white" viewBox="0 0 24 24">
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                 </svg>
@@ -309,7 +309,7 @@ export default function ManageSizeStockModal({ product, onClose, onStockUpdated 
               </>
             ) : (
               <>
-                <Save size={16} />
+                <Save size={15} />
                 Simpan Perubahan Stok
               </>
             )}

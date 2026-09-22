@@ -68,14 +68,14 @@ const UserRow = memo(function UserRow({ user, index, page, limit, onUserChange }
   };
 
   return (
-    <tr className="border-b border-white/5 hover:bg-white/3 transition-colors duration-200 group">
-      <td className="p-4 text-white/40 text-sm font-mono">
+    <tr className="border-b border-stone-100 hover:bg-stone-50/60 transition-colors group">
+      <td className="p-4 text-stone-400 text-xs font-mono font-semibold">
         {(page - 1) * limit + index + 1}
       </td>
       <td className="p-4">
         <div className="flex items-center gap-3">
           {/* Initial Avatar */}
-          <div className="w-9 h-9 rounded-full bg-linear-to-br from-[#00BFA5]/80 to-teal-600 flex items-center justify-center shrink-0 shadow-[0_0_12px_rgba(0,191,165,0.15)] overflow-hidden">
+          <div className="w-9 h-9 rounded-full bg-[#FAF0ED] border border-[#B9382B]/20 text-[#B9382B] flex items-center justify-center shrink-0 overflow-hidden font-bold text-xs shadow-xs">
             {avatarUrl && !avatarError ? (
               <img
                 src={avatarUrl}
@@ -84,16 +84,16 @@ const UserRow = memo(function UserRow({ user, index, page, limit, onUserChange }
                 onError={() => setAvatarError(true)}
               />
             ) : (
-              <span className="text-white font-bold text-xs">
+              <span>
                 {fullName?.charAt(0)?.toUpperCase() || "U"}
               </span>
             )}
           </div>
           <div>
-            <p className="text-white/90 text-sm font-semibold group-hover:text-white transition-colors duration-200">
+            <p className="text-slate-900 text-sm font-bold group-hover:text-[#B9382B] transition-colors">
               {fullName}
             </p>
-            <p className="text-white/30 text-xs">{email}</p>
+            <p className="text-stone-400 text-xs font-mono">{email}</p>
           </div>
         </div>
       </td>
@@ -105,17 +105,17 @@ const UserRow = memo(function UserRow({ user, index, page, limit, onUserChange }
             value={roleRaw}
             onChange={handleRoleChange}
             disabled={updatingRole}
-            className={`bg-[#0D0D0D] border rounded-xl px-3 py-1.5 text-xs font-semibold outline-none cursor-pointer transition ${
+            className={`border rounded-xl px-3 py-1.5 text-xs font-bold outline-hidden cursor-pointer transition shadow-xs ${
               isAdmin
-                ? "border-red-500/40 text-red-400 focus:border-red-500"
+                ? "border-[#B9382B]/30 text-[#B9382B] bg-[#FAF0ED]"
                 : isLogistics
-                ? "border-purple-500/40 text-purple-400 focus:border-purple-500"
-                : "border-emerald-500/40 text-emerald-400 focus:border-[#00BFA5]"
+                ? "border-blue-200 text-blue-700 bg-blue-50"
+                : "border-emerald-200 text-emerald-800 bg-emerald-50"
             }`}
           >
-            <option value="ROLE_CUSTOMER" className="bg-[#14141E] text-white">Customer</option>
-            <option value="ROLE_LOGISTICS" className="bg-[#14141E] text-white">Staf Gudang (Logistik)</option>
-            <option value="ROLE_ADMIN" className="bg-[#14141E] text-white">Admin</option>
+            <option value="ROLE_CUSTOMER">Pelanggan (Customer)</option>
+            <option value="ROLE_LOGISTICS">Staf Gudang (Logistik)</option>
+            <option value="ROLE_ADMIN">Administrator</option>
           </select>
         </div>
       </td>
@@ -123,19 +123,19 @@ const UserRow = memo(function UserRow({ user, index, page, limit, onUserChange }
       {/* Status Akun */}
       <td className="p-4">
         <span
-          className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-2xl text-xs font-bold border ${
+          className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border ${
             isActive
-              ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
-              : "bg-rose-500/10 text-rose-400 border-rose-500/20"
+              ? "bg-emerald-50 text-emerald-800 border-emerald-200"
+              : "bg-rose-50 text-rose-800 border-rose-200"
           }`}
         >
-          <span className={`w-1.5 h-1.5 rounded-full ${isActive ? "bg-emerald-400" : "bg-rose-400"}`} />
+          <span className={`w-1.5 h-1.5 rounded-full ${isActive ? "bg-emerald-500" : "bg-rose-500"}`} />
           {isActive ? "Aktif" : "Suspended"}
         </span>
       </td>
 
       {/* Tanggal Bergabung */}
-      <td className="p-4 text-white/40 text-sm">
+      <td className="p-4 text-stone-500 text-xs font-medium">
         {createdAt
           ? new Date(createdAt).toLocaleDateString("id-ID", {
               day: "2-digit",
@@ -150,10 +150,10 @@ const UserRow = memo(function UserRow({ user, index, page, limit, onUserChange }
         <button
           onClick={handleToggleStatus}
           disabled={updatingStatus}
-          className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-semibold border transition-all duration-200 active:scale-95 disabled:opacity-50 cursor-pointer ${
+          className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold border transition-all active:scale-95 disabled:opacity-50 cursor-pointer shadow-xs ${
             isActive
-              ? "border-rose-500/30 text-rose-400 hover:bg-rose-500/10"
-              : "border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10"
+              ? "border-rose-200 text-rose-700 bg-white hover:bg-rose-50 hover:border-rose-300"
+              : "border-emerald-200 text-emerald-700 bg-white hover:bg-emerald-50 hover:border-emerald-300"
           }`}
           title={isActive ? "Suspend Akun Pengguna" : "Aktifkan Kembali Akun"}
         >
@@ -224,39 +224,48 @@ export default function Users() {
   }, [getUsers]);
 
   return (
-    <div className="min-h-screen bg-[#0D0D0D] pb-10">
+    <div className="space-y-8 pb-12">
       {/* ======================== HEADER ======================== */}
-      <div className="flex items-center gap-4 mb-10">
-        <div className="relative">
-          <div className="absolute inset-0 bg-[#00BFA5]/20 blur-xl rounded-2xl" />
-          <div className="relative bg-[#00BFA5]/10 border border-[#00BFA5]/30 p-3 rounded-2xl">
-            <UsersIcon size={28} className="text-[#00BFA5]" />
-          </div>
-        </div>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-4xl font-black text-white tracking-[-1px]">USERS</h1>
-          <p className="text-[#2a3a3a] text-sm">
-            Total <span className="text-white font-semibold">{total}</span> pengguna terdaftar
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-stone-100 border border-stone-200 text-stone-700 text-[10px] font-bold tracking-widest uppercase mb-2">
+            <UsersIcon size={12} className="text-[#B9382B]" />
+            <span>RS // USER MANAGEMENT</span>
+          </div>
+          <h1 className="font-['Barlow_Condensed'] font-black uppercase tracking-tight text-3xl sm:text-4xl text-slate-900 leading-none">
+            MANAJEMEN PENGGUNA
+          </h1>
+          <p className="text-stone-500 text-xs sm:text-sm mt-1">
+            Pantau akun terdaftar, kelola hak akses role admin/logistik, dan kontrol status moderasi.
           </p>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <div className="bg-white border border-stone-200/80 px-4 py-2 rounded-2xl shadow-xs text-right">
+            <p className="text-[10px] font-bold text-stone-400 uppercase tracking-widest">Total Pengguna</p>
+            <p className="font-['Barlow_Condensed'] font-black text-xl text-slate-900 leading-tight">
+              {total} Akun Terdaftar
+            </p>
+          </div>
         </div>
       </div>
 
       {/* ======================== FILTER BAR ======================== */}
-      <div className="flex flex-col md:flex-row gap-3 mb-8">
+      <div className="flex flex-col md:flex-row gap-3">
         {/* Search */}
-        <div className="flex items-center gap-3 flex-1 bg-[#14141E] border border-white/5 rounded-2xl px-5 py-3 hover:border-[#00BFA5]/20 transition-all duration-300 group">
-          <Search size={20} className="text-white/30 group-hover:text-[#00BFA5]/60 transition-colors duration-300" />
+        <div className="flex items-center gap-3 flex-1 bg-white border border-stone-200/80 rounded-2xl px-4 py-3 shadow-xs focus-within:border-[#B9382B] focus-within:ring-1 focus-within:ring-[#B9382B] transition-all group">
+          <Search size={18} className="text-stone-400 group-focus-within:text-[#B9382B] transition-colors" />
           <input
             type="text"
-            placeholder="Cari nama atau email..."
+            placeholder="Cari nama lengkap atau email pengguna..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="flex-1 bg-transparent text-white text-sm outline-none placeholder:text-white/30"
+            className="flex-1 bg-transparent text-slate-900 text-sm outline-hidden placeholder:text-stone-400"
           />
           {search && (
             <button
               onClick={() => setSearch("")}
-              className="p-1 rounded-lg hover:bg-white/5 text-white/30 hover:text-white/60 transition-all"
+              className="p-1 rounded-lg hover:bg-stone-100 text-stone-400 hover:text-stone-700 transition-all cursor-pointer"
             >
               <ChevronRight size={16} className="rotate-45" />
             </button>
@@ -264,22 +273,26 @@ export default function Users() {
         </div>
 
         {/* Role Filter */}
-        <select
-          value={roleFilter}
-          onChange={(e) => {
-            setPage(1);
-            setRoleFilter(e.target.value);
-          }}
-          className="bg-[#14141E] border border-white/5 rounded-2xl px-5 py-3 text-white text-sm outline-none hover:border-[#00BFA5]/20 focus:border-[#00BFA5]/40 transition-all duration-300 cursor-pointer appearance-none bg-no-repeat bg-position-[right_1rem_center] bg-size-[1rem]"
-          style={{
-            backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%2300BFA5' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`,
-          }}
-        >
-          <option value="">Semua Role</option>
-          <option value="admin" className="bg-[#0D0D0D]">Admin</option>
-          <option value="logistics" className="bg-[#0D0D0D]">Staf Gudang (Logistik)</option>
-          <option value="customer" className="bg-[#0D0D0D]">Customer</option>
-        </select>
+        <div className="relative">
+          <select
+            value={roleFilter}
+            onChange={(e) => {
+              setPage(1);
+              setRoleFilter(e.target.value);
+            }}
+            className="bg-white border border-stone-200/80 rounded-2xl px-4 py-3 text-slate-800 text-sm font-semibold outline-hidden focus:border-[#B9382B] transition-all cursor-pointer shadow-xs pr-10 appearance-none"
+          >
+            <option value="">Semua Role Pengguna</option>
+            <option value="admin">Administrator</option>
+            <option value="logistics">Staf Gudang (Logistik)</option>
+            <option value="customer">Pelanggan (Customer)</option>
+          </select>
+          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-stone-500">
+            <svg className="w-4 h-4 fill-current" viewBox="0 0 20 20">
+              <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
+            </svg>
+          </div>
+        </div>
       </div>
 
       {/* ======================== TABLE ======================== */}
@@ -290,37 +303,37 @@ export default function Users() {
           title="Tidak ada pengguna"
           description={
             debouncedSearch || roleFilter
-              ? "Tidak ada pengguna yang cocok dengan filter."
-              : "Belum ada pengguna terdaftar."
+              ? "Tidak ada pengguna yang cocok dengan kata kunci atau filter role."
+              : "Belum ada akun pengguna terdaftar."
           }
         />
       ) : (
-        <div className="bg-[#14141E] border border-white/5 rounded-3xl overflow-hidden">
+        <div className="bg-white border border-stone-200/80 rounded-3xl overflow-hidden shadow-xs">
           <div className="overflow-x-auto">
             <table className="w-full min-w-175">
               <thead>
-                <tr className="border-b border-white/5 bg-white/2">
-                  <th className="p-4 text-left text-xs font-bold text-slate-400 uppercase tracking-widest">
+                <tr className="border-b border-stone-100 bg-stone-50/70">
+                  <th className="p-4 text-left text-[11px] font-bold text-stone-500 uppercase tracking-wider">
                     No
                   </th>
-                  <th className="p-4 text-left text-xs font-bold text-slate-400 uppercase tracking-widest">
+                  <th className="p-4 text-left text-[11px] font-bold text-stone-500 uppercase tracking-wider">
                     Pengguna
                   </th>
-                  <th className="p-4 text-left text-xs font-bold text-slate-400 uppercase tracking-widest">
+                  <th className="p-4 text-left text-[11px] font-bold text-stone-500 uppercase tracking-wider">
                     Role & Hak Akses
                   </th>
-                  <th className="p-4 text-left text-xs font-bold text-slate-400 uppercase tracking-widest">
+                  <th className="p-4 text-left text-[11px] font-bold text-stone-500 uppercase tracking-wider">
                     Status Akun
                   </th>
-                  <th className="p-4 text-left text-xs font-bold text-slate-400 uppercase tracking-widest">
+                  <th className="p-4 text-left text-[11px] font-bold text-stone-500 uppercase tracking-wider">
                     Bergabung
                   </th>
-                  <th className="p-4 text-left text-xs font-bold text-slate-400 uppercase tracking-widest">
+                  <th className="p-4 text-left text-[11px] font-bold text-stone-500 uppercase tracking-wider">
                     Aksi Moderasi
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-white/5">
+              <tbody className="divide-y divide-stone-100">
                 {users.map((user, index) => (
                   <UserRow
                     key={user.id}
@@ -339,25 +352,26 @@ export default function Users() {
 
       {/* ======================== PAGINATION ======================== */}
       {!loading && totalPages > 1 && (
-        <div className="flex items-center justify-center gap-4 mt-10">
+        <div className="flex items-center justify-center gap-3 mt-10">
           <button
             disabled={page === 1}
             onClick={() => setPage((p) => Math.max(p - 1, 1))}
-            className="flex items-center gap-2 px-5 py-3 bg-[#14141E] border border-white/5 hover:border-white/20 rounded-2xl text-white/60 disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-300 hover:text-white active:scale-95"
+            className="flex items-center gap-1.5 px-4 py-2.5 bg-white border border-stone-200/80 hover:bg-stone-50 rounded-xl text-stone-700 disabled:opacity-40 disabled:cursor-not-allowed transition font-bold text-xs shadow-xs cursor-pointer"
           >
-            <ChevronLeft size={18} />
+            <ChevronLeft size={16} />
             Sebelumnya
           </button>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5">
             {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
               <button
                 key={p}
                 onClick={() => setPage(p)}
-                className={`w-10 h-10 rounded-xl text-sm font-semibold transition-all duration-300 active:scale-90 ${p === page
-                    ? "bg-[#00BFA5] text-black shadow-[0_0_20px_rgba(0,191,165,0.3)]"
-                    : "bg-[#14141E] border border-white/5 text-white/50 hover:text-white hover:border-white/20"
-                  }`}
+                className={`w-9 h-9 rounded-xl text-xs font-bold transition cursor-pointer ${
+                  p === page
+                    ? "bg-[#B9382B] text-white shadow-xs"
+                    : "bg-white border border-stone-200/80 text-stone-600 hover:bg-stone-50 hover:text-slate-900"
+                }`}
               >
                 {p}
               </button>
@@ -367,22 +381,13 @@ export default function Users() {
           <button
             disabled={page === totalPages}
             onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
-            className="flex items-center gap-2 px-5 py-3 bg-[#14141E] border border-white/5 hover:border-white/20 rounded-2xl text-white/60 disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-300 hover:text-white active:scale-95"
+            className="flex items-center gap-1.5 px-4 py-2.5 bg-white border border-stone-200/80 hover:bg-stone-50 rounded-xl text-stone-700 disabled:opacity-40 disabled:cursor-not-allowed transition font-bold text-xs shadow-xs cursor-pointer"
           >
             Berikutnya
-            <ChevronRight size={18} />
+            <ChevronRight size={16} />
           </button>
         </div>
       )}
-
-      {/* Subtle background grid */}
-      <div
-        className="fixed inset-0 pointer-events-none opacity-[0.015] z-[-1]"
-        style={{
-          backgroundImage: `linear-gradient(#00BFA5 1px, transparent 1px), linear-gradient(90deg, #00BFA5 1px, transparent 1px)`,
-          backgroundSize: "80px 80px",
-        }}
-      />
     </div>
   );
 }

@@ -121,71 +121,103 @@ export default function Categories() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0D0D0D]">
-      {/* Header */}
-      <div className="flex items-center gap-4 mb-10">
-        <div className="relative">
-          <div className="absolute inset-0 bg-[#00BFA5]/20 blur-xl rounded-2xl" />
-          <div className="relative bg-[#00BFA5]/10 border border-[#00BFA5]/30 p-3 rounded-2xl">
-            <FolderTree size={28} className="text-[#00BFA5]" />
+    <div className="space-y-8 animate-in fade-in duration-300">
+      {/* Header Banner */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex items-center gap-3.5">
+          <div className="w-12 h-12 rounded-2xl bg-[#162018] text-white flex items-center justify-center shadow-md">
+            <FolderTree size={24} />
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="px-2 py-0.5 rounded-md bg-stone-100 text-stone-700 font-mono text-[10px] font-black tracking-widest border border-stone-200">
+                RS // CATALOG
+              </span>
+              <span className="text-[11px] font-mono uppercase tracking-widest text-stone-500">
+                HIERARKI PRODUK ATELIER
+              </span>
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-black text-slate-900 font-['Barlow_Condensed'] uppercase tracking-tight mt-1">
+              MANAJEMEN KATEGORI PRODUK
+            </h1>
+            <p className="text-stone-500 text-xs">
+              Struktur klasifikasi katalog apparel olahraga dan perlengkapan atletik RegarSport.
+            </p>
           </div>
         </div>
-        <div>
-          <h1 className="text-4xl font-black text-white tracking-[-1px]">CATEGORIES</h1>
-          <p className="text-[#2a3a3a] text-sm">Kelola kategori produk RegarSport</p>
+
+        <div className="flex items-center gap-2 self-start sm:self-auto px-4 py-2 rounded-2xl bg-white border border-stone-200/80 text-xs font-mono shadow-xs">
+          <span className="text-stone-500">Total Kategori:</span>
+          <span className="font-bold text-slate-900 text-sm">{categories.length} Kategori</span>
         </div>
       </div>
 
       {/* Form Card */}
-      <div className="bg-[#14141E] border border-white/5 rounded-3xl p-8 mb-10">
-        <h2 className="text-lg font-bold text-white mb-6 flex items-center gap-3">
-          {editingId ? "Edit Category" : "Tambah Category Baru"}
-          <div className="h-px flex-1 bg-white/10" />
-        </h2>
+      <div className="bg-white border border-stone-200/80 rounded-3xl p-6 sm:p-8 shadow-xs">
+        <div className="flex items-center justify-between mb-6 pb-4 border-b border-stone-100">
+          <div>
+            <h2 className="text-base sm:text-lg font-bold text-slate-900 font-['Barlow_Condensed'] uppercase tracking-wide">
+              {editingId ? "Edit Kategori Produk" : "Tambah Kategori Baru"}
+            </h2>
+            <p className="text-xs text-stone-500">
+              {editingId ? `Memperbarui data kategori ID #${editingId}` : "Masukkan nama kategori dan unggah ikon atau foto representatif"}
+            </p>
+          </div>
+          {editingId && (
+            <span className="px-2.5 py-1 rounded-full text-[10px] font-mono font-bold bg-[#FAF0ED] text-[#B9382B] border border-[#B9382B]/20">
+              MODE EDIT
+            </span>
+          )}
+        </div>
 
-        <form onSubmit={handleCreate} className="space-y-6">
+        <form onSubmit={editingId ? handleUpdate : handleCreate} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
             {/* Name Input */}
-            <div className="md:col-span-7">
-              <label className="block text-xs font-bold uppercase tracking-widest text-slate-400 mb-2">
+            <div className="md:col-span-7 space-y-2">
+              <label className="block text-xs font-bold uppercase tracking-widest text-stone-600">
                 NAMA KATEGORI
               </label>
               <input
                 type="text"
-                placeholder="Contoh: Sepatu Basket, Raket Badminton"
+                placeholder="Contoh: Jersey Futsal, Sepatu Running, Aksesori"
                 value={form.name}
                 onChange={(e) => setForm({ ...form, name: e.target.value })}
-                className="w-full bg-[#0D0D0D] border border-white/10 rounded-2xl px-5 py-4 text-white placeholder:text-slate-500 focus:outline-none focus:border-[#00BFA5]/60 transition-all"
+                className="w-full bg-stone-50 border border-stone-200 rounded-2xl px-4 py-3.5 text-stone-900 placeholder:text-stone-400 focus:outline-none focus:border-[#162018] focus:bg-white transition-all text-sm font-medium"
               />
+              <p className="text-[11px] text-stone-400">
+                Nama kategori akan ditampilkan di navbar katalog toko dan filter produk pelanggan.
+              </p>
             </div>
 
             {/* Image Upload */}
-            <div className="md:col-span-5">
-              <label className="block text-xs font-bold uppercase tracking-widest text-slate-400 mb-2">
-                GAMBAR KATEGORI
+            <div className="md:col-span-5 space-y-2">
+              <label className="block text-xs font-bold uppercase tracking-widest text-stone-600">
+                FOTO / IKON KATEGORI
               </label>
-              <label className="flex flex-col items-center justify-center border border-dashed border-white/20 hover:border-[#00BFA5]/50 rounded-2xl h-36 cursor-pointer transition-colors group">
+              <label className="flex flex-col items-center justify-center border border-dashed border-stone-300 hover:border-[#162018] bg-stone-50/60 rounded-2xl h-36 cursor-pointer transition-colors group">
                 {imagePreview ? (
-                  <div className="relative w-full h-full flex items-center justify-center">
+                  <div className="relative w-full h-full flex items-center justify-center p-2">
                     <img
                       src={imagePreview}
                       alt="Preview"
-                      className="max-h-32 rounded-xl object-cover border border-white/10"
+                      className="max-h-30 rounded-xl object-cover border border-stone-200 shadow-xs"
                     />
                     <button
                       type="button"
-                      onClick={(e) => { e.preventDefault(); setImage(null); }}
-                      className="absolute -top-2 -right-2 bg-red-500 text-white p-1 rounded-full hover:bg-red-600"
+                      onClick={(e) => { e.preventDefault(); setImage(null); setCurrentImageUrl(""); setImagePreview(""); }}
+                      className="absolute top-2 right-2 bg-rose-600 text-white p-1.5 rounded-full hover:bg-rose-700 shadow-sm cursor-pointer"
+                      title="Hapus Foto"
                     >
-                      <X size={14} />
+                      <X size={13} />
                     </button>
                   </div>
                 ) : (
-                  <div className="flex flex-col items-center">
-                    <div className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center mb-3 group-hover:bg-[#00BFA5]/10 transition-colors">
-                      <Upload size={24} className="text-slate-400 group-hover:text-[#00BFA5]" />
+                  <div className="flex flex-col items-center p-4 text-center">
+                    <div className="w-10 h-10 rounded-xl bg-white border border-stone-200 flex items-center justify-center mb-2 group-hover:bg-[#162018] group-hover:text-white transition-colors text-stone-500">
+                      <Upload size={18} />
                     </div>
-                    <span className="text-sm text-slate-400">Klik untuk upload gambar</span>
+                    <span className="text-xs font-bold text-stone-700">Pilih Foto Kategori</span>
+                    <span className="text-[10px] text-stone-400 mt-0.5">JPG, PNG atau WebP (Maks. 2MB)</span>
                   </div>
                 )}
                 <input
@@ -199,33 +231,34 @@ export default function Categories() {
           </div>
 
           {/* Action Buttons */}
-          <div className="flex gap-3 pt-4">
+          <div className="flex gap-3 pt-2">
             {editingId ? (
               <>
                 <button
                   type="button"
                   onClick={handleUpdate}
                   disabled={loading}
-                  className="flex-1 bg-[#00BFA5] hover:bg-[#00BFA5]/90 disabled:opacity-70 text-black font-bold py-4 rounded-2xl transition-all flex items-center justify-center gap-2"
+                  className="flex-1 bg-[#162018] hover:bg-black text-white font-bold py-3.5 px-6 rounded-2xl text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 shadow-md cursor-pointer active:scale-95 disabled:opacity-50"
                 >
-                  {loading ? "Memperbarui..." : "Simpan Perubahan"}
+                  {loading ? "Menyimpan Perubahan..." : "Simpan Perubahan Kategori"}
                 </button>
                 <button
                   type="button"
                   onClick={resetForm}
-                  className="px-8 py-4 border border-white/10 hover:bg-white/5 rounded-2xl transition-all"
+                  className="px-6 py-3.5 border border-stone-200 hover:bg-stone-100 rounded-2xl text-xs font-bold text-stone-600 transition-all cursor-pointer"
+                  title="Batalkan Edit"
                 >
-                  <X size={20} />
+                  Batal
                 </button>
               </>
             ) : (
               <button
                 type="submit"
                 disabled={loading || !form.name.trim()}
-                className="flex-1 bg-[#00BFA5] hover:bg-[#00BFA5]/90 disabled:opacity-70 text-black font-bold py-4 rounded-2xl transition-all flex items-center justify-center gap-2"
+                className="bg-[#B9382B] hover:bg-[#9E2D22] text-white font-bold py-3.5 px-8 rounded-2xl text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 shadow-md cursor-pointer active:scale-95 disabled:opacity-50"
               >
-                <Plus size={20} />
-                {loading ? "Menambahkan..." : "Tambah Kategori"}
+                <Plus size={16} />
+                <span>{loading ? "Menambahkan..." : "Tambah Kategori Baru"}</span>
               </button>
             )}
           </div>
@@ -233,54 +266,72 @@ export default function Categories() {
       </div>
 
       {/* Categories Table */}
-      <div className="bg-[#14141E] border border-white/5 rounded-3xl overflow-hidden">
-        <div className="px-8 py-5 border-b border-white/5 flex items-center justify-between">
-          <h3 className="font-bold text-white">Daftar Kategori</h3>
-          <span className="text-xs text-slate-400 font-mono">{categories.length} kategori</span>
+      <div className="bg-white border border-stone-200/80 rounded-3xl overflow-hidden shadow-xs">
+        <div className="px-6 sm:px-8 py-5 border-b border-stone-100 flex items-center justify-between">
+          <div>
+            <h3 className="text-base font-bold text-slate-900 font-['Barlow_Condensed'] uppercase tracking-wide">
+              Daftar Kategori Aktif
+            </h3>
+            <p className="text-xs text-stone-500">Daftar seluruh kelompok apparel yang terdaftar di database</p>
+          </div>
+          <span className="text-xs text-stone-500 font-mono px-3 py-1 bg-stone-100 rounded-full font-bold">
+            {categories.length} data
+          </span>
         </div>
 
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr className="border-b border-white/5">
-                <th className="p-5 text-left text-xs font-bold text-slate-400 uppercase tracking-wider">ID</th>
-                <th className="p-5 text-left text-xs font-bold text-slate-400 uppercase tracking-wider">Image</th>
-                <th className="p-5 text-left text-xs font-bold text-slate-400 uppercase tracking-wider">Nama Kategori</th>
-                <th className="p-5 text-right text-xs font-bold text-slate-400 uppercase tracking-wider">Action</th>
+              <tr className="border-b border-stone-100 bg-stone-50/80 text-[11px] font-mono font-bold text-stone-500 uppercase tracking-wider">
+                <th className="py-3.5 px-6 text-left">ID</th>
+                <th className="py-3.5 px-6 text-left">Ikon / Foto</th>
+                <th className="py-3.5 px-6 text-left">Nama Kategori</th>
+                <th className="py-3.5 px-6 text-right">Aksi</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/5">
+            <tbody className="divide-y divide-stone-100">
               {categories.length > 0 ? (
                 categories.map((category) => (
-                  <tr key={category.id} className="hover:bg-white/5 transition-colors group">
-                    <td className="p-5 text-sm text-slate-400 font-mono">#{category.id}</td>
-                    <td className="p-5">
+                  <tr key={category.id} className="hover:bg-stone-50/70 transition-colors group">
+                    <td className="py-4 px-6 text-xs text-stone-500 font-mono font-bold">
+                      #{category.id}
+                    </td>
+                    <td className="py-4 px-6">
                       {(category.imageUrl || category.image_url) ? (
                         <img
                           src={category.imageUrl || category.image_url}
                           alt={category.name}
-                          className="w-14 h-14 object-cover rounded-2xl border border-white/10"
+                          className="w-12 h-12 object-cover rounded-xl border border-stone-200 shadow-2xs"
                         />
                       ) : (
-                        <div className="w-14 h-14 bg-white/5 rounded-2xl flex items-center justify-center">
-                          <ImageIcon size={20} className="text-slate-500" />
+                        <div className="w-12 h-12 bg-stone-100 rounded-xl flex items-center justify-center text-stone-400 border border-stone-200">
+                          <ImageIcon size={18} />
                         </div>
                       )}
                     </td>
-                    <td className="p-5 text-white font-medium">{category.name}</td>
-                    <td className="p-5 text-right">
-                      <div className="flex items-center justify-end gap-2 opacity-70 group-hover:opacity-100 transition-opacity">
+                    <td className="py-4 px-6">
+                      <span className="font-bold text-slate-900 text-sm block">
+                        {category.name}
+                      </span>
+                      <span className="text-[11px] text-stone-400 font-mono">
+                        Slug: {category.name.toLowerCase().replace(/\s+/g, '-')}
+                      </span>
+                    </td>
+                    <td className="py-4 px-6 text-right">
+                      <div className="flex items-center justify-end gap-1.5">
                         <button
                           onClick={() => handleEdit(category)}
-                          className="p-3 hover:bg-white/5 rounded-xl text-blue-400 hover:text-blue-300 transition-colors"
+                          className="p-2.5 hover:bg-stone-100 rounded-xl text-stone-600 hover:text-slate-900 transition-colors cursor-pointer border border-transparent hover:border-stone-200"
+                          title="Edit Kategori"
                         >
-                          <Edit size={18} />
+                          <Edit size={16} />
                         </button>
                         <button
                           onClick={() => handleDelete(category.id)}
-                          className="p-3 hover:bg-white/5 rounded-xl text-red-400 hover:text-red-300 transition-colors"
+                          className="p-2.5 hover:bg-rose-50 rounded-xl text-rose-600 hover:text-rose-700 transition-colors cursor-pointer border border-transparent hover:border-rose-200"
+                          title="Hapus Kategori"
                         >
-                          <Trash2 size={18} />
+                          <Trash2 size={16} />
                         </button>
                       </div>
                     </td>
@@ -288,11 +339,12 @@ export default function Categories() {
                 ))
               ) : (
                 <tr>
-                  <td colSpan={4} className="p-20 text-center">
-                    <div className="mx-auto w-16 h-16 bg-white/5 rounded-3xl flex items-center justify-center mb-4">
-                      <FolderTree size={32} className="text-slate-500" />
+                  <td colSpan={4} className="py-16 text-center">
+                    <div className="mx-auto w-14 h-14 bg-stone-100 rounded-2xl flex items-center justify-center mb-3 text-stone-400">
+                      <FolderTree size={28} />
                     </div>
-                    <p className="text-slate-400">Belum ada kategori</p>
+                    <p className="text-sm font-bold text-slate-800">Belum Ada Kategori</p>
+                    <p className="text-xs text-stone-400 mt-1">Gunakan form di atas untuk membuat kategori baru.</p>
                   </td>
                 </tr>
               )}

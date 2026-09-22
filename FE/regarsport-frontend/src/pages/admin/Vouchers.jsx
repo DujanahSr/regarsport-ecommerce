@@ -130,30 +130,26 @@ export default function Vouchers() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0D0D0D] text-white space-y-8">
+    <div className="space-y-8 pb-12">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div className="flex items-center gap-4">
-          <div className="relative">
-            <div className="absolute inset-0 bg-[#00BFA5]/20 blur-xl rounded-2xl" />
-            <div className="relative bg-[#00BFA5]/10 border border-[#00BFA5]/30 p-3 rounded-2xl">
-              <Tag size={28} className="text-[#00BFA5]" />
-            </div>
+        <div>
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-stone-100 border border-stone-200 text-stone-700 text-[10px] font-bold tracking-widest uppercase mb-2">
+            <Tag size={12} className="text-[#B9382B]" />
+            <span>RS // DISCOUNTS & PROMOTIONS</span>
           </div>
-          <div>
-            <h1 className="text-3xl sm:text-4xl font-black text-white tracking-[-1px]">
-              KUPON & VOUCHER PROMO
-            </h1>
-            <p className="text-slate-400 text-xs sm:text-sm">
-              Kelola diskon promosi, potongan harga pesanan tim, dan kuota kupon checkout Midtrans
-            </p>
-          </div>
+          <h1 className="font-['Barlow_Condensed'] font-black uppercase tracking-tight text-3xl sm:text-4xl text-slate-900 leading-none">
+            KUPON & VOUCHER PROMO
+          </h1>
+          <p className="text-stone-500 text-xs sm:text-sm mt-1">
+            Kelola diskon promosi, potongan harga pesanan tim, dan kuota kupon checkout Midtrans.
+          </p>
         </div>
 
         <div className="flex items-center gap-3">
           <button
             onClick={() => setShowAddModal(true)}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#00BFA5] text-black font-extrabold text-xs uppercase tracking-wider hover:shadow-lg hover:shadow-[#00BFA5]/25 hover:scale-105 transition-all cursor-pointer"
+            className="flex items-center gap-2 px-5 py-3 rounded-xl bg-[#B9382B] hover:bg-[#9E2D22] text-white font-bold text-xs uppercase tracking-wider shadow-md hover:shadow-lg transition-all active:scale-95 cursor-pointer"
           >
             <Plus size={16} strokeWidth={3} />
             <span>Buat Kupon Baru</span>
@@ -163,19 +159,21 @@ export default function Vouchers() {
 
       {/* Vouchers Grid */}
       {loading ? (
-        <ScreenLoader />
+        <ScreenLoader label="Memuat kupon promo..." />
       ) : vouchers.length === 0 ? (
-        <div className="p-12 text-center rounded-2xl bg-[#14141E] border border-white/5 space-y-4">
-          <div className="w-16 h-16 mx-auto rounded-full bg-[#00BFA5]/10 flex items-center justify-center text-[#00BFA5]">
+        <div className="p-12 text-center rounded-3xl bg-white border border-stone-200/80 shadow-xs space-y-4">
+          <div className="w-16 h-16 mx-auto rounded-2xl bg-[#FAF0ED] border border-[#B9382B]/20 flex items-center justify-center text-[#B9382B]">
             <Tag size={32} />
           </div>
-          <h3 className="text-lg font-bold text-white">Belum Ada Kupon Promo</h3>
-          <p className="text-xs text-slate-400 max-w-sm mx-auto">
+          <h3 className="font-['Barlow_Condensed'] font-black uppercase tracking-wide text-2xl text-slate-900">
+            Belum Ada Kupon Promo
+          </h3>
+          <p className="text-xs text-stone-500 max-w-sm mx-auto">
             Buat kupon pertama Anda seperti diskon 10% atau potongan Rp 20.000 untuk menarik pembeli apparel olahraga.
           </p>
           <button
             onClick={() => setShowAddModal(true)}
-            className="px-5 py-2.5 rounded-xl bg-[#00BFA5] text-black font-extrabold text-xs uppercase tracking-wider"
+            className="px-5 py-2.5 rounded-xl bg-[#B9382B] hover:bg-[#9E2D22] text-white font-bold text-xs uppercase tracking-wider shadow-md transition cursor-pointer"
           >
             + Buat Kupon Sekarang
           </button>
@@ -192,10 +190,10 @@ export default function Vouchers() {
             return (
               <div
                 key={voucher.id}
-                className={`p-6 rounded-2xl border transition-all flex flex-col justify-between space-y-5 ${
+                className={`p-6 rounded-3xl border transition-all flex flex-col justify-between space-y-5 relative overflow-hidden ${
                   voucher.isActive
-                    ? "bg-[#14141E] border-white/10 hover:border-[#00BFA5]/50 shadow-xl"
-                    : "bg-[#14141E]/50 border-white/5 opacity-60"
+                    ? "bg-white border-stone-200/80 hover:border-stone-300 hover:shadow-lg shadow-xs"
+                    : "bg-stone-50/80 border-stone-200 opacity-70"
                 }`}
               >
                 {/* Top Section */}
@@ -203,12 +201,12 @@ export default function Vouchers() {
                   <div className="flex items-center justify-between">
                     <button
                       onClick={() => handleCopyCode(voucher.code)}
-                      className="group flex items-center gap-2 px-3 py-1.5 rounded-lg bg-black/40 border border-white/15 text-xs font-mono font-black text-[#00BFA5] hover:border-[#00BFA5] transition-colors"
+                      className="group flex items-center gap-2 px-3 py-1.5 rounded-xl bg-stone-100 hover:bg-[#FAF0ED] border border-stone-200 text-xs font-mono font-black text-[#B9382B] transition-colors cursor-pointer"
                       title="Klik untuk menyalin kode"
                     >
                       <span>{voucher.code}</span>
                       {copiedCode === voucher.code ? (
-                        <Check size={14} className="text-emerald-400" />
+                        <Check size={14} className="text-emerald-600" />
                       ) : (
                         <Copy size={14} className="opacity-60 group-hover:opacity-100" />
                       )}
@@ -216,17 +214,17 @@ export default function Vouchers() {
 
                     <div className="flex items-center gap-2">
                       <span
-                        className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full ${
+                        className={`text-[10px] font-bold uppercase px-2.5 py-0.5 rounded-md border ${
                           voucher.isActive
-                            ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
-                            : "bg-rose-500/20 text-rose-400 border border-rose-500/30"
+                            ? "bg-emerald-50 text-emerald-800 border-emerald-200"
+                            : "bg-rose-50 text-rose-800 border-rose-200"
                         }`}
                       >
                         {voucher.isActive ? "Aktif" : "Nonaktif"}
                       </span>
                       <button
                         onClick={() => handleDelete(voucher.id, voucher.code)}
-                        className="text-slate-500 hover:text-rose-400 p-1"
+                        className="text-stone-400 hover:text-rose-600 p-1 rounded-lg transition-colors cursor-pointer"
                         title="Hapus kupon"
                       >
                         <Trash2 size={16} />
@@ -235,27 +233,29 @@ export default function Vouchers() {
                   </div>
 
                   <div>
-                    <h3 className="text-base font-bold text-white">{voucher.name}</h3>
-                    <div className="text-2xl font-black text-[#00BFA5] mt-1">
+                    <h3 className="text-base font-bold text-slate-900">{voucher.name}</h3>
+                    <div className="font-['Barlow_Condensed'] font-black text-3xl text-[#B9382B] tracking-tight leading-none mt-1">
                       {isPercentage
                         ? `Diskon ${voucher.discountValue}%`
                         : `Potongan Rp ${Number(voucher.discountValue).toLocaleString("id-ID")}`}
                     </div>
                   </div>
 
-                  <div className="text-xs text-slate-400 space-y-1 pt-2 border-t border-white/5">
-                    <div>
-                      Min. Belanja: <strong className="text-slate-200">Rp {Number(voucher.minSpend || 0).toLocaleString("id-ID")}</strong>
+                  <div className="text-xs text-stone-500 space-y-1 pt-3 border-t border-stone-100">
+                    <div className="flex justify-between items-center">
+                      <span>Min. Belanja:</span>
+                      <strong className="text-slate-800">Rp {Number(voucher.minSpend || 0).toLocaleString("id-ID")}</strong>
                     </div>
                     {isPercentage && voucher.maxDiscount && (
-                      <div>
-                        Maks. Potongan: <strong className="text-slate-200">Rp {Number(voucher.maxDiscount).toLocaleString("id-ID")}</strong>
+                      <div className="flex justify-between items-center">
+                        <span>Maks. Potongan:</span>
+                        <strong className="text-slate-800">Rp {Number(voucher.maxDiscount).toLocaleString("id-ID")}</strong>
                       </div>
                     )}
                     {voucher.validUntil && (
-                      <div>
-                        Berlaku s/d:{" "}
-                        <strong className="text-slate-200">
+                      <div className="flex justify-between items-center">
+                        <span>Berlaku s/d:</span>
+                        <strong className="text-slate-800">
                           {new Date(voucher.validUntil).toLocaleDateString("id-ID", {
                             day: "2-digit",
                             month: "short",
@@ -268,17 +268,17 @@ export default function Vouchers() {
                 </div>
 
                 {/* Bottom Section: Usage & Toggle */}
-                <div className="space-y-3 pt-3 border-t border-white/5">
+                <div className="space-y-3 pt-3 border-t border-stone-100">
                   <div>
-                    <div className="flex items-center justify-between text-[11px] text-slate-400 mb-1">
+                    <div className="flex items-center justify-between text-[11px] font-semibold text-stone-500 mb-1">
                       <span>Pemakaian Kuota</span>
-                      <span>
+                      <span className="font-mono text-slate-800">
                         {voucher.usedCount || 0} / {voucher.usageLimit || 100} ({usagePct}%)
                       </span>
                     </div>
-                    <div className="w-full h-1.5 rounded-full bg-white/10 overflow-hidden">
+                    <div className="w-full h-2 rounded-full bg-stone-100 overflow-hidden border border-stone-200/50">
                       <div
-                        className="h-full bg-gradient-to-r from-[#00BFA5] to-teal-400 rounded-full transition-all"
+                        className="h-full bg-[#B9382B] rounded-full transition-all"
                         style={{ width: `${usagePct}%` }}
                       />
                     </div>
@@ -286,10 +286,10 @@ export default function Vouchers() {
 
                   <button
                     onClick={() => handleToggleActive(voucher.id)}
-                    className={`w-full py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                    className={`w-full py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                       voucher.isActive
-                        ? "bg-white/5 hover:bg-rose-500/20 hover:text-rose-400 text-slate-300 border border-white/10"
-                        : "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/30"
+                        ? "bg-stone-100 hover:bg-rose-50 hover:text-rose-700 text-stone-700 border border-stone-200"
+                        : "bg-emerald-50 text-emerald-800 border border-emerald-200 hover:bg-emerald-100"
                     }`}
                   >
                     {voucher.isActive ? "Nonaktifkan Kupon" : "Aktifkan Kupon"}
@@ -303,21 +303,23 @@ export default function Vouchers() {
 
       {/* CREATE VOUCHER MODAL */}
       {showAddModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="relative w-full max-w-lg rounded-2xl bg-[#14141E] border border-white/10 p-6 shadow-2xl space-y-5">
-            <div className="flex items-center justify-between pb-3 border-b border-white/10">
-              <div className="flex items-center gap-2.5">
-                <div className="bg-[#00BFA5]/10 p-2 rounded-lg text-[#00BFA5]">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200">
+          <div className="relative w-full max-w-lg rounded-3xl bg-white border border-stone-200 p-6 sm:p-7 shadow-2xl space-y-5 text-slate-900">
+            <div className="flex items-center justify-between pb-4 border-b border-stone-100">
+              <div className="flex items-center gap-3">
+                <div className="bg-[#FAF0ED] border border-[#B9382B]/20 p-2.5 rounded-2xl text-[#B9382B]">
                   <Plus size={18} strokeWidth={3} />
                 </div>
                 <div>
-                  <h3 className="text-base font-bold text-white">Buat Kupon Promo Baru</h3>
-                  <p className="text-[11px] text-slate-400">Atur kode voucher dan besaran diskon</p>
+                  <h3 className="font-['Barlow_Condensed'] font-black uppercase tracking-wide text-2xl text-slate-900 leading-none">
+                    Buat Kupon Promo Baru
+                  </h3>
+                  <p className="text-xs text-stone-500 mt-0.5">Atur kode voucher dan ketentuan diskon</p>
                 </div>
               </div>
               <button
                 onClick={() => setShowAddModal(false)}
-                className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-white/10"
+                className="text-stone-400 hover:text-slate-800 p-1.5 rounded-xl hover:bg-stone-100 transition-colors cursor-pointer"
               >
                 <X size={18} />
               </button>
@@ -326,7 +328,7 @@ export default function Vouchers() {
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">
+                  <label className="block text-[11px] font-bold text-stone-700 uppercase tracking-wider mb-2">
                     Kode Kupon *
                   </label>
                   <input
@@ -335,18 +337,18 @@ export default function Vouchers() {
                     value={formData.code}
                     onChange={(e) => setFormData({ ...formData, code: e.target.value.toUpperCase() })}
                     placeholder="Contoh: REGARJUARA"
-                    className="w-full px-4 py-2.5 rounded-xl bg-[#0D0D0D] border border-white/10 font-mono font-bold text-white text-xs uppercase focus:outline-none focus:border-[#00BFA5]"
+                    className="w-full px-4 py-2.5 rounded-xl bg-stone-50 border border-stone-200 font-mono font-bold text-slate-900 text-xs uppercase focus:bg-white focus:border-[#B9382B] focus:ring-1 focus:ring-[#B9382B] outline-hidden transition-all"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">
+                  <label className="block text-[11px] font-bold text-stone-700 uppercase tracking-wider mb-2">
                     Tipe Diskon *
                   </label>
                   <select
                     value={formData.discountType}
                     onChange={(e) => setFormData({ ...formData, discountType: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-xl bg-[#0D0D0D] border border-white/10 text-xs text-white focus:outline-none focus:border-[#00BFA5]"
+                    className="w-full px-4 py-2.5 rounded-xl bg-stone-50 border border-stone-200 text-xs font-semibold text-slate-900 focus:bg-white focus:border-[#B9382B] focus:ring-1 focus:ring-[#B9382B] outline-hidden transition-all cursor-pointer"
                   >
                     <option value="PERCENTAGE">Persentase (%)</option>
                     <option value="FIXED_AMOUNT">Nominal Tetap (Rp)</option>
@@ -355,7 +357,7 @@ export default function Vouchers() {
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">
+                <label className="block text-[11px] font-bold text-stone-700 uppercase tracking-wider mb-2">
                   Nama Promo *
                 </label>
                 <input
@@ -364,13 +366,13 @@ export default function Vouchers() {
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   placeholder="Contoh: Diskon Juara Turnamen Futsal"
-                  className="w-full px-4 py-2.5 rounded-xl bg-[#0D0D0D] border border-white/10 text-xs text-white focus:outline-none focus:border-[#00BFA5]"
+                  className="w-full px-4 py-2.5 rounded-xl bg-stone-50 border border-stone-200 text-xs text-slate-900 focus:bg-white focus:border-[#B9382B] focus:ring-1 focus:ring-[#B9382B] outline-hidden transition-all font-medium"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">
+                  <label className="block text-[11px] font-bold text-stone-700 uppercase tracking-wider mb-2">
                     Nilai Diskon {formData.discountType === "PERCENTAGE" ? "(%)" : "(Rp)"} *
                   </label>
                   <input
@@ -380,12 +382,12 @@ export default function Vouchers() {
                     value={formData.discountValue}
                     onChange={(e) => setFormData({ ...formData, discountValue: e.target.value })}
                     placeholder={formData.discountType === "PERCENTAGE" ? "10" : "20000"}
-                    className="w-full px-4 py-2.5 rounded-xl bg-[#0D0D0D] border border-white/10 text-xs text-white focus:outline-none focus:border-[#00BFA5]"
+                    className="w-full px-4 py-2.5 rounded-xl bg-stone-50 border border-stone-200 text-xs font-mono font-bold text-slate-900 focus:bg-white focus:border-[#B9382B] focus:ring-1 focus:ring-[#B9382B] outline-hidden transition-all"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">
+                  <label className="block text-[11px] font-bold text-stone-700 uppercase tracking-wider mb-2">
                     Minimal Belanja (Rp)
                   </label>
                   <input
@@ -394,14 +396,14 @@ export default function Vouchers() {
                     value={formData.minSpend}
                     onChange={(e) => setFormData({ ...formData, minSpend: e.target.value })}
                     placeholder="100000"
-                    className="w-full px-4 py-2.5 rounded-xl bg-[#0D0D0D] border border-white/10 text-xs text-white focus:outline-none focus:border-[#00BFA5]"
+                    className="w-full px-4 py-2.5 rounded-xl bg-stone-50 border border-stone-200 text-xs font-mono font-bold text-slate-900 focus:bg-white focus:border-[#B9382B] focus:ring-1 focus:ring-[#B9382B] outline-hidden transition-all"
                   />
                 </div>
               </div>
 
               {formData.discountType === "PERCENTAGE" && (
                 <div>
-                  <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">
+                  <label className="block text-[11px] font-bold text-stone-700 uppercase tracking-wider mb-2">
                     Maksimal Potongan Diskon (Rp, Opsional)
                   </label>
                   <input
@@ -410,14 +412,14 @@ export default function Vouchers() {
                     value={formData.maxDiscount}
                     onChange={(e) => setFormData({ ...formData, maxDiscount: e.target.value })}
                     placeholder="Contoh: 50000"
-                    className="w-full px-4 py-2.5 rounded-xl bg-[#0D0D0D] border border-white/10 text-xs text-white focus:outline-none focus:border-[#00BFA5]"
+                    className="w-full px-4 py-2.5 rounded-xl bg-stone-50 border border-stone-200 text-xs font-mono font-bold text-slate-900 focus:bg-white focus:border-[#B9382B] focus:ring-1 focus:ring-[#B9382B] outline-hidden transition-all"
                   />
                 </div>
               )}
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">
+                  <label className="block text-[11px] font-bold text-stone-700 uppercase tracking-wider mb-2">
                     Batas Kuota Pemakaian
                   </label>
                   <input
@@ -426,35 +428,35 @@ export default function Vouchers() {
                     value={formData.usageLimit}
                     onChange={(e) => setFormData({ ...formData, usageLimit: e.target.value })}
                     placeholder="100"
-                    className="w-full px-4 py-2.5 rounded-xl bg-[#0D0D0D] border border-white/10 text-xs text-white focus:outline-none focus:border-[#00BFA5]"
+                    className="w-full px-4 py-2.5 rounded-xl bg-stone-50 border border-stone-200 text-xs font-mono font-bold text-slate-900 focus:bg-white focus:border-[#B9382B] focus:ring-1 focus:ring-[#B9382B] outline-hidden transition-all"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">
+                  <label className="block text-[11px] font-bold text-stone-700 uppercase tracking-wider mb-2">
                     Berlaku Sampai (Opsional)
                   </label>
                   <input
                     type="date"
                     value={formData.validUntil}
                     onChange={(e) => setFormData({ ...formData, validUntil: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-xl bg-[#0D0D0D] border border-white/10 text-xs text-white focus:outline-none focus:border-[#00BFA5]"
+                    className="w-full px-4 py-2.5 rounded-xl bg-stone-50 border border-stone-200 text-xs font-semibold text-slate-900 focus:bg-white focus:border-[#B9382B] focus:ring-1 focus:ring-[#B9382B] outline-hidden transition-all cursor-pointer"
                   />
                 </div>
               </div>
 
-              <div className="pt-2 flex items-center justify-end gap-3">
+              <div className="pt-3 flex items-center justify-end gap-3 border-t border-stone-100">
                 <button
                   type="button"
                   onClick={() => setShowAddModal(false)}
-                  className="px-4 py-2 text-xs font-bold text-slate-400 hover:text-white"
+                  className="px-4 py-2 text-xs font-bold text-stone-500 hover:text-slate-900 cursor-pointer"
                 >
                   Batal
                 </button>
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#00BFA5] text-black font-extrabold text-xs uppercase tracking-wider hover:shadow-lg hover:shadow-[#00BFA5]/25 disabled:opacity-50 cursor-pointer"
+                  className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#B9382B] hover:bg-[#9E2D22] text-white font-bold text-xs uppercase tracking-wider shadow-md disabled:opacity-50 cursor-pointer active:scale-95 transition-all"
                 >
                   {submitting && <Loader2 size={14} className="animate-spin" />}
                   <span>Simpan Kupon</span>

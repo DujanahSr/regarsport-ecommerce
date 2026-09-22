@@ -237,7 +237,7 @@ export default function Orders() {
   };
 
   return (
-    <div className={isLogistics ? "space-y-8 animate-in fade-in duration-300" : "min-h-screen bg-[#0D0D0D]"}>
+    <div className="space-y-8 animate-in fade-in duration-300">
       {/* Header */}
       {isLogistics ? (
         <div className="relative overflow-hidden rounded-3xl border border-black/10 shadow-xl bg-[#162018]">
@@ -300,25 +300,27 @@ export default function Orders() {
           </div>
         </div>
       ) : (
-        <div className="flex items-center gap-4 mb-8">
-          <div className="p-3.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400">
-            <ShoppingCart size={28} />
-          </div>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
           <div>
-            <div className="flex items-center gap-2 mb-1">
-              <span className="px-2.5 py-0.5 rounded-md font-mono text-[10px] font-black tracking-widest bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
-                RS // ORDER CENTER
-              </span>
-              <span className="text-[11px] font-mono uppercase tracking-widest text-slate-400">
-                CENTRAL SALES MANAGEMENT
-              </span>
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-stone-100 border border-stone-200 text-stone-700 text-[10px] font-bold tracking-widest uppercase mb-2">
+              <ShoppingCart size={12} className="text-[#B9382B]" />
+              <span>RS // ORDER CENTER</span>
             </div>
-            <h1 className="font-['Barlow_Condensed'] font-black text-3xl sm:text-4xl uppercase tracking-tight leading-none text-white">
+            <h1 className="font-['Barlow_Condensed'] font-black text-3xl sm:text-4xl uppercase tracking-tight leading-none text-slate-900">
               MANAJEMEN PESANAN
             </h1>
-            <p className="text-xs sm:text-sm mt-1.5 text-slate-400">
-              Kelola semua pesanan pelanggan RegarSport
+            <p className="text-xs sm:text-sm mt-1 text-stone-500">
+              Pantau antrean pesanan pelanggan, status pembayaran, produksi atelier, dan koordinasi pengiriman.
             </p>
+          </div>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={getOrders}
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white hover:bg-stone-50 text-stone-700 text-xs font-bold transition-all border border-stone-200/80 shadow-xs cursor-pointer active:scale-95"
+            >
+              <RefreshCw size={13} className={loading ? "animate-spin" : ""} />
+              <span>Refresh Antrean</span>
+            </button>
           </div>
         </div>
       )}
@@ -334,33 +336,6 @@ export default function Orders() {
           { label: "Dibatalkan", value: "CANCELLED" },
         ].map((tab) => {
           const isActive = (statusFilter || "").toUpperCase() === (tab.value || "").toUpperCase();
-          if (isLogistics) {
-            return (
-              <button
-                key={tab.value}
-                onClick={() => {
-                  setPage(1);
-                  setStatusFilter(tab.value);
-                }}
-                className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${
-                  isActive
-                    ? tab.value === "PAID"
-                      ? "bg-[#B9382B] text-white shadow-md"
-                      : "bg-[#162018] text-white shadow-md"
-                    : "bg-white text-stone-600 hover:text-black hover:bg-stone-100 border border-stone-200"
-                }`}
-              >
-                <span>{tab.label}</span>
-                {tab.badge && (
-                  <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${
-                    isActive ? "bg-white/20 text-white" : "bg-[#FAF0ED] text-[#B9382B] border border-[#B9382B]/20"
-                  }`}>
-                    {tab.badge}
-                  </span>
-                )}
-              </button>
-            );
-          }
           return (
             <button
               key={tab.value}
@@ -368,15 +343,19 @@ export default function Orders() {
                 setPage(1);
                 setStatusFilter(tab.value);
               }}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${
+              className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${
                 isActive
-                  ? "bg-[#00BFA5] text-black shadow-lg shadow-[#00BFA5]/25"
-                  : "bg-[#14141E] text-slate-400 hover:text-white hover:bg-white/5 border border-white/5"
+                  ? tab.value === "PAID"
+                    ? "bg-[#B9382B] text-white shadow-md"
+                    : "bg-[#162018] text-white shadow-md"
+                  : "bg-white text-stone-600 hover:text-black hover:bg-stone-100 border border-stone-200"
               }`}
             >
               <span>{tab.label}</span>
               {tab.badge && (
-                <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${isActive ? "bg-black/20 text-black font-black" : "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"}`}>
+                <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${
+                  isActive ? "bg-white/20 text-white" : "bg-[#FAF0ED] text-[#B9382B] border border-[#B9382B]/20"
+                }`}>
                   {tab.badge}
                 </span>
               )}
@@ -389,27 +368,21 @@ export default function Orders() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
         {/* Barcode & Text Search */}
         <div className="flex-1 max-w-lg">
-          <div className={`flex items-center rounded-2xl px-4 py-2.5 transition-all ${
-            isLogistics
-              ? "bg-white border border-stone-200 focus-within:border-[#162018] shadow-xs"
-              : "bg-[#14141E] border border-white/10 focus-within:border-[#00BFA5]/60 shadow-inner"
-          }`}>
-            <Scan size={18} className={`mr-2.5 shrink-0 ${isLogistics ? "text-stone-400" : "text-[#00BFA5]"}`} />
+          <div className="flex items-center rounded-2xl px-4 py-2.5 transition-all bg-white border border-stone-200/80 focus-within:border-[#B9382B] focus-within:ring-1 focus-within:ring-[#B9382B] shadow-xs">
+            <Scan size={18} className="mr-2.5 shrink-0 text-stone-400" />
             <input
               ref={searchInputRef}
               type="text"
               placeholder="Cari No. Order, Scan Barcode Resi, Nama, Kota, atau HP..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className={`w-full bg-transparent text-xs sm:text-sm outline-none font-mono ${
-                isLogistics ? "text-slate-900 placeholder:text-stone-400" : "text-white placeholder:text-white/30"
-              }`}
+              className="w-full bg-transparent text-xs sm:text-sm outline-hidden font-mono text-slate-900 placeholder:text-stone-400"
             />
             {searchQuery && (
               <button
                 type="button"
                 onClick={() => setSearchQuery("")}
-                className={`${isLogistics ? "text-stone-400 hover:text-black" : "text-white/40 hover:text-white"} ml-2 p-1 cursor-pointer`}
+                className="text-stone-400 hover:text-slate-900 ml-2 p-1 cursor-pointer transition-colors"
                 title="Hapus pencarian"
               >
                 <X size={15} />
@@ -424,15 +397,11 @@ export default function Orders() {
             <button
               type="button"
               onClick={toggleSelectAll}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-semibold transition cursor-pointer ${
-                isLogistics
-                  ? "bg-white hover:bg-stone-100 text-stone-700 border border-stone-200 shadow-xs"
-                  : "bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white border border-white/5"
-              }`}
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition cursor-pointer bg-white hover:bg-stone-50 text-stone-700 border border-stone-200/80 shadow-xs"
             >
               {selectedOrderIds.length > 0 && selectedOrderIds.length === filteredOrders.length ? (
                 <>
-                  <CheckSquare size={16} className={isLogistics ? "text-emerald-800" : "text-[#00BFA5]"} />
+                  <CheckSquare size={16} className="text-[#B9382B]" />
                   <span>Batal Pilih Semua</span>
                 </>
               ) : (
@@ -448,9 +417,9 @@ export default function Orders() {
             <button
               onClick={handleExportCSV}
               disabled={exporting}
-              className="flex items-center gap-2.5 bg-[#00BFA5]/10 hover:bg-[#00BFA5]/20 text-[#00BFA5] hover:text-white px-5 py-2.5 rounded-2xl border border-[#00BFA5]/20 transition-all font-semibold text-xs disabled:opacity-50 cursor-pointer"
+              className="flex items-center gap-2 bg-white hover:bg-stone-50 text-stone-700 px-4 py-2.5 rounded-xl border border-stone-200/80 transition-all font-bold text-xs disabled:opacity-50 cursor-pointer shadow-xs"
             >
-              <Download size={16} />
+              <Download size={15} />
               {exporting ? "Mengekspor..." : "Export CSV"}
             </button>
           )}
@@ -469,40 +438,36 @@ export default function Orders() {
           }
         />
       ) : (
-        <div className={`rounded-3xl overflow-hidden shadow-sm ${
-          isLogistics
-            ? "bg-white border border-stone-200/80"
-            : "relative bg-[#14141E] border border-white/10 shadow-xl"
-        }`}>
+        <div className="rounded-3xl overflow-hidden shadow-xs bg-white border border-stone-200/80">
           <div className="overflow-x-auto relative z-10">
             <table className="w-full min-w-225">
               <thead>
-                <tr className={`border-b ${isLogistics ? "bg-stone-50 border-stone-200 text-stone-600" : "bg-white/5 border-white/5 text-slate-400"}`}>
-                  <th className={`${isLogistics ? "py-3 px-3 pl-4" : "p-5 pl-6"} text-center w-12`}>
+                <tr className="border-b bg-stone-50/70 border-stone-200 text-stone-600 font-bold uppercase tracking-wider text-[11px]">
+                  <th className="py-3 px-3 pl-4 text-center w-12">
                     <button
                       type="button"
                       onClick={toggleSelectAll}
-                      className={isLogistics ? "text-stone-500 hover:text-black cursor-pointer" : "text-slate-400 hover:text-white cursor-pointer"}
+                      className="text-stone-500 hover:text-black cursor-pointer"
                       title="Pilih semua pesanan"
                     >
                       {selectedOrderIds.length > 0 && selectedOrderIds.length === filteredOrders.length ? (
-                        <CheckSquare size={18} className={isLogistics ? "text-emerald-800" : "text-[#00BFA5]"} />
+                        <CheckSquare size={18} className="text-[#B9382B]" />
                       ) : (
                         <Square size={18} />
                       )}
                     </button>
                   </th>
-                  <th className={`${isLogistics ? "py-3 px-3.5" : "p-5"} text-left text-xs font-bold uppercase tracking-wider`}>Order ID</th>
-                  <th className={`${isLogistics ? "py-3 px-3.5" : "p-5"} text-left text-xs font-bold uppercase tracking-wider`}>Pelanggan</th>
-                  <th className={`${isLogistics ? "py-3 px-3.5" : "p-5"} text-left text-xs font-bold uppercase tracking-wider`}>Item &amp; Ukuran</th>
-                  <th className={`${isLogistics ? "py-3 px-3.5" : "p-5"} text-left text-xs font-bold uppercase tracking-wider`}>Total</th>
-                  <th className={`${isLogistics ? "py-3 px-3.5" : "p-5"} text-left text-xs font-bold uppercase tracking-wider`}>Status</th>
-                  <th className={`${isLogistics ? "py-3 px-3.5" : "p-5"} text-left text-xs font-bold uppercase tracking-wider`}>Pengiriman &amp; Resi</th>
-                  <th className={`${isLogistics ? "py-3 px-3.5" : "p-5"} text-left text-xs font-bold uppercase tracking-wider`}>Label Logistik</th>
-                  <th className={`${isLogistics ? "py-3 px-3.5" : "p-5"} text-left text-xs font-bold uppercase tracking-wider`}>Ubah Status</th>
+                  <th className="py-3 px-3.5 text-left text-xs font-bold uppercase tracking-wider">Order ID</th>
+                  <th className="py-3 px-3.5 text-left text-xs font-bold uppercase tracking-wider">Pelanggan</th>
+                  <th className="py-3 px-3.5 text-left text-xs font-bold uppercase tracking-wider">Item &amp; Ukuran</th>
+                  <th className="py-3 px-3.5 text-left text-xs font-bold uppercase tracking-wider">Total</th>
+                  <th className="py-3 px-3.5 text-left text-xs font-bold uppercase tracking-wider">Status</th>
+                  <th className="py-3 px-3.5 text-left text-xs font-bold uppercase tracking-wider">Pengiriman &amp; Resi</th>
+                  <th className="py-3 px-3.5 text-left text-xs font-bold uppercase tracking-wider">Label Logistik</th>
+                  <th className="py-3 px-3.5 text-left text-xs font-bold uppercase tracking-wider">Ubah Status</th>
                 </tr>
               </thead>
-              <tbody className={`divide-y ${isLogistics ? "divide-stone-100" : "divide-white/5"}`}>
+              <tbody className="divide-y divide-stone-100">
                 {filteredOrders.map((order) => {
                   const s = (order.status || "").toLowerCase();
                   const hasShipping = order.shippingCourier || order.trackingNumber;
@@ -510,50 +475,46 @@ export default function Orders() {
                   return (
                     <tr
                       key={order.id}
-                      className={`transition-all duration-200 group ${
-                        isLogistics
-                          ? `hover:bg-stone-50 ${selectedOrderIds.includes(order.id) ? "bg-stone-100/80" : ""}`
-                          : `hover:bg-white/5 ${selectedOrderIds.includes(order.id) ? "bg-[#00BFA5]/5" : ""}`
+                      className={`transition-all duration-200 group hover:bg-stone-50/60 ${
+                        selectedOrderIds.includes(order.id) ? "bg-[#FAF0ED]/60" : ""
                       }`}
                     >
-                      <td className={`${isLogistics ? "py-3 px-3 pl-4" : "p-5 pl-6"} text-center`}>
+                      <td className="py-3 px-3 pl-4 text-center">
                         <input
                           type="checkbox"
                           checked={selectedOrderIds.includes(order.id)}
                           onChange={() => toggleSelectOrder(order.id)}
-                          className={`w-4 h-4 rounded cursor-pointer ${isLogistics ? "accent-[#111613]" : "accent-[#00BFA5]"}`}
+                          className="w-4 h-4 rounded cursor-pointer accent-[#B9382B]"
                         />
                       </td>
-                      <td className={`${isLogistics ? "py-3 px-3.5" : "p-5"} font-mono text-sm font-bold ${isLogistics ? "text-slate-900" : "text-white/60"}`}>
+                      <td className="py-3 px-3.5 font-mono text-sm font-bold text-slate-900">
                         {order.orderNumber || `#${order.id}`}
                       </td>
-                      <td className={`${isLogistics ? "py-3 px-3.5" : "p-6"}`}>
-                        <div className={`font-bold ${isLogistics ? "text-slate-900" : "text-white"}`}>
+                      <td className="py-3 px-3.5">
+                        <div className="font-bold text-slate-900">
                           {order.recipientName || order.customerName || order.users?.full_name || "Customer"}
                         </div>
-                        <div className={`text-xs mt-0.5 ${isLogistics ? "text-stone-500" : "text-slate-400"}`}>
+                        <div className="text-xs mt-0.5 text-stone-500 font-mono">
                           {order.customerPhone || order.customerEmail || order.users?.email || "-"}
                         </div>
                         {order.shippingCity && (
-                          <div className={`text-[11px] mt-0.5 ${isLogistics ? "text-stone-500 font-medium" : "text-[#00BFA5]/80"}`}>
+                          <div className="text-[11px] mt-0.5 text-stone-600 font-medium">
                             📍 {order.shippingCity}
                           </div>
                         )}
                       </td>
-                      <td className={`${isLogistics ? "py-3 px-3.5" : "p-6"}`}>
+                      <td className="py-3 px-3.5">
                         <div className="space-y-1.5 min-w-44 max-w-xs">
                           {(order.items || []).map((it, itIdx) => (
                             <div key={itIdx} className="flex flex-wrap items-center gap-1.5 text-xs">
-                              <span className={`font-medium truncate max-w-36 ${isLogistics ? "text-slate-800" : "text-white/90"}`}>
+                              <span className="font-medium truncate max-w-36 text-slate-800">
                                 {it.productName}
                               </span>
-                              <span className={`font-mono text-[11px] ${isLogistics ? "text-stone-400" : "text-white/40"}`}>
+                              <span className="font-mono text-[11px] text-stone-400">
                                 {it.quantity}x
                               </span>
                               {it.size && (
-                                <span className={`px-1.5 py-0.5 rounded-md font-bold text-[10px] ${
-                                  isLogistics ? "bg-stone-100 text-stone-800 border border-stone-200" : "bg-[#00BFA5]/15 text-[#00BFA5] border border-[#00BFA5]/30"
-                                }`}>
+                                <span className="px-1.5 py-0.5 rounded-md font-bold text-[10px] bg-stone-100 text-stone-800 border border-stone-200">
                                   {it.size}
                                 </span>
                               )}
@@ -561,75 +522,67 @@ export default function Orders() {
                           ))}
                         </div>
                       </td>
-                      <td className={`${isLogistics ? "py-3 px-3.5" : "p-6"}`}>
-                        <span className={`text-base font-bold font-mono ${isLogistics ? "text-slate-900" : "text-white"}`}>
+                      <td className="py-3 px-3.5">
+                        <span className="text-sm font-bold font-mono text-slate-900">
                           Rp {Number(order.totalAmount || order.total_amount).toLocaleString("id-ID")}
                         </span>
                       </td>
-                      <td className={`${isLogistics ? "py-3 px-3.5" : "p-6"}`}>
+                      <td className="py-3 px-3.5">
                         <span
                           className={`inline-block text-xs font-bold px-3 py-1 rounded-full border ${
-                            isLogistics
-                              ? s === "paid"
-                                ? "bg-[#FAF0ED] text-[#B9382B] border-[#B9382B]/30 font-mono"
-                                : s === "shipped"
-                                ? "bg-blue-50 text-blue-800 border-blue-200 font-mono"
-                                : s === "completed"
-                                ? "bg-stone-100 text-stone-800 border-stone-200 font-mono"
-                                : "bg-stone-100 text-stone-600 border-stone-200 font-mono"
-                              : statusColors[s] || "bg-white/10 text-white/70"
+                            s === "paid"
+                              ? "bg-[#FAF0ED] text-[#B9382B] border-[#B9382B]/30 font-mono"
+                              : s === "shipped"
+                              ? "bg-blue-50 text-blue-800 border-blue-200 font-mono"
+                              : s === "completed"
+                              ? "bg-emerald-50 text-emerald-800 border-emerald-200 font-mono"
+                              : s === "processing"
+                              ? "bg-purple-50 text-purple-800 border-purple-200 font-mono"
+                              : s === "pending"
+                              ? "bg-amber-50 text-amber-800 border-amber-200 font-mono"
+                              : "bg-stone-100 text-stone-600 border-stone-200 font-mono"
                           }`}
                         >
-                          {s === "paid" && isLogistics ? "🔥 Perlu Dikemas" : s.charAt(0).toUpperCase() + s.slice(1)}
+                          {s === "paid" ? "🔥 Perlu Dikemas" : s.charAt(0).toUpperCase() + s.slice(1)}
                         </span>
                       </td>
-                      <td className={`${isLogistics ? "py-3 px-3.5" : "p-6"}`}>
+                      <td className="py-3 px-3.5">
                         {hasShipping ? (
                           <div className="flex flex-col gap-1">
-                            <span className={`text-xs font-bold flex items-center gap-1 ${isLogistics ? "text-slate-900" : "text-[#00BFA5]"}`}>
+                            <span className="text-xs font-bold flex items-center gap-1 text-slate-900">
                               <Truck size={12} /> {order.shippingCourier || "Ekspedisi"}
                             </span>
-                            <span className={`text-xs font-mono px-2 py-0.5 rounded border w-fit ${
-                              isLogistics ? "text-slate-900 bg-stone-100 border-stone-200" : "text-white/80 bg-white/5 border-white/10"
-                            }`}>
+                            <span className="text-xs font-mono px-2 py-0.5 rounded border w-fit text-slate-900 bg-stone-100 border-stone-200 font-bold">
                               {order.trackingNumber}
                             </span>
                           </div>
                         ) : s === "paid" || s === "processing" ? (
                           <button
                             onClick={() => handleOpenShipModal(order)}
-                            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-semibold transition active:scale-95 cursor-pointer ${
-                              isLogistics
-                                ? "bg-stone-100 hover:bg-stone-200 text-stone-800 border-stone-200"
-                                : "bg-[#00BFA5]/10 hover:bg-[#00BFA5]/20 text-[#00BFA5] border border-[#00BFA5]/30"
-                            }`}
+                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-bold transition active:scale-95 cursor-pointer bg-[#FAF0ED] hover:bg-[#B9382B] text-[#B9382B] hover:text-white border-[#B9382B]/30 shadow-xs"
                           >
                             <Truck size={14} /> Input Resi
                           </button>
                         ) : (
-                          <span className={`text-xs italic ${isLogistics ? "text-stone-400" : "text-white/30"}`}>-</span>
+                          <span className="text-xs italic text-stone-400">-</span>
                         )}
                       </td>
-                      <td className={`${isLogistics ? "py-3 px-3.5" : "p-6"}`}>
+                      <td className="py-3 px-3.5">
                         <button
                           onClick={() => setLabelOrder(order)}
-                          className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-semibold transition active:scale-95 whitespace-nowrap cursor-pointer ${
-                            isLogistics
-                              ? "bg-[#162018] hover:bg-black text-white shadow-xs"
-                              : "bg-purple-500/10 hover:bg-purple-500/20 text-purple-300 border border-purple-500/30"
-                          }`}
+                          className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition active:scale-95 whitespace-nowrap cursor-pointer bg-stone-100 hover:bg-[#162018] text-stone-800 hover:text-white border border-stone-200 shadow-xs"
                           title="Cetak Label Pengiriman Thermal A6 & Packing Slip"
                         >
                           <Printer size={14} /> Cetak Label A6
                         </button>
                       </td>
-                      <td className={`${isLogistics ? "py-3 px-3.5" : "p-6"}`}>
+                      <td className="py-3 px-3.5">
                         {s === "completed" ? (
-                          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 text-xs font-mono font-bold whitespace-nowrap">
+                          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-mono font-bold whitespace-nowrap">
                             <CheckCircle2 size={13} /> Selesai
                           </span>
                         ) : s === "cancelled" ? (
-                          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-rose-500/15 text-rose-300 border border-rose-500/30 text-xs font-mono font-bold whitespace-nowrap">
+                          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-rose-50 text-rose-700 border border-rose-200 text-xs font-mono font-bold whitespace-nowrap">
                             <Ban size={13} /> Dibatalkan
                           </span>
                         ) : s === "pending" ? (
@@ -638,7 +591,7 @@ export default function Orders() {
                               type="button"
                               onClick={() => handleSyncPayment(order)}
                               disabled={syncingOrderId === order.id}
-                              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/30 text-xs font-mono font-bold transition active:scale-95 cursor-pointer disabled:opacity-50"
+                              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 text-xs font-mono font-bold transition active:scale-95 cursor-pointer disabled:opacity-50"
                               title="Sinkronkan status pembayaran terkini dari Midtrans"
                             >
                               <RefreshCw size={12} className={syncingOrderId === order.id ? "animate-spin" : ""} />
@@ -647,7 +600,7 @@ export default function Orders() {
                             <button
                               type="button"
                               onClick={() => updateStatus(order.id, "cancelled", s)}
-                              className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 border border-rose-500/30 text-xs font-mono font-bold transition active:scale-95 cursor-pointer"
+                              className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-xs font-mono font-bold transition active:scale-95 cursor-pointer"
                               title="Batalkan pesanan ini"
                             >
                               <Ban size={12} />
@@ -659,7 +612,7 @@ export default function Orders() {
                             <button
                               type="button"
                               onClick={() => updateStatus(order.id, "processing", s)}
-                              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-[#00BFA5]/20 hover:bg-[#00BFA5]/30 text-[#00BFA5] border border-[#00BFA5]/40 text-xs font-mono font-bold transition active:scale-95 cursor-pointer"
+                              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-[#B9382B] hover:bg-[#9E2D22] text-white text-xs font-mono font-bold transition active:scale-95 cursor-pointer shadow-xs"
                               title="Pindahkan ke antrean produksi Atelier"
                             >
                               <span>Mulai Jahit →</span>
@@ -667,7 +620,7 @@ export default function Orders() {
                             <button
                               type="button"
                               onClick={() => updateStatus(order.id, "cancelled", s)}
-                              className="p-1.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 border border-rose-500/30 text-xs transition cursor-pointer"
+                              className="p-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-xs transition cursor-pointer"
                               title="Batalkan pesanan"
                             >
                               <Ban size={13} />
@@ -678,7 +631,7 @@ export default function Orders() {
                             <button
                               type="button"
                               onClick={() => handleOpenShipModal(order)}
-                              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-blue-500/20 hover:bg-blue-500/30 text-blue-300 border border-blue-500/40 text-xs font-mono font-bold transition active:scale-95 cursor-pointer"
+                              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-mono font-bold transition active:scale-95 cursor-pointer shadow-xs"
                               title="Input nomor resi pengiriman kurir"
                             >
                               <Truck size={13} />
@@ -687,7 +640,7 @@ export default function Orders() {
                             <button
                               type="button"
                               onClick={() => updateStatus(order.id, "cancelled", s)}
-                              className="p-1.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 border border-rose-500/30 text-xs transition cursor-pointer"
+                              className="p-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-xs transition cursor-pointer"
                               title="Batalkan pesanan"
                             >
                               <Ban size={13} />
@@ -706,7 +659,7 @@ export default function Orders() {
                                   toast.error(e.response?.data?.message || "Gagal menyelesaikan pesanan");
                                 }
                               }}
-                              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 text-xs font-mono font-bold transition active:scale-95 cursor-pointer"
+                              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-mono font-bold transition active:scale-95 cursor-pointer shadow-xs"
                               title="Tandai pesanan telah sampai dan selesai"
                             >
                               <CheckCircle2 size={13} />
@@ -714,7 +667,7 @@ export default function Orders() {
                             </button>
                           </div>
                         ) : (
-                          <span className="text-xs text-white/40 font-mono">-</span>
+                          <span className="text-xs text-stone-400 font-mono">-</span>
                         )}
                       </td>
                     </tr>
@@ -728,68 +681,70 @@ export default function Orders() {
 
       {/* Pagination */}
       {!loading && totalPages > 1 && (
-        <div className="flex items-center justify-center gap-4 mt-10">
+        <div className="flex items-center justify-center gap-3 mt-10">
           <button
             disabled={page === 1}
             onClick={() => setPage((p) => Math.max(p - 1, 1))}
-            className="flex items-center gap-2 px-5 py-3 bg-[#14141E] border border-white/5 hover:border-white/20 rounded-2xl text-white/70 disabled:opacity-40 disabled:cursor-not-allowed transition-all hover:text-white"
+            className="flex items-center gap-1.5 px-4 py-2.5 bg-white border border-stone-200/80 hover:bg-stone-50 rounded-xl text-stone-700 disabled:opacity-40 disabled:cursor-not-allowed transition font-bold text-xs shadow-xs cursor-pointer"
           >
-            <ChevronLeft size={18} />
+            <ChevronLeft size={16} />
             Sebelumnya
           </button>
 
-          <div className="px-6 py-3 bg-[#14141E] border border-white/5 rounded-2xl text-sm text-white/70 font-medium">
-            Halaman <span className="text-white font-bold">{page}</span> dari {totalPages}
+          <div className="px-5 py-2.5 bg-white border border-stone-200/80 rounded-xl text-xs text-stone-600 font-bold shadow-xs">
+            Halaman <span className="text-slate-900">{page}</span> dari {totalPages}
           </div>
 
           <button
             disabled={page === totalPages}
             onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
-            className="flex items-center gap-2 px-5 py-3 bg-[#14141E] border border-white/5 hover:border-white/20 rounded-2xl text-white/70 disabled:opacity-40 disabled:cursor-not-allowed transition-all hover:text-white"
+            className="flex items-center gap-1.5 px-4 py-2.5 bg-white border border-stone-200/80 hover:bg-stone-50 rounded-xl text-stone-700 disabled:opacity-40 disabled:cursor-not-allowed transition font-bold text-xs shadow-xs cursor-pointer"
           >
             Berikutnya
-            <ChevronRight size={18} />
+            <ChevronRight size={16} />
           </button>
         </div>
       )}
 
       {/* Modal Input Resi / Kirim Pesanan */}
       {shippingOrder && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="relative w-full max-w-md bg-[#14141E] border border-white/10 rounded-3xl p-6 shadow-2xl">
-            <div className="flex items-center justify-between pb-4 mb-5 border-b border-white/10">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200">
+          <div className="relative w-full max-w-md bg-white border border-stone-200 rounded-3xl p-6 shadow-2xl text-slate-900">
+            <div className="flex items-center justify-between pb-4 mb-5 border-b border-stone-100">
               <div className="flex items-center gap-3">
-                <div className="p-2.5 rounded-xl bg-[#00BFA5]/10 text-[#00BFA5] border border-[#00BFA5]/20">
+                <div className="p-2.5 rounded-2xl bg-[#FAF0ED] text-[#B9382B] border border-[#B9382B]/20">
                   <Truck size={22} />
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold text-white">Kirim Pesanan</h3>
-                  <p className="text-xs text-white/40 font-mono">#{shippingOrder.orderNumber}</p>
+                  <h3 className="font-['Barlow_Condensed'] font-black uppercase tracking-wide text-2xl text-slate-900 leading-none">
+                    Kirim Pesanan
+                  </h3>
+                  <p className="text-xs text-stone-500 font-mono mt-0.5">#{shippingOrder.orderNumber}</p>
                 </div>
               </div>
               <button
                 onClick={() => setShippingOrder(null)}
-                className="p-1 text-white/40 hover:text-white rounded-lg hover:bg-white/5 transition"
+                className="p-1.5 text-stone-400 hover:text-slate-900 rounded-xl hover:bg-stone-100 transition cursor-pointer"
               >
                 <X size={20} />
               </button>
             </div>
 
             {/* Destination Preview */}
-            <div className="mb-4 p-3 rounded-2xl bg-white/5 border border-white/10 text-xs text-white/80 space-y-1">
+            <div className="mb-4 p-3.5 rounded-2xl bg-stone-50 border border-stone-200 text-xs text-stone-700 space-y-1">
               <p>
-                <span className="text-white/40">Penerima:</span>{" "}
-                <strong className="text-white">
+                <span className="text-stone-400">Penerima:</span>{" "}
+                <strong className="text-slate-900">
                   {shippingOrder.recipientName || shippingOrder.customerName || "Customer"}
                 </strong>
                 {(shippingOrder.customerPhone || shippingOrder.shippingPhone) && (
-                  <span className="font-mono text-white/60 ml-1.5">
+                  <span className="font-mono text-stone-500 ml-1.5">
                     ({shippingOrder.customerPhone || shippingOrder.shippingPhone})
                   </span>
                 )}
               </p>
-              <p className="text-white/70">
-                <span className="text-white/40">Alamat:</span>{" "}
+              <p className="text-stone-600">
+                <span className="text-stone-400">Alamat:</span>{" "}
                 {[
                   shippingOrder.shippingAddress || shippingOrder.shipping_address,
                   shippingOrder.shippingCity,
@@ -799,7 +754,7 @@ export default function Orders() {
                   .join(", ") || "Alamat tidak tercantum"}
               </p>
               {shippingOrder.shippingNotes && (
-                <p className="text-amber-400 bg-amber-400/10 px-2 py-1 rounded-lg border border-amber-400/20 text-[11px] mt-1">
+                <p className="text-amber-800 bg-amber-50 px-2 py-1 rounded-lg border border-amber-200 text-[11px] mt-1 font-medium">
                   <span className="font-bold">Catatan:</span> {shippingOrder.shippingNotes}
                 </p>
               )}
@@ -807,11 +762,13 @@ export default function Orders() {
 
             <form onSubmit={handleShipSubmit} className="space-y-4">
               <div>
-                <label className="block text-xs font-semibold text-white/60 mb-2">Pilih Kurir / Ekspedisi</label>
+                <label className="block text-[11px] font-bold uppercase tracking-wider text-stone-700 mb-2">
+                  Pilih Kurir / Ekspedisi
+                </label>
                 <select
                   value={courier}
                   onChange={(e) => setCourier(e.target.value)}
-                  className="w-full bg-[#0D0D0D] border border-white/10 rounded-2xl px-4 py-3 text-sm text-white outline-none focus:border-[#00BFA5] transition"
+                  className="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-2.5 text-xs font-semibold text-slate-900 outline-hidden focus:bg-white focus:border-[#B9382B] transition cursor-pointer"
                 >
                   {courierList.map((c) => (
                     <option key={c} value={c}>{c}</option>
@@ -820,13 +777,15 @@ export default function Orders() {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-white/60 mb-2">Nomor Resi Pengiriman</label>
+                <label className="block text-[11px] font-bold uppercase tracking-wider text-stone-700 mb-2">
+                  Nomor Resi Pengiriman
+                </label>
                 <input
                   type="text"
                   placeholder="Contoh: JP8829104812"
                   value={trackingNumber}
                   onChange={(e) => setTrackingNumber(e.target.value)}
-                  className="w-full bg-[#0D0D0D] border border-white/10 rounded-2xl px-4 py-3 text-sm text-white outline-none focus:border-[#00BFA5] transition font-mono placeholder:text-white/20"
+                  className="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-2.5 text-xs text-slate-900 outline-hidden focus:bg-white focus:border-[#B9382B] transition font-mono font-bold placeholder:text-stone-400"
                   required
                 />
               </div>
@@ -835,16 +794,16 @@ export default function Orders() {
                 <button
                   type="button"
                   onClick={() => setShippingOrder(null)}
-                  className="flex-1 px-4 py-3 rounded-2xl bg-white/5 hover:bg-white/10 text-white/60 hover:text-white text-sm font-semibold transition"
+                  className="flex-1 px-4 py-2.5 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-bold transition cursor-pointer"
                 >
                   Batal
                 </button>
                 <button
                   type="submit"
                   disabled={shippingSubmitting}
-                  className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-2xl bg-[#00BFA5] hover:bg-[#00BFA5]/90 text-black font-bold text-sm transition active:scale-95 disabled:opacity-50"
+                  className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[#B9382B] hover:bg-[#9E2D22] text-white font-bold text-xs uppercase tracking-wider transition active:scale-95 disabled:opacity-50 shadow-md cursor-pointer"
                 >
-                  <PackageCheck size={18} />
+                  <PackageCheck size={16} />
                   {shippingSubmitting ? "Mengirim..." : "Kirim Pesanan"}
                 </button>
               </div>
@@ -855,19 +814,19 @@ export default function Orders() {
 
       {/* Floating Action Bar untuk Cetak Massal */}
       {selectedOrderIds.length > 0 && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 bg-[#14141E] border border-[#00BFA5]/40 rounded-2xl px-5 py-3 shadow-2xl shadow-black/80 flex items-center gap-3 sm:gap-4 animate-in fade-in slide-in-from-bottom-4">
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 bg-[#162018] border border-white/10 rounded-2xl px-5 py-3 shadow-2xl shadow-black/40 flex items-center gap-3 sm:gap-4 animate-in fade-in slide-in-from-bottom-4">
           <div className="flex items-center gap-2 text-xs sm:text-sm text-white font-medium">
-            <span className="w-6 h-6 rounded-full bg-[#00BFA5] text-black font-black text-xs flex items-center justify-center">
+            <span className="w-6 h-6 rounded-full bg-[#B9382B] text-white font-black text-xs flex items-center justify-center">
               {selectedOrderIds.length}
             </span>
             <span className="hidden sm:inline">Pesanan terpilih</span>
           </div>
 
-          <div className="h-4 w-px bg-white/10" />
+          <div className="h-4 w-px bg-white/20" />
 
           <button
             onClick={() => setShowBulkModal(true)}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#00BFA5] hover:bg-[#00BFA5]/90 text-black text-xs font-black transition cursor-pointer shadow-lg shadow-[#00BFA5]/20 active:scale-95"
+            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#B9382B] hover:bg-[#9E2D22] text-white text-xs font-bold transition cursor-pointer shadow-md active:scale-95"
           >
             <Printer size={15} />
             Cetak {selectedOrderIds.length} Label Thermal (A6)
@@ -875,7 +834,7 @@ export default function Orders() {
 
           <button
             onClick={() => setSelectedOrderIds([])}
-            className="text-xs text-slate-400 hover:text-white px-2 py-1 transition cursor-pointer"
+            className="text-xs text-stone-300 hover:text-white px-2 py-1 transition cursor-pointer"
           >
             Batal
           </button>

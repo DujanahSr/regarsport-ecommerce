@@ -74,13 +74,13 @@ const ReviewRow = memo(function ReviewRow({ review, index, page, limit, onReplyS
   };
 
   return (
-    <tr className="border-b border-white/5 hover:bg-white/3 transition-colors duration-200 group">
-      <td className="p-4 text-white/40 text-sm font-mono">
+    <tr className="border-b border-stone-100 hover:bg-stone-50/60 transition-colors group">
+      <td className="p-4 text-stone-400 text-xs font-mono font-semibold">
         {(page - 1) * limit + index + 1}
       </td>
       <td className="p-4 min-w-48">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-full overflow-hidden bg-[#1a1a2a] border border-white/10 flex items-center justify-center shrink-0">
+          <div className="w-9 h-9 rounded-full overflow-hidden bg-[#FAF0ED] border border-[#B9382B]/20 text-[#B9382B] flex items-center justify-center shrink-0 font-bold text-xs shadow-xs">
             {customerAvatar && !avatarError ? (
               <img
                 src={customerAvatar}
@@ -89,22 +89,22 @@ const ReviewRow = memo(function ReviewRow({ review, index, page, limit, onReplyS
                 onError={() => setAvatarError(true)}
               />
             ) : (
-              <span className="text-xs font-bold text-[#00BFA5]">
+              <span>
                 {customerName.charAt(0).toUpperCase()}
               </span>
             )}
           </div>
           <div>
-            <p className="text-white/90 text-sm font-semibold group-hover:text-white transition-colors">
+            <p className="text-slate-900 text-sm font-bold group-hover:text-[#B9382B] transition-colors">
               {customerName}
             </p>
-            {customerEmail && <p className="text-white/30 text-xs">{customerEmail}</p>}
+            {customerEmail && <p className="text-stone-400 text-xs font-mono">{customerEmail}</p>}
           </div>
         </div>
       </td>
       <td className="p-4 min-w-48">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg overflow-hidden bg-[#0C0C16] border border-white/10 flex items-center justify-center shrink-0">
+          <div className="w-10 h-10 rounded-xl overflow-hidden bg-stone-100 border border-stone-200 flex items-center justify-center shrink-0">
             {productImage && !productImageError ? (
               <img
                 src={productImage}
@@ -113,26 +113,26 @@ const ReviewRow = memo(function ReviewRow({ review, index, page, limit, onReplyS
                 onError={() => setProductImageError(true)}
               />
             ) : (
-              <MessageSquareText size={16} className="text-white/30" />
+              <MessageSquareText size={16} className="text-stone-400" />
             )}
           </div>
-          <p className="text-white/80 text-sm font-medium truncate max-w-45" title={productName}>
+          <p className="text-slate-800 text-sm font-semibold truncate max-w-45" title={productName}>
             {productName}
           </p>
         </div>
       </td>
       <td className="p-4">
-        <div className="flex items-center gap-0.5 text-yellow-500">
+        <div className="flex items-center gap-0.5 text-amber-400">
           {Array.from({ length: 5 }).map((_, i) => (
             <Star
               key={i}
               size={14}
-              className={i < Number(review.rating) ? "fill-current" : "text-white/20"}
+              className={i < Number(review.rating) ? "fill-current" : "text-stone-200"}
             />
           ))}
         </div>
       </td>
-      <td className="p-4 text-white/70 text-sm max-w-xs">
+      <td className="p-4 text-slate-700 text-sm max-w-xs">
         <p className="line-clamp-3 leading-relaxed">{review.comment}</p>
         {Array.isArray(review.images) && review.images.length > 0 && (
           <div className="mt-2 flex flex-wrap gap-1.5">
@@ -142,24 +142,24 @@ const ReviewRow = memo(function ReviewRow({ review, index, page, limit, onReplyS
                 href={imgUrl}
                 target="_blank"
                 rel="noreferrer"
-                className="h-10 w-10 rounded-lg overflow-hidden border border-white/10 hover:border-[#00BFA5] transition shrink-0 block"
+                className="h-10 w-10 rounded-xl overflow-hidden border border-stone-200 hover:border-[#B9382B] transition shrink-0 block shadow-xs"
                 title="Buka foto resolusi penuh"
               >
-                <img src={imgUrl} alt={`Foto ulasan ${i + 1}`} className="h-full w-full object-cover hover:scale-110 transition duration-200" />
+                <img src={imgUrl} alt={`Foto ulasan ${i + 1}`} className="h-full w-full object-cover hover:scale-105 transition duration-200" />
               </a>
             ))}
           </div>
         )}
         {existingReply && (
-          <div className="mt-2 p-2.5 bg-[#00BFA5]/10 border border-[#00BFA5]/20 rounded-xl text-xs">
-            <span className="font-semibold text-[#00BFA5]">
+          <div className="mt-2 p-2.5 bg-stone-50 border border-stone-200 rounded-xl text-xs">
+            <span className="font-bold text-[#B9382B]">
               Admin {existingReply.admin_name || "RegarSport"}:
             </span>
-            <span className="text-white/80 ml-1">{existingReply.reply}</span>
+            <span className="text-slate-700 ml-1">{existingReply.reply}</span>
           </div>
         )}
       </td>
-      <td className="p-4 text-white/40 text-sm whitespace-nowrap">
+      <td className="p-4 text-stone-500 text-xs font-medium whitespace-nowrap">
         {reviewDate ? (
           new Date(reviewDate).toLocaleDateString("id-ID", {
             day: "2-digit",
@@ -173,14 +173,14 @@ const ReviewRow = memo(function ReviewRow({ review, index, page, limit, onReplyS
           <div className="flex items-center gap-1">
             <button
               onClick={() => setShowReplyForm(true)}
-              className="p-2 rounded-xl hover:bg-white/5 text-[#00BFA5]/70 hover:text-[#00BFA5] transition-all duration-200"
+              className="p-2 rounded-xl hover:bg-stone-100 text-stone-600 hover:text-[#B9382B] transition-colors cursor-pointer"
               title="Balas Ulasan"
             >
               <Reply size={18} />
             </button>
             <button
               onClick={handleDeleteReview}
-              className="p-2 rounded-xl hover:bg-red-500/10 text-red-400/60 hover:text-red-400 transition-all duration-200"
+              className="p-2 rounded-xl hover:bg-rose-50 text-stone-400 hover:text-rose-600 transition-colors cursor-pointer"
               title="Hapus Ulasan Ini"
             >
               <Trash2 size={17} />
@@ -192,27 +192,27 @@ const ReviewRow = memo(function ReviewRow({ review, index, page, limit, onReplyS
               value={replyText}
               onChange={(e) => setReplyText(e.target.value)}
               placeholder="Tulis balasan resmi toko..."
-              className="bg-[#0D0D0D] border border-white/10 rounded-xl p-2.5 text-sm text-white placeholder:text-white/30 outline-none focus:border-[#00BFA5]/60 transition-all resize-none"
+              className="bg-stone-50 border border-stone-200 rounded-xl p-2.5 text-xs text-slate-900 placeholder:text-stone-400 outline-hidden focus:bg-white focus:border-[#B9382B] transition-all resize-none font-medium leading-relaxed"
               rows={2}
             />
             <div className="flex flex-wrap gap-2">
               <button
                 onClick={handleSubmitReply}
                 disabled={submitting}
-                className="flex items-center gap-1.5 bg-[#00BFA5] hover:bg-[#00BFA5]/90 text-black font-bold px-3 py-1.5 rounded-lg text-xs transition disabled:opacity-50 active:scale-95"
+                className="flex items-center gap-1.5 bg-[#B9382B] hover:bg-[#9E2D22] text-white font-bold px-3 py-1.5 rounded-lg text-xs transition disabled:opacity-50 active:scale-95 shadow-xs cursor-pointer"
               >
                 <Send size={12} /> Kirim
               </button>
               <button
                 onClick={() => setShowReplyForm(false)}
-                className="bg-white/5 hover:bg-white/10 text-white/70 px-3 py-1.5 rounded-lg text-xs border border-white/10 transition"
+                className="bg-stone-100 hover:bg-stone-200 text-stone-700 font-semibold px-3 py-1.5 rounded-lg text-xs transition cursor-pointer"
               >
                 Batal
               </button>
               {existingReply && (
                 <button
                   onClick={handleDeleteReply}
-                  className="flex items-center gap-1.5 bg-red-500/10 hover:bg-red-500/20 text-red-400 px-3 py-1.5 rounded-lg text-xs border border-red-500/20 transition"
+                  className="flex items-center gap-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 font-semibold px-3 py-1.5 rounded-lg text-xs border border-rose-200 transition cursor-pointer"
                 >
                   <Trash2 size={12} /> Hapus Balasan
                 </button>
@@ -281,41 +281,50 @@ export default function Reviews() {
   const activeFilterLabel = ratingFilter ? `${ratingFilter} bintang` : "Semua rating";
 
   return (
-    <div className="min-h-screen bg-[#0D0D0D] pb-10">
+    <div className="space-y-8 pb-12">
       {/* ======================== HEADER ======================== */}
-      <div className="flex items-center gap-4 mb-10">
-        <div className="relative">
-          <div className="absolute inset-0 bg-[#00BFA5]/20 blur-xl rounded-2xl" />
-          <div className="relative bg-[#00BFA5]/10 border border-[#00BFA5]/30 p-3 rounded-2xl">
-            <MessageSquareText size={28} className="text-[#00BFA5]" />
-          </div>
-        </div>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-4xl font-black text-white tracking-[-1px]">REVIEWS</h1>
-          <p className="text-[#2a3a3a] text-sm">
-            Total <span className="text-white font-semibold">{total}</span> review · Rata‑rata{" "}
-            <span className="text-white font-semibold">{averageRating.toFixed(1)}</span>/5 ·{" "}
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-stone-100 border border-stone-200 text-stone-700 text-[10px] font-bold tracking-widest uppercase mb-2">
+            <MessageSquareText size={12} className="text-[#B9382B]" />
+            <span>RS // CUSTOMER FEEDBACK</span>
+          </div>
+          <h1 className="font-['Barlow_Condensed'] font-black uppercase tracking-tight text-3xl sm:text-4xl text-slate-900 leading-none">
+            ULASAN & RATING PRODUK
+          </h1>
+          <p className="text-stone-500 text-xs sm:text-sm mt-1">
+            Total <span className="text-slate-900 font-bold">{total}</span> ulasan · Rata‑rata{" "}
+            <span className="text-[#B9382B] font-bold">{averageRating.toFixed(1)}</span>/5 ·{" "}
             {activeFilterLabel}
           </p>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <div className="bg-white border border-stone-200/80 px-4 py-2 rounded-2xl shadow-xs text-right">
+            <p className="text-[10px] font-bold text-stone-400 uppercase tracking-widest">Kepuasan Pembeli</p>
+            <p className="font-['Barlow_Condensed'] font-black text-xl text-amber-500 leading-tight flex items-center justify-end gap-1">
+              ★ {averageRating.toFixed(1)} <span className="text-xs text-stone-400 font-normal">/ 5.0</span>
+            </p>
+          </div>
         </div>
       </div>
 
       {/* ======================== FILTER BAR ======================== */}
-      <div className="flex flex-col md:flex-row gap-3 mb-8">
+      <div className="flex flex-col md:flex-row gap-3">
         {/* Search */}
-        <div className="flex items-center gap-3 flex-1 bg-[#14141E] border border-white/5 rounded-2xl px-5 py-3 hover:border-[#00BFA5]/20 transition-all duration-300 group">
-          <Search size={20} className="text-white/30 group-hover:text-[#00BFA5]/60 transition-colors duration-300" />
+        <div className="flex items-center gap-3 flex-1 bg-white border border-stone-200/80 rounded-2xl px-4 py-3 shadow-xs focus-within:border-[#B9382B] focus-within:ring-1 focus-within:ring-[#B9382B] transition-all group">
+          <Search size={18} className="text-stone-400 group-focus-within:text-[#B9382B] transition-colors" />
           <input
             type="text"
-            placeholder="Cari isi komentar..."
+            placeholder="Cari kata kunci dalam ulasan pembeli..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="flex-1 bg-transparent text-white text-sm outline-none placeholder:text-white/30"
+            className="flex-1 bg-transparent text-slate-900 text-sm outline-hidden placeholder:text-stone-400"
           />
           {search && (
             <button
               onClick={() => setSearch("")}
-              className="p-1 rounded-lg hover:bg-white/5 text-white/30 hover:text-white/60 transition-all"
+              className="p-1 rounded-lg hover:bg-stone-100 text-stone-400 hover:text-stone-700 transition-all cursor-pointer"
             >
               <ChevronRight size={16} className="rotate-45" />
             </button>
@@ -323,45 +332,49 @@ export default function Reviews() {
         </div>
 
         {/* Rating Filter */}
-        <select
-          value={ratingFilter}
-          onChange={(e) => {
-            setPage(1);
-            setRatingFilter(e.target.value);
-          }}
-          className="bg-[#14141E] border border-white/5 rounded-2xl px-5 py-3 text-white text-sm outline-none hover:border-[#00BFA5]/20 focus:border-[#00BFA5]/40 transition-all duration-300 cursor-pointer appearance-none bg-no-repeat bg-position-[right_1rem_center] bg-size-[1rem]"
-          style={{
-            backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%2300BFA5' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`,
-          }}
-        >
-          <option value="">Semua Rating</option>
-          {[5, 4, 3, 2, 1].map((r) => (
-            <option key={r} value={r} className="bg-[#0D0D0D]">{r} Bintang</option>
-          ))}
-        </select>
+        <div className="relative">
+          <select
+            value={ratingFilter}
+            onChange={(e) => {
+              setPage(1);
+              setRatingFilter(e.target.value);
+            }}
+            className="bg-white border border-stone-200/80 rounded-2xl px-4 py-3 text-slate-800 text-sm font-semibold outline-hidden focus:border-[#B9382B] transition-all cursor-pointer shadow-xs pr-10 appearance-none"
+          >
+            <option value="">Semua Rating</option>
+            {[5, 4, 3, 2, 1].map((r) => (
+              <option key={r} value={r}>{r} Bintang</option>
+            ))}
+          </select>
+          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-stone-500">
+            <svg className="w-4 h-4 fill-current" viewBox="0 0 20 20">
+              <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
+            </svg>
+          </div>
+        </div>
       </div>
 
       {/* ======================== TABLE ======================== */}
       {loading ? (
-        <ScreenLoader label="Memuat review..." />
+        <ScreenLoader label="Memuat ulasan produk..." />
       ) : reviews.length === 0 ? (
         <EmptyState title="Belum ada review" description="Belum ada customer yang memberikan review produk." />
       ) : (
-        <div className="bg-[#14141E] border border-white/5 rounded-3xl overflow-hidden">
+        <div className="bg-white border border-stone-200/80 rounded-3xl overflow-hidden shadow-xs">
           <div className="overflow-x-auto">
             <table className="w-full min-w-225">
               <thead>
-                <tr className="border-b border-white/5 bg-white/2">
-                  <th className="p-4 text-left text-xs font-bold text-slate-400 uppercase tracking-widest">No</th>
-                  <th className="p-4 text-left text-xs font-bold text-slate-400 uppercase tracking-widest">Customer</th>
-                  <th className="p-4 text-left text-xs font-bold text-slate-400 uppercase tracking-widest">Produk</th>
-                  <th className="p-4 text-left text-xs font-bold text-slate-400 uppercase tracking-widest">Rating</th>
-                  <th className="p-4 text-left text-xs font-bold text-slate-400 uppercase tracking-widest">Komentar</th>
-                  <th className="p-4 text-left text-xs font-bold text-slate-400 uppercase tracking-widest">Tanggal</th>
-                  <th className="p-4 text-left text-xs font-bold text-slate-400 uppercase tracking-widest">Aksi</th>
+                <tr className="border-b border-stone-100 bg-stone-50/70">
+                  <th className="p-4 text-left text-[11px] font-bold text-stone-500 uppercase tracking-wider">No</th>
+                  <th className="p-4 text-left text-[11px] font-bold text-stone-500 uppercase tracking-wider">Customer</th>
+                  <th className="p-4 text-left text-[11px] font-bold text-stone-500 uppercase tracking-wider">Produk</th>
+                  <th className="p-4 text-left text-[11px] font-bold text-stone-500 uppercase tracking-wider">Rating</th>
+                  <th className="p-4 text-left text-[11px] font-bold text-stone-500 uppercase tracking-wider">Komentar</th>
+                  <th className="p-4 text-left text-[11px] font-bold text-stone-500 uppercase tracking-wider">Tanggal</th>
+                  <th className="p-4 text-left text-[11px] font-bold text-stone-500 uppercase tracking-wider">Aksi</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-white/5">
+              <tbody className="divide-y divide-stone-100">
                 {reviews.map((review, idx) => (
                   <ReviewRow
                     key={review.id}
@@ -380,25 +393,25 @@ export default function Reviews() {
 
       {/* ======================== PAGINATION ======================== */}
       {!loading && totalPages > 1 && (
-        <div className="flex items-center justify-center gap-4 mt-10">
+        <div className="flex items-center justify-center gap-3 mt-10">
           <button
             disabled={page === 1}
             onClick={() => setPage((p) => Math.max(p - 1, 1))}
-            className="flex items-center gap-2 px-5 py-3 bg-[#14141E] border border-white/5 hover:border-white/20 rounded-2xl text-white/60 disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-300 hover:text-white active:scale-95"
+            className="flex items-center gap-1.5 px-4 py-2.5 bg-white border border-stone-200/80 hover:bg-stone-50 rounded-xl text-stone-700 disabled:opacity-40 disabled:cursor-not-allowed transition font-bold text-xs shadow-xs cursor-pointer"
           >
-            <ChevronLeft size={18} />
+            <ChevronLeft size={16} />
             Sebelumnya
           </button>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5">
             {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
               <button
                 key={p}
                 onClick={() => setPage(p)}
-                className={`w-10 h-10 rounded-xl text-sm font-semibold transition-all duration-300 active:scale-90 ${
+                className={`w-9 h-9 rounded-xl text-xs font-bold transition cursor-pointer ${
                   p === page
-                    ? "bg-[#00BFA5] text-black shadow-[0_0_20px_rgba(0,191,165,0.3)]"
-                    : "bg-[#14141E] border border-white/5 text-white/50 hover:text-white hover:border-white/20"
+                    ? "bg-[#B9382B] text-white shadow-xs"
+                    : "bg-white border border-stone-200/80 text-stone-600 hover:bg-stone-50 hover:text-slate-900"
                 }`}
               >
                 {p}
@@ -409,22 +422,13 @@ export default function Reviews() {
           <button
             disabled={page === totalPages}
             onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
-            className="flex items-center gap-2 px-5 py-3 bg-[#14141E] border border-white/5 hover:border-white/20 rounded-2xl text-white/60 disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-300 hover:text-white active:scale-95"
+            className="flex items-center gap-1.5 px-4 py-2.5 bg-white border border-stone-200/80 hover:bg-stone-50 rounded-xl text-stone-700 disabled:opacity-40 disabled:cursor-not-allowed transition font-bold text-xs shadow-xs cursor-pointer"
           >
             Berikutnya
-            <ChevronRight size={18} />
+            <ChevronRight size={16} />
           </button>
         </div>
       )}
-
-      {/* Subtle background grid */}
-      <div
-        className="fixed inset-0 pointer-events-none opacity-[0.015] z-[-1]"
-        style={{
-          backgroundImage: `linear-gradient(#00BFA5 1px, transparent 1px), linear-gradient(90deg, #00BFA5 1px, transparent 1px)`,
-          backgroundSize: "80px 80px",
-        }}
-      />
     </div>
   );
 }
