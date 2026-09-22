@@ -1,6 +1,6 @@
 # 🏆 RegarStore — Enterprise Microservices E-Commerce & RMA Warranty Platform
 
-> **Platform E-Commerce & Manajemen Garansi (RMA) Skala Enterprise berbasis Arsitektur Microservices terdistribusi, dibangun menggunakan Java 21, Spring Boot 3, Spring Cloud Gateway, PostgreSQL (Database-per-Service), RabbitMQ Event-Driven, Redis Caching, Prometheus & Grafana Observability, serta React 19.**
+> **Platform E-Commerce Apparel Olahraga & Manajemen Garansi (RMA) Skala Enterprise berbasis Arsitektur Microservices Terdistribusi, dibangun menggunakan Java 21, Spring Boot 3, Spring Cloud Gateway, PostgreSQL (Database-per-Service), RabbitMQ Event-Driven, Redis Caching, Prometheus & Grafana Observability, serta React 19 dengan Desain Sistem Athletic Atelier.**
 
 ---
 
@@ -23,13 +23,14 @@
 
 ## 📌 Ringkasan Eksekutif Projek
 
-**RegarStore** adalah aplikasi e-commerce apparel dan jersey olahraga terdistribusi yang dirancang untuk menjawab tantangan industri nyata: **pemisahan domain layanan (*domain-driven design*)**, **keandalan transaksi tinggi (*high throughput & low latency*)**, **pemrosesan asinkron nir-hambatan (*non-blocking event-driven*)**, serta **siklus hidup purna jual transparan (*RMA - Return Merchandise Authorization & 3 Pilar Garansi 100%*)**.
+**RegarStore** adalah ekosistem aplikasi e-commerce apparel dan jersey olahraga terdistribusi yang dirancang untuk menjawab tantangan industri nyata: **pemisahan domain layanan (*Domain-Driven Design*)**, **keandalan transaksi tinggi (*high throughput & low latency*)**, **pemrosesan asinkron nir-hambatan (*event-driven messaging*)**, serta **layanan purna jual transparan (*RMA - Return Merchandise Authorization & Komitmen Garansi Tukar Ukuran 100%*)**.
 
 Seluruh arsitektur backend dibangun dengan standar rekayasa perangkat lunak modern:
-- **Zero Tight-Coupling**: Tidak ada SQL `JOIN` antar-database layanan.
-- **Microservices Independen**: Setiap domain memiliki skema database mandiri (*Database-per-Service*).
-- **Asynchronous Reliability**: Transaksi pembayaran dan notifikasi dikomunikasikan melalui message broker RabbitMQ dengan mekanisme *auto-retry*.
-- **Full Observability**: Monitoring real-time metrik JVM (Memory heap, GC pause, live threads) dan indikator bisnis via Prometheus dan Grafana.
+- **Zero Tight-Coupling**: Tidak ada SQL `JOIN` lintas-database antar-layanan.
+- **Database-per-Service**: Setiap domain memiliki skema database PostgreSQL mandiri (`auth`, `catalog`, `order`, `payment`).
+- **Asynchronous Reliability**: Transaksi checkout, status pembayaran, dan email notifikasi dikomunikasikan secara asinkron via message broker RabbitMQ dengan *dead-letter* & *auto-retry*.
+- **Full Observability**: Monitoring langsung metrik JVM (Memory heap G1GC, garbage collection pause, thread pool) dan indikator bisnis via Prometheus dan Grafana.
+- **Athletic Atelier Design System**: Antarmuka responsif bernuansa olahraga profesional dengan perpaduan warna *Warm Sand* (`#FAF8F4`), *Tactical Forest* (`#162018`), corak kontur topografi, dan aksen *Terracotta* (`#B9382B`).
 
 ---
 
@@ -42,23 +43,24 @@ flowchart TB
     Client["🌐 Client Apps: Web / Mobile (React 19 + Tailwind CSS)"]
     
     subgraph EdgeLayer["Edge & Security Layer"]
-        Gateway["🚪 API Gateway (Spring Cloud Gateway :8080)\n• JWT AuthenticationFilter\n• Global CORS & Rate Limiting\n• Swagger Aggregator"]
+        Gateway["🚪 API Gateway (Spring Cloud Gateway :8080)\n• JWT AuthenticationFilter\n• Global CORS & Rate Limiting\n• Swagger OpenAPI Aggregator"]
     end
 
     Client -->|HTTP REST Requests| Gateway
 
     subgraph CoreServices["Microservices Ecosystem (Java 21 + Spring Boot 3)"]
-        AuthSvc["🔐 Auth Service (:8086)\n• Spring Security 6\n• Stateless JWT & RBAC"]
-        CatSvc["📦 Catalog Service (:8087)\n• Redis Cache-Aside\n• Cloudinary CDN Upload"]
-        OrdSvc["🛒 Order Service (:8088)\n• Cart & Checkout Engine\n• 3 Pilar Garansi & RMA"]
-        PaySvc["💳 Payment Service (:8089)\n• Midtrans Snap Gateway\n• Webhook Idempotency"]
-        NotifSvc["📬 Notification Service (:8090)\n• Async Mail Worker\n• Mailpit / SMTP"]
+        AuthSvc["🔐 Auth Service (:8086)\n• Spring Security 6\n• Stateless JWT & Multi-Role RBAC"]
+        CatSvc["📦 Catalog Service (:8087)\n• Redis Cache-Aside\n• Cloudinary Media Upload"]
+        OrdSvc["🛒 Order Service (:8088)\n• Cart & Checkout Engine\n• 3 Pilar Garansi & RMA Tracking"]
+        PaySvc["💳 Payment Service (:8089)\n• Midtrans Snap Gateway\n• Webhook Idempotency Guard"]
+        NotifSvc["📬 Notification Service (:8090)\n• Async Mail Worker\n• Mailpit / SMTP Server"]
     end
 
     Gateway --> AuthSvc
     Gateway --> CatSvc
     Gateway --> OrdSvc
     Gateway --> PaySvc
+    Gateway --> NotifSvc
 
     subgraph DataLayer["Database-per-Service (PostgreSQL 16)"]
         DB_Auth[(regarsport_auth)]
@@ -111,22 +113,22 @@ sequenceDiagram
     participant NS as Notification Service
 
     C->>GW: Checkout Keranjang (POST /api/v1/orders/checkout)
-    GW->>OS: Forward dengan X-User-Id
+    GW->>OS: Forward Request dengan X-User-Id
     OS->>OS: Validasi Stok & Buat Order (Status: PENDING)
     OS->>MQ: Publish OrderCreatedEvent
-    OS-->>C: Order Dibuat (No. Order: REGAR-...)
+    OS-->>C: Order Terbuat (Nomor Order: REGAR-...)
     
     MQ->>PS: Consume OrderCreatedEvent
     PS->>MT: Request Snap Token (Midtrans API)
     MT-->>PS: Snap Token & Redirect URL
     
-    C->>MT: Bayar Tagihan (QRIS / VA / Kartu Kredit)
+    C->>MT: Bayar Tagihan (QRIS / Virtual Account / Kartu Kredit)
     MT->>PS: Webhook HTTP Notification (settlement)
-    PS->>PS: Validasi Signature & Idempotency Key
+    PS->>PS: Validasi Signature & Composite Idempotency Key
     PS->>MQ: Publish PaymentStatusUpdatedEvent (PAID)
     
     MQ->>OS: Update Status Order -> PAID (Siap Dikemas)
-    MQ->>NS: Kirim Email Invoice ke Pelanggan (Async)
+    MQ->>NS: Kirim Email Invoice ke Pelanggan (Async Worker)
 ```
 
 ---
@@ -137,7 +139,7 @@ sequenceDiagram
 stateDiagram-v2
     [*] --> PENDING: 1. Pelanggan Mengajukan Klaim (#CLM-...)
     
-    state "Review oleh Admin / CS" as CSReview {
+    state "Peninjauan oleh Admin / CS" as CSReview {
         PENDING --> APPROVED: CS Setujui Bukti Foto & Ukuran Baru
         PENDING --> REJECTED: CS Tolak (Alasan Resmi Tercatat)
     }
@@ -171,63 +173,70 @@ spring:
     virtual:
       enabled: true
 ```
-Memberikan efisiensi memori tinggi saat menangani lonjakan ribuan koneksi I/O pemesanan secara bersamaan tanpa kehabisan *OS thread pool*.
+Memberikan efisiensi memori tinggi saat menangani ribuan koneksi I/O pemesanan secara simultan tanpa risiko kehabisan *OS thread pool*.
 
 ### 3. Observability Penuh dengan Prometheus & Grafana
 - Microservices mengekspos metrik sistem via **Spring Boot Actuator** di `/actuator/prometheus`.
 - **Prometheus** melakukan scraping berkala terhadap CPU, JVM memory pools (Eden, Survivor, Old Gen), garbage collection pause time, dan throughput HTTP.
-- **Grafana** dikonfigurasi dengan *automated provisioning* (`datasources.yml` & `regarstore-overview.json`) untuk visualisasi instan metrik performa dan bisnis (volume transaksi & klaim garansi).
+- **Grafana** dikonfigurasi dengan *automated provisioning* (`datasources.yml` & `regarstore-overview.json`) untuk visualisasi instan metrik performa teknis dan indikator bisnis.
 
 ### 4. Perlindungan Idempotensi Webhook (*Strict Idempotency*)
-Untuk mencegah pengiriman ganda saldo atau duplikasi status akibat *retry* dari payment gateway Midtrans, sistem menerapkan kunci idempotensi komposit:
+Untuk mencegah eksekusi ganda atau duplikasi status akibat *retry* dari payment gateway Midtrans, sistem menerapkan kunci idempotensi komposit:
 ```java
 String idempotencyKey = orderNumber + "_" + transactionStatus;
 ```
-Transaksi yang sudah diproses tidak akan pernah diproses ulang (*idempotent execution*).
+Webhook yang sudah diproses tidak akan pernah dieksekusi ulang (*guaranteed idempotent execution*).
 
 ### 5. Multi-Role RBAC (Role-Based Access Control)
-- **Pelanggan (`ROLE_CUSTOMER`)**: Eksplorasi katalog, checkout, pelacakan pesanan, pengajuan klaim garansi 7 hari, submit review.
-- **Admin / CS (`ROLE_ADMIN`)**: Analisis omset/keuangan, manajemen katalog & promo voucher, persetujuan klaim tiket `#CLM-...`.
-- **Gudang / Logistik (`ROLE_LOGISTICS`)**: Antrean packing lunas (`PAID`), cetak label thermal A6, input nomor resi pengiriman utama & resi produk pengganti retur.
+- **Pelanggan (`ROLE_CUSTOMER`)**: Eksplorasi katalog, kustom sablon nama/nomor punggung, checkout Midtrans, pelacakan ekspedisi real-time, cetak invoice PDF, pengajuan klaim garansi 7 hari, dan submit review produk.
+- **Admin / CS (`ROLE_ADMIN`)**: Analisis omset penjualan Recharts, widget telemetri efisiensi fulfillment, manajemen produk & voucher promosi, moderasi ulasan, dan persetujuan klaim tiket `#CLM-...`.
+- **Gudang / Logistik (`ROLE_LOGISTICS`)**: Antrean packing lunas (`PAID`), cetak label thermal A6 berstandar ekspedisi (100x150 mm), pencatatan nomor resi kurir, dan pengiriman produk pengganti retur.
 
 ---
 
 ## 📸 Bukti Nyata Implementasi (Live Screenshots)
 
-Berikut adalah bukti dokumentasi visual langsung dari sistem yang telah aktif berjalan:
+Berikut adalah dokumentasi visual langsung dari antarmuka sistem yang beroperasi:
 
-### 1. Monitoring Server & JVM di Grafana Dashboard
-> Visualisasi real-time performa sistem, memori heap JVM G1GC, penggunaan CPU, metrik klaim garansi, dan aktivitas thread.
+### 1. Storefront Utama Pelanggan (Athletic Atelier Experience)
+> Etalase belanja modern bernuansa *Athletic Atelier* dengan hero banner dinamis, navigasi kategori olahraga, kartu promosi kupon voucher, dan integrasi konsultasi kustomisasi jersey.
+
+![Storefront Homepage](docs/images/storefront-homepage.png)
+
+---
+
+### 2. Executive Command Center: Analisis Omzet & Telemetri Fulfillment
+> Dashboard eksekutif admin yang menyajikan grafik tren pertumbuhan omzet riil berbasis Recharts, dipadukan dengan widget telemetri efisiensi fulfillment presisi yang memantau konversi pesanan toko secara langsung.
+
+![Admin Analytics Dashboard](docs/images/admin-analytics-dashboard.png)
+
+---
+
+### 3. Manajemen Inventaris & Workshop Apparel Olahraga
+> Tata kelola katalog produk komprehensif dengan kartu formulir *Tactical Forest* bercorak topografi, chip ketersediaan stok per ukuran (S, M, L, XL, XXL), penetapan harga tier, serta upload foto produk ke CDN Cloudinary.
+
+![Admin Products Catalog](docs/images/admin-products-catalog.png)
+
+---
+
+### 4. Order Command Center & Ekspedisi Pengiriman Logistik
+> Pusat kendali operasional pesanan pelanggan dengan tab filter status terstruktur, sinkronisasi transaksi Midtrans, integrasi kurir ekspedisi (J&T Express, SiCepat), pencetakan resi thermal A6, dan ekspor data CSV.
+
+![Admin Orders Dispatch](docs/images/admin-orders-dispatch.png)
+
+---
+
+### 5. Portal Pelacakan Pesanan & Resi Pengiriman Pelanggan Real-time
+> Pengalaman transparansi pesanan bagi pembeli: stepper progres 5 tahap interaktif, widget nomor resi ekspedisi yang dapat disalin, tautan pelacakan langsung ke portal kurir, serta unduh invoice resmi berformat PDF.
+
+![Customer Order Tracking](docs/images/customer-order-tracking.png)
+
+---
+
+### 6. Observability Terdistribusi & Monitoring JVM di Grafana Dashboard
+> Visualisasi real-time performa sistem backend, pemanfaatan memori heap JVM G1GC (Eden, Survivor, Old Gen), penggunaan CPU server, latensi HTTP, serta metrik volume transaksi bisnis.
 
 ![Grafana JVM & Business Dashboard](docs/images/grafana-dashboard.png)
-
----
-
-### 2. Panel Admin: Manajemen Klaim Garansi & Retur
-> Pusat kendali CS/Admin dalam memverifikasi pengajuan kendala pembeli dengan kartu KPI, filter status, dan tabel tiket terpadu.
-
-![Admin Warranty Claims Management](docs/images/admin-warranty-dashboard.png)
-
----
-
-### 3. Modal Tinjau Klaim CS: Validasi Bukti Foto Cloudinary
-> CS dapat memeriksa foto bukti dari CDN, membaca keluhan ukuran pembeli, serta memberikan catatan persetujuan atau penolakan resmi.
-
-![CS Claim Verification Modal](docs/images/admin-claim-verification.png)
-
----
-
-### 4. Operasional Gudang: Input Resi Produk Pengganti
-> Tim logistik memproses pengiriman produk pengganti, memilih ekspedisi kurir, dan mencatat nomor resi baru.
-
-![Warehouse Replacement Fulfillment](docs/images/warehouse-replacement-dispatch.png)
-
----
-
-### 5. Portal Pelanggan: Transparansi Garansi & Resi Pengganti Real-time
-> Pelanggan dapat memantau countdown garansi 7 hari, status tiket, catatan CS/Gudang, dan menyalin nomor resi pengganti secara langsung.
-
-![Customer Order Warranty & Tracking](docs/images/customer-order-warranty.png)
 
 ---
 
@@ -238,22 +247,23 @@ RegarStore/
 ├── backend/
 │   ├── pom.xml                                   # Master Parent POM (Spring Boot 3.3.4, Java 21)
 │   ├── common-dto/                               # Shared DTOs, Event Models & ApiResponse Wrapper
-│   ├── api-gateway/            (Port 8080)       # Spring Cloud Gateway & Edge JWT Filter
-│   ├── auth-service/           (Port 8086)       # Spring Security 6, JWT & Manajemen Akun
-│   ├── catalog-service/        (Port 8087)       # Produk, Kategori, Redis Cache & Upload CDN
-│   ├── order-service/          (Port 8088)       # Checkout, Keranjang, Kupon, RMA & Garansi
+│   ├── api-gateway/            (Port 8080)       # Spring Cloud Gateway & Edge JWT AuthenticationFilter
+│   ├── auth-service/           (Port 8086)       # Spring Security 6, JWT & Manajemen Akun Multi-Role
+│   ├── catalog-service/        (Port 8087)       # Produk, Kategori, Redis Cache-Aside & Cloudinary CDN
+│   ├── order-service/          (Port 8088)       # Checkout, Keranjang, Kupon Diskon, RMA & Garansi
 │   ├── payment-service/        (Port 8089)       # Midtrans Snap, Webhook Idempotency & Events
-│   └── notification-service/   (Port 8090)       # Consumer Email Asinkron & Mailpit
+│   └── notification-service/   (Port 8090)       # Consumer Email Asinkron RabbitMQ & Mailpit
 ├── docker/
 │   ├── docker-compose.yml                        # Stack Infrastruktur (Postgres, Redis, RabbitMQ, Mailpit, Prometheus, Grafana)
 │   └── grafana/
-│       └── provisioning/                         # Auto-provisioning Datasource & Dashboard
+│       └── provisioning/                         # Auto-provisioning Datasource & Dashboard Grafana
 ├── docs/
-│   └── images/                                   # Dokumentasi visual & screenshot sistem
+│   ├── DEPLOYMENT_GUIDE.md                       # Panduan Deployment Produksi (Railway & Cloud)
+│   └── images/                                   # Dokumentasi visual screenshot sistem
 ├── FE/
 │   └── regarsport-frontend/    (Port 5173)       # React 19 + TypeScript + Tailwind CSS (Vite)
 ├── run-backend.bat                               # Script otomatisasi startup microservices (lean JVM)
-└── stop-backend.bat                              # Script graceful shutdown port
+└── stop-backend.bat                              # Script graceful shutdown port backend
 ```
 
 ---
@@ -285,7 +295,21 @@ Total Pengujian Otomatis                                             56 Passed (
 
 ---
 
-## ⚡ Panduan Menjalankan Sistem (Local Setup)
+## 🚀 Panduan Deployment Produksi (Railway & Cloud)
+
+Panduan deployment lengkap dan terstruktur ke penyedia cloud seperti **Railway**, Render, atau VPS mandiri telah disediakan secara terperinci di:
+
+👉 **[Buka Panduan Deployment Produksi (docs/DEPLOYMENT_GUIDE.md)](docs/DEPLOYMENT_GUIDE.md)**
+
+Panduan tersebut mencakup:
+1. Konfigurasi 1-klik Database PostgreSQL, Redis, dan RabbitMQ di Railway.
+2. Pengaturan variabel lingkungan bersama (*Shared Environment Variables*) untuk Microservices.
+3. Skrip build dan start command hemat memori (`-XX:MaxRAMPercentage=75.0`).
+4. Deployment frontend React Vite ke Vercel / Railway Static Site.
+
+---
+
+## ⚡ Panduan Menjalankan Sistem Secara Lokal (Local Setup)
 
 ### 1. Prasyarat Sistem
 - **Java 21 LTS** (JDK 21)
@@ -306,7 +330,7 @@ Layanan yang aktif:
 - **Prometheus**: `http://localhost:9090`
 - **Grafana**: `http://localhost:3000` (Kredensial: `admin` / `admin`)
 
-### 3. Jalankan Seluruh Microservices
+### 3. Jalankan Seluruh Microservices Backend
 Gunakan script otomatis yang telah disiapkan (sudah dioptimalkan dengan flag alokasi memori hemat JVM):
 ```cmd
 run-backend.bat
@@ -330,7 +354,7 @@ npm run dev
 Buka browser di: **`http://localhost:5173`**
 
 ### 5. Akses Dokumentasi API (OpenAPI / Swagger)
-Buka dokumentasi interaktif seluruh endpoint microservices melalui API Gateway:
+Buka dokumentasi interaktif seluruh endpoint microservices terpusat melalui API Gateway:
 ```
 http://localhost:8080/swagger-ui.html
 ```
@@ -340,7 +364,7 @@ http://localhost:8080/swagger-ui.html
 ## 👤 Profil Pengembang (Author)
 
 **Abu Dujanah Siregar**
-- **Keahlian Utama**: Java Enterprise, Spring Boot, Microservices Architecture, Event-Driven Systems, Distributed Databases.
+- **Keahlian Utama**: Java Enterprise, Spring Boot, Microservices Architecture, Event-Driven Systems, Distributed Databases, React Frontend.
 - **LinkedIn / Portofolio**: [linkedin.com/in/abudujanahsiregar](https://linkedin.com)
 - **Email**: abudujanahsiregar@gmail.com
 - **GitHub**: [@DujanahSr](https://github.com/DujanahSr)
