@@ -65,3 +65,4 @@ uploads/*
 !uploads/.gitkeep
 temp_*
 scratch/
+tools/
